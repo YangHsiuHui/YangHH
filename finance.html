@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收錢糧收稅徵兵</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>收錢糧收稅徵兵</h1>
+        <button onclick="collectTax()">收稅</button>
+        <button onclick="collectGrain()">收糧</button>
+        <button onclick="recruitSoldiers()">徵兵</button>
+        <div id="financeResult"></div>
+        <br>
+        <a href="index.html">返回主頁</a>
+    </div>
+
+    <script>
+        function collectTax() {
+            document.getElementById('financeResult').innerText = "稅收已收取";
+        }
+
+        function collectGrain() {
+            document.getElementById('financeResult').innerText = "糧食已收取";
+        }
+
+        function recruitSoldiers() {
+            document.getElementById('financeResult').innerText = "士兵已徵募";
+        }
+    </script>
+</body>
+</html>
