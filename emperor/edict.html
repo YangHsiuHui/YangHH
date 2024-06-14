@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>批改折章</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>批改折章</h1>
+        <textarea id="edictContent" rows="10" cols="50" placeholder="請輸入折章內容..."></textarea><br>
+        <button onclick="approveEdict()">批改</button>
+        <div id="result"></div>
+        <br>
+        <a href="index.html">返回主頁</a>
+    </div>
+
+    <script>
+        function approveEdict() {
+            let content = document.getElementById('edictContent').value;
+            if (content.trim() === "") {
+                alert("請輸入折章內容！");
+                return;
+            }
+            document.getElementById('result').innerText = "折章已批改: " + content;
+        }
+    </script>
+</body>
+</html>
