@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>踩地雷遊戲</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        #minesweeper {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            grid-template-rows: repeat(10, 30px);
+            gap: 2px;
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            background-color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .cell.revealed {
+            background-color: #eee;
+            cursor: default;
+        }
+
+        .cell.mine {
+            background-color: red;
+        }
+
+        .cell.flag {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <div id="minesweeper"></div>
+    <script>
+        const rows = 10;
+        const cols = 10;
+        const minesCount = 20;
+        const grid = [];
+        const minesweeper = document.getElementById("minesweeper");
+
+        function createGrid() {
+            for (let row = 0; row < rows; row++) {
+                const rowArray = [];
+                for (let col = 0; col < cols; col++) {
+                    const cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.dataset.mine = false;
+                    cell.dataset.revealed = false;
+                    cell.dataset.flagged = false;
+                    cell.addEventListener("click", revealCell);
+                    cell.addEventListener("contextmenu", flagCell);
+                    rowArray.push(cell);
+                    minesweeper.appendChild(cell);
+                }
+                grid.push(rowArray);
+            }
+        }
+
+        function placeMines() {
+            let placedMines = 0;
+            while (placedMines < minesCount) {
+                const row = Math.floor(Math.random() * rows);
+                const col = Math.floor(Math.random() * cols);
+                const cell = grid[row][col];
+                if (cell.dataset.mine === "false") {
+                    cell.dataset.mine = "true";
+                    placedMines++;
+                }
+            }
+        }
+
+        function revealCell(event) {
+            const cell = event.target;
+            if (cell.dataset.revealed === "true" || cell.dataset.flagged === "true") return;
+
+            cell.dataset.revealed = "true";
+            cell.classList.add("revealed");
+
+            if (cell.dataset.mine === "true") {
+                cell.classList.add("mine");
+                alert("遊戲結束！");
+                revealAllMines();
+                return;
+            }
+
+            const minesAround = countMinesAround(cell.dataset.row, cell.dataset.col);
+            if (minesAround > 0) {
+                cell.textContent = minesAround;
+            } else {
+                revealAdjacentCells(cell.dataset.row, cell.dataset.col);
+            }
+
+            checkWin();
+        }
+
+        function revealAdjacentCells(row, col) {
+            row = parseInt(row);
+            col = parseInt(col);
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    const newRow = row + i;
+                    const newCol = col + j;
+                    if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+                        const adjacentCell = grid[newRow][newCol];
+                        if (adjacentCell.dataset.revealed === "false") {
+                            revealCell({ target: adjacentCell });
+                        }
+                    }
+                }
+            }
+        }
+
+        function countMinesAround(row, col) {
+            row = parseInt(row);
+            col = parseInt(col);
+            let count = 0;
+
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    const newRow = row + i;
+                    const newCol = col + j;
+                    if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+                        if (grid[newRow][newCol].dataset.mine === "true") {
+                            count++;
+                        }
+                    }
+                }
+            }
+
+            return count;
+        }
+
+        function revealAllMines() {
+            grid.forEach(row => {
+                row.forEach(cell => {
+                    if (cell.dataset.mine === "true") {
+                        cell.classList.add("mine");
+                        cell.classList.add("revealed");
+                    }
+                });
+            });
+        }
+
+        function flagCell(event) {
+            event.preventDefault();
+            const cell = event.target;
+            if (cell.dataset.revealed === "true") return;
+
+            if (cell.dataset.flagged === "false") {
+                cell.dataset.flagged = "true";
+                cell.classList.add("flag");
+            } else {
+                cell.dataset.flagged = "false";
+                cell.classList.remove("flag");
+            }
+        }
+
+        function checkWin() {
+            let unrevealedCells = 0;
+            grid.forEach(row => {
+                row.forEach(cell => {
+                    if (cell.dataset.revealed === "false" && cell.dataset.mine === "false") {
+                        unrevealedCells++;
+                    }
+                });
+            });
+
+            if (unrevealedCells === 0) {
+                alert("你贏了！");
+                revealAllMines();
+            }
+        }
+
+        createGrid();
+        placeMines();
+    </script>
+</body>
+</html>
