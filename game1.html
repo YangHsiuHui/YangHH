@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>貪食蛇遊戲</title>
-    <link rel="stylesheet" href="style2.css">
     <style>
         body {
             display: flex;
@@ -16,6 +15,14 @@
             font-family: Arial, sans-serif;
         }
 
+        #game {
+            margin: 50px auto;
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
         canvas {
             background-color: #000;
             display: block;
@@ -34,6 +41,7 @@
     <canvas id="gameCanvas" width="400" height="400"></canvas>
     <div id="game-over">遊戲結束</div>
     </div>
+    <br>
     <a href="index.html">返回主頁</a>
     <script>
         const canvas = document.getElementById("gameCanvas");
