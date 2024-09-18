@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>開心商店</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+        }
+        .store {
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: grey;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>歡迎來到開心商店</h1>
+    <div class="store">
+        <h2>我的金額: <span id="balance">100</span> 元</h2>
+        <div class="item">
+            <span>商品 1: 10 元</span>
+            <button onclick="buyItem(1, 10)">購買</button>
+        </div>
+        <div class="item">
+            <span>商品 2: 30 元</span>
+            <button onclick="buyItem(2, 30)">購買</button>
+        </div>
+        <div class="item">
+            <span>商品 3: 50 元</span>
+            <button onclick="buyItem(3, 50)">購買</button>
+        </div>
+    </div>
+
+    <script>
+        let balance = 100;
+
+        function buyItem(itemNumber, price) {
+            if (balance >= price) {
+                balance -= price;
+                document.getElementById('balance').textContent = balance;
+                alert('你成功購買了商品 ' + itemNumber);
+            } else {
+                alert('餘額不足！');
+            }
+        }
+    </script>
+
+</body>
+</html>
