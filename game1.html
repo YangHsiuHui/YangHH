@@ -7,6 +7,7 @@
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -21,18 +22,26 @@
         }
 
         #game-over {
-            position: absolute;
+            position: relative;
             color: red;
             font-size: 36px;
+            margin-bottom: 20px; /* 調整遊戲結束文字與返回主頁連結的間距 */
             display: none;
         }
+
         .spacer {
             height: 20px; /* 調整空白行的高度 */
         }
 
         .centered-link {
-            text-align: center; /* 置中 */
+            text-align: center;
             margin-top: 20px; /* 上方間距 */
+        }
+
+        a {
+            text-decoration: none;
+            color: blue;
+            font-size: 18px;
         }
     </style>
 </head>
