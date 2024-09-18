@@ -58,14 +58,21 @@
         .spacer {
             height: 20px; /* 調整空白行的高度 */
         }
+
+        .centered-link {
+            text-align: center; /* 置中 */
+            margin-top: 20px; /* 上方間距 */
+        }
     </style>
 </head>
 <body>
     <div id="st2">
     <div id="minesweeper"></div>
     </div>
-    <div class="spacer"></div> <!-- 增加一個空白行 -->
-    <a href="index.html">返回主頁</a>
+    <div class="spacer"></div> <!-- 空白行 -->
+    <div class="centered-link">
+        <a href="index.html">返回主頁</a>
+    </div>
     <script>
         const rows = 10;
         const cols = 10;
