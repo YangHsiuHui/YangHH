@@ -34,10 +34,15 @@
             font-size: 36px;
             display: none;
         }
-        #space {
-            position: absolute;
-            font-size: 36px;
+        .spacer {
+            height: 20px; /* 調整空白行的高度 */
         }
+
+        .centered-link {
+            text-align: center; /* 置中 */
+            margin-top: 20px; /* 上方間距 */
+        }
+
     </style>
 </head>
 <body>
@@ -45,8 +50,10 @@
     <canvas id="gameCanvas" width="400" height="400"></canvas>
     <div id="game-over">遊戲結束</div>
     </div>
-    <div id="space">
-    <a href="index.html">返回主頁</a>
+    <div class="spacer"></div> <!-- 空白行 -->
+    <div class="centered-link">
+        <a href="index.html">返回主頁</a>
+    </div>
     </div>
     <script>
         const canvas = document.getElementById("gameCanvas");
