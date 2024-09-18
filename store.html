@@ -32,6 +32,14 @@
         button:disabled {
             background-color: grey;
         }
+        .spacer {
+            height: 20px; /* 調整空白行的高度 */
+        }
+
+        .centered-link {
+            text-align: center; /* 置中 */
+            margin-top: 20px; /* 上方間距 */
+        }
     </style>
 </head>
 <body>
@@ -52,7 +60,10 @@
             <button onclick="buyItem(3, 50)">購買</button>
         </div>
     </div>
-
+    <div class="spacer"></div> <!-- 空白行 -->
+    <div class="centered-link">
+        <a href="index.html">返回主頁</a>
+    </div>
     <script>
         let balance = 100;
 
