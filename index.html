@@ -1,26 +1,300 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理系統</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>四大主題管理系統</title>
+  <style>
+    /* 基本版型 */
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "微軟正黑體", Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      padding: 20px 0;
+      background-color: #dbe9f4;
+      margin: 0 0 30px 0;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto 50px auto;
+      padding: 0 20px;
+    }
+
+    /* 四大主題區塊 */
+    .section {
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      padding: 20px 30px;
+      margin-bottom: 40px;
+      opacity: 1; /* 不透明 */
+    }
+
+    .section h2 {
+      margin-top: 0;
+      border-bottom: 2px solid #5a9bd5;
+      padding-bottom: 8px;
+      color: #2a5d9f;
+    }
+
+    /* 範本資料表格 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    table thead {
+      background-color: #5a9bd5;
+      color: white;
+    }
+    table th, table td {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+      font-size: 14px;
+    }
+    table tbody tr:nth-child(even) {
+      background-color: #f0f5fb;
+    }
+
+    /* 新增資料表單 */
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    form label {
+      flex: 1 1 150px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #444;
+    }
+    form input, form select {
+      flex: 2 1 250px;
+      padding: 6px 10px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      font-size: 14px;
+      outline-color: #5a9bd5;
+    }
+    form button {
+      background-color: #5a9bd5;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+    form button:hover {
+      background-color: #4376b5;
+    }
+
+    /* 響應式 */
+    @media (max-width: 768px) {
+      form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      form label, form input, form select, form button {
+        flex: 1 1 100%;
+      }
+      table th, table td {
+        font-size: 12px;
+        padding: 8px 6px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>管理系統</h1>
-        <nav>
-            <ul>
-                <li><a href="index2.html">皇帝上朝庭</a></li>
-                <li><a href="edict.html">批改折章</a></li>
-                <li><a href="finance.html">收錢糧收稅徵兵</a></li>
-                <li><a href="inner_palace.html">內宮管理</a></li>
-                <li><a href="gov.html">政府管理系統</a></li>
-                <li><a href="game1.html">小遊戲1</a></li>
-                <li><a href="game2.html">小遊戲2</a></li>
-                <li><a href="store.html">開心商店</a></li>
-            </ul>
-        </nav>
-    </div>
+  <h1>四大主題管理系統</h1>
+
+  <div class="container">
+
+    <!-- 人員管理 -->
+    <section class="section" id="personnel-management">
+      <h2>人員管理</h2>
+      <table>
+        <thead>
+          <tr><th>員工編號</th><th>姓名</th><th>職稱</th><th>部門</th></tr>
+        </thead>
+        <tbody id="personnel-table-body">
+          <tr><td>001</td><td>張三</td><td>經理</td><td>業務部</td></tr>
+          <tr><td>002</td><td>李四</td><td>工程師</td><td>技術部</td></tr>
+          <tr><td>003</td><td>王五</td><td>會計</td><td>財務部</td></tr>
+        </tbody>
+      </table>
+
+      <form id="personnel-form">
+        <label for="empId">員工編號</label>
+        <input type="text" id="empId" name="empId" required />
+        <label for="empName">姓名</label>
+        <input type="text" id="empName" name="empName" required />
+        <label for="empTitle">職稱</label>
+        <input type="text" id="empTitle" name="empTitle" required />
+        <label for="empDept">部門</label>
+        <input type="text" id="empDept" name="empDept" required />
+        <button type="submit">新增人員</button>
+      </form>
+    </section>
+
+    <!-- 經濟倉儲 -->
+    <section class="section" id="economic-storage">
+      <h2>經濟倉儲</h2>
+      <table>
+        <thead>
+          <tr><th>商品編號</th><th>商品名稱</th><th>數量</th><th>價格 (NT$)</th></tr>
+        </thead>
+        <tbody id="storage-table-body">
+          <tr><td>P1001</td><td>稻米</td><td>500</td><td>20</td></tr>
+          <tr><td>P1002</td><td>玉米</td><td>300</td><td>15</td></tr>
+          <tr><td>P1003</td><td>豬肉</td><td>200</td><td>120</td></tr>
+        </tbody>
+      </table>
+
+      <form id="storage-form">
+        <label for="prodId">商品編號</label>
+        <input type="text" id="prodId" name="prodId" required />
+        <label for="prodName">商品名稱</label>
+        <input type="text" id="prodName" name="prodName" required />
+        <label for="prodQty">數量</label>
+        <input type="number" id="prodQty" name="prodQty" min="0" required />
+        <label for="prodPrice">價格 (NT$)</label>
+        <input type="number" id="prodPrice" name="prodPrice" min="0" step="0.01" required />
+        <button type="submit">新增商品</button>
+      </form>
+    </section>
+
+    <!-- 政府管理 -->
+    <section class="section" id="government-management">
+      <h2>政府管理</h2>
+      <table>
+        <thead>
+          <tr><th>部門代碼</th><th>部門名稱</th><th>主管</th><th>聯絡電話</th></tr>
+        </thead>
+        <tbody id="gov-table-body">
+          <tr><td>G001</td><td>財政部</td><td>陳大文</td><td>02-12345678</td></tr>
+          <tr><td>G002</td><td>教育部</td><td>林小華</td><td>02-87654321</td></tr>
+          <tr><td>G003</td><td>內政部</td><td>黃志明</td><td>02-11223344</td></tr>
+        </tbody>
+      </table>
+
+      <form id="gov-form">
+        <label for="deptCode">部門代碼</label>
+        <input type="text" id="deptCode" name="deptCode" required />
+        <label for="deptName">部門名稱</label>
+        <input type="text" id="deptName" name="deptName" required />
+        <label for="deptBoss">主管</label>
+        <input type="text" id="deptBoss" name="deptBoss" required />
+        <label for="deptPhone">聯絡電話</label>
+        <input type="tel" id="deptPhone" name="deptPhone" required pattern="[0-9\-]{8,15}" />
+        <button type="submit">新增部門</button>
+      </form>
+    </section>
+
+    <!-- 皇帝上朝 -->
+    <section class="section" id="emperor-assembly">
+      <h2>皇帝上朝</h2>
+      <table>
+        <thead>
+          <tr><th>日期</th><th>議題</th><th>參與官員</th><th>決議結果</th></tr>
+        </thead>
+        <tbody id="assembly-table-body">
+          <tr><td>2025-08-01</td><td>糧食分配</td><td>張三、李四、王五</td><td>增加糧食庫存</td></tr>
+          <tr><td>2025-08-05</td><td>邊境安全</td><td>陳六、黃七</td><td>增派守衛</td></tr>
+          <tr><td>2025-08-08</td><td>稅收政策</td><td>李四、王五</td><td>調整稅率</td></tr>
+        </tbody>
+      </table>
+
+      <form id="assembly-form">
+        <label for="assemblyDate">日期</label>
+        <input type="date" id="assemblyDate" name="assemblyDate" required />
+        <label for="assemblyTopic">議題</label>
+        <input type="text" id="assemblyTopic" name="assemblyTopic" required />
+        <label for="assemblyOfficials">參與官員</label>
+        <input type="text" id="assemblyOfficials" name="assemblyOfficials" required />
+        <label for="assemblyResult">決議結果</label>
+        <input type="text" id="assemblyResult" name="assemblyResult" required />
+        <button type="submit">新增議題</button>
+      </form>
+    </section>
+
+  </div>
+
+  <script>
+    // 人員管理新增事件
+    document.getElementById("personnel-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const empId = this.empId.value.trim();
+      const empName = this.empName.value.trim();
+      const empTitle = this.empTitle.value.trim();
+      const empDept = this.empDept.value.trim();
+      if(empId && empName && empTitle && empDept) {
+        const tbody = document.getElementById("personnel-table-body");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${empId}</td><td>${empName}</td><td>${empTitle}</td><td>${empDept}</td>`;
+        tbody.appendChild(tr);
+        this.reset();
+      }
+    });
+
+    // 經濟倉儲新增事件
+    document.getElementById("storage-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const prodId = this.prodId.value.trim();
+      const prodName = this.prodName.value.trim();
+      const prodQty = this.prodQty.value;
+      const prodPrice = this.prodPrice.value;
+      if(prodId && prodName && prodQty >= 0 && prodPrice >= 0) {
+        const tbody = document.getElementById("storage-table-body");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${prodId}</td><td>${prodName}</td><td>${prodQty}</td><td>${prodPrice}</td>`;
+        tbody.appendChild(tr);
+        this.reset();
+      }
+    });
+
+    // 政府管理新增事件
+    document.getElementById("gov-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const deptCode = this.deptCode.value.trim();
+      const deptName = this.deptName.value.trim();
+      const deptBoss = this.deptBoss.value.trim();
+      const deptPhone = this.deptPhone.value.trim();
+      if(deptCode && deptName && deptBoss && deptPhone) {
+        const tbody = document.getElementById("gov-table-body");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${deptCode}</td><td>${deptName}</td><td>${deptBoss}</td><td>${deptPhone}</td>`;
+        tbody.appendChild(tr);
+        this.reset();
+      }
+    });
+
+    // 皇帝上朝新增事件
+    document.getElementById("assembly-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const date = this.assemblyDate.value;
+      const topic = this.assemblyTopic.value.trim();
+      const officials = this.assemblyOfficials.value.trim();
+      const result = this.assemblyResult.value.trim();
+      if(date && topic && officials && result) {
+        const tbody = document.getElementById("assembly-table-body");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${date}</td><td>${topic}</td><td>${officials}</td><td>${result}</td>`;
+        tbody.appendChild(tr);
+        this.reset();
+      }
+    });
+  </script>
 </body>
 </html>
