@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人力資源資訊系統</title>
+    <style>
+        body {
+            font-family: "Noto Sans TC", Arial, sans-serif;
+            margin: 0;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        header {
+            background: linear-gradient(90deg, #1d4ed8, #2563eb);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+        nav {
+            background-color: #f1f5f9;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        nav a {
+            text-decoration: none;
+            color: #334155;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #2563eb;
+        }
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 20px;
+        }
+        .section h2 {
+            border-left: 6px solid #2563eb;
+            padding-left: 10px;
+            color: #1d4ed8;
+        }
+        /* 表格 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+        th {
+            background-color: #2563eb;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+        /* 表單 */
+        form {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        form input, form select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+        }
+        form button {
+            padding: 8px 16px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #1d4ed8;
+        }
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin: 0 2px;
+        }
+        .edit-btn {
+            background-color: #fbbf24;
+            color: black;
+        }
+        .delete-btn {
+            background-color: #ef4444;
+            color: white;
+        }
+        .edit-btn:hover {
+            background-color: #f59e0b;
+        }
+        .delete-btn:hover {
+            background-color: #dc2626;
+        }
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #64748b;
+            background-color: #f1f5f9;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>人力資源資訊系統</h1>
+        <p>Human Resources Information System</p>
+    </header>
+
+    <nav>
+        <a href="sys.html">首頁</a>
+        <a href="#employees">員工資料</a>
+        <a href="#addData">新增員工</a>
+    </nav>
+
+    <div class="container">
+        <!-- 員工資料 -->
+        <div class="section" id="employees">
+            <h2>員工清單</h2>
+            <table id="employeeTable">
+                <thead>
+                    <tr>
+                        <th>員工編號</th>
+                        <th>姓名</th>
+                        <th>部門</th>
+                        <th>職稱</th>
+                        <th>薪資</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>EMP001</td>
+                        <td>王小明</td>
+                        <td>行銷部</td>
+                        <td>行銷專員</td>
+                        <td>$40,000</td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="editEmployee(this)">編輯</button>
+                            <button class="action-btn delete-btn" onclick="deleteEmployee(this)">刪除</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>EMP002</td>
+                        <td>陳美麗</td>
+                        <td>財務部</td>
+                        <td>會計師</td>
+                        <td>$50,000</td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="editEmployee(this)">編輯</button>
+                            <button class="action-btn delete-btn" onclick="deleteEmployee(this)">刪除</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 新增資料 -->
+        <div class="section" id="addData">
+            <h2>新增員工</h2>
+            <form id="employeeForm">
+                <input type="text" id="empId" placeholder="員工編號" required>
+                <input type="text" id="name" placeholder="姓名" required>
+                <input type="text" id="department" placeholder="部門" required>
+                <input type="text" id="position" placeholder="職稱" required>
+                <input type="number" id="salary" placeholder="薪資" required>
+                <button type="submit">新增</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        © 2025 人力資源資訊系統 - 範本資料僅供示範
+    </footer>
+
+    <script>
+        const form = document.getElementById('employeeForm');
+        const tableBody = document.getElementById('employeeTable').querySelector('tbody');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const empId = document.getElementById('empId').value;
+            const name = document.getElementById('name').value;
+            const department = document.getElementById('department').value;
+            const position = document.getElementById('position').value;
+            const salary = document.getElementById('salary').value;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${empId}</td>
+                <td>${name}</td>
+                <td>${department}</td>
+                <td>${position}</td>
+                <td>$${parseFloat(salary).toLocaleString()}</td>
+                <td>
+                    <button class="action-btn edit-btn" onclick="editEmployee(this)">編輯</button>
+                    <button class="action-btn delete-btn" onclick="deleteEmployee(this)">刪除</button>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+            form.reset();
+        });
+
+        function deleteEmployee(button) {
+            if (confirm("確定要刪除此員工資料嗎？")) {
+                button.parentElement.parentElement.remove();
+            }
+        }
+
+        function editEmployee(button) {
+            const row = button.parentElement.parentElement;
+            const cells = row.querySelectorAll('td');
+
+            const empId = prompt("員工編號：", cells[0].innerText);
+            const name = prompt("姓名：", cells[1].innerText);
+            const department = prompt("部門：", cells[2].innerText);
+            const position = prompt("職稱：", cells[3].innerText);
+            const salary = prompt("薪資：", cells[4].innerText.replace("$", "").replace(/,/g, ""));
+
+            if (empId && name && department && position && salary) {
+                cells[0].innerText = empId;
+                cells[1].innerText = name;
+                cells[2].innerText = department;
+                cells[3].innerText = position;
+                cells[4].innerText = `$${parseFloat(salary).toLocaleString()}`;
+            }
+        }
+    </script>
+</body>
+</html>
