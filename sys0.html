@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>生產作業資訊系統</title>
+  <style>
+    :root{
+      --bg:#f5f7fb; --card:#ffffff; --muted:#6b7280;
+      --accent:#2563eb; --success:#10b981; --danger:#ef4444;
+      --glass: rgba(255,255,255,0.7);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans CJK TC", "PingFang TC", "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#eef2ff 0%, var(--bg) 60%); color:#0f172a; min-height:100vh}
+    header{display:flex;align-items:center;gap:16px;padding:18px 24px;background:transparent}
+    .logo{font-weight:700;color:var(--accent);font-size:18px}
+    .container{display:flex;gap:18px;padding:18px;max-width:1200px;margin:0 auto}
+    nav.sidebar{
+      width:220px;background:var(--card);border-radius:10px;padding:12px;box-shadow:0 6px 18px rgba(12,15,25,0.06);
+      height:calc(100vh - 90px);position:sticky;top:18px;overflow:auto;
+    }
+    nav.sidebar h3{margin:8px 0;color:#111827;font-size:14px}
+    nav.sidebar ul{list-style:none;padding:0;margin:6px 0}
+    nav.sidebar li{padding:8px;border-radius:8px;color:var(--muted);cursor:pointer}
+    nav.sidebar li.active, nav.sidebar li:hover{background:#eef2ff;color:var(--accent)}
+    main{flex:1}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(12,15,25,0.04);min-width:0}
+    .kpi{flex:1;min-width:160px}
+    .kpi .value{font-size:20px;font-weight:700}
+    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0}
+    .search, .select, .btn{padding:8px 10px;border-radius:8px;border:1px solid #e6edf3;background:var(--card)}
+    .btn{cursor:pointer;background:var(--accent);color:#fff;border:none}
+    .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(37,99,235,0.12)}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px 8px;border-bottom:1px solid #f1f5f9;text-align:left;font-size:14px}
+    th{background:linear-gradient(90deg,rgba(0,0,0,0.01),transparent);cursor:pointer;user-select:none}
+    .badge{display:inline-block;padding:6px 8px;border-radius:999px;font-size:12px;color:#fff}
+    .badge.pending{background:#f59e0b}
+    .badge.running{background:var(--accent)}
+    .badge.done{background:var(--success)}
+    .actions button{margin-right:6px;padding:6px 8px;border:0;border-radius:6px;cursor:pointer}
+    .actions .edit{background:#f3f4f6}
+    .actions .del{background:#fee2e2;color:var(--danger)}
+    /* modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:none;align-items:center;justify-content:center;padding:24px}
+    .modal{background:var(--card);padding:16px;border-radius:12px;max-width:640px;width:100%;box-shadow:0 12px 40px rgba(2,6,23,0.35)}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+    input, select, textarea{width:100%;padding:8px;border-radius:8px;border:1px solid #e6edf3;font-size:14px}
+    footer{padding:18px;text-align:center;color:var(--muted);font-size:13px}
+    @media (max-width:900px){
+      nav.sidebar{display:none}
+      .container{padding:12px}
+      .form-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">生產作業資訊系統</div>
+     <a href="sys.html">首頁</a>
+    <div style="margin-left:auto;color:var(--muted)">使用者：楊琇惠</div>
+  </header>
+
+  <div class="container">
+    <nav class="sidebar" aria-label="側邊選單">
+      <h3>系統功能</h3>
+      <ul>
+        <li class="active">儀表板</li>
+        <li>生產訂單</li>
+        <li>機台管理</li>
+        <li>報表匯出</li>
+        <li>系統設定</li>
+      </ul>
+      <hr />
+      <h3>快速連結</h3>
+      <ul>
+        <li>建立新訂單</li>
+        <li>匯出 CSV</li>
+        <li>清除測試資料</li>
+      </ul>
+    </nav>
+
+    <main>
+      <!-- KPI -->
+      <div class="row">
+        <div class="card kpi">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:12px;color:var(--muted)">進行中訂單</div>
+              <div class="value" id="kpi-running">0</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:12px;color:var(--muted)">良率</div>
+              <div class="value" id="kpi-yield">0%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card kpi">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:12px;color:var(--muted)">今日產量</div>
+              <div class="value" id="kpi-today">0</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:12px;color:var(--muted)">機台上線率</div>
+              <div class="value" id="kpi-uptime">0%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="flex-basis:100%;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <strong>生產訂單總覽</strong>
+            <div style="font-size:13px;color:var(--muted)">管理訂單、狀態與負責人</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="search" class="search" placeholder="搜尋訂單 / 產品 / 負責人" />
+            <select id="filterStatus" class="select">
+              <option value="">全部狀態</option>
+              <option value="Pending">待排程</option>
+              <option value="Running">生產中</option>
+              <option value="Done">完成</option>
+            </select>
+            <button class="btn" id="addBtn">＋ 新增訂單</button>
+            <button class="btn ghost" id="exportBtn">匯出 CSV</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="card" id="ordersCard">
+        <table id="ordersTable" aria-label="生產訂單">
+          <thead>
+            <tr>
+              <th data-key="id">訂單編號 ▲</th>
+              <th data-key="product">產品</th>
+              <th data-key="qty">數量</th>
+              <th data-key="due">交期</th>
+              <th data-key="status">狀態</th>
+              <th data-key="owner">負責人</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <footer>系統範例版 • 本地測試使用 • 資料儲存在 localStorage</footer>
+
+  <!-- Modal -->
+  <div class="modal-backdrop" id="modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">建立訂單</h2>
+      <form id="orderForm">
+        <div class="form-grid" style="margin-top:8px">
+          <div>
+            <label for="product">產品名稱</label>
+            <input id="product" name="product" required />
+          </div>
+          <div>
+            <label for="qty">數量</label>
+            <input id="qty" name="qty" type="number" min="1" required />
+          </div>
+          <div>
+            <label for="due">交期</label>
+            <input id="due" name="due" type="date" required />
+          </div>
+          <div>
+            <label for="owner">負責人</label>
+            <input id="owner" name="owner" required />
+          </div>
+          <div style="grid-column:1/-1">
+            <label for="note">備註</label>
+            <textarea id="note" name="note" rows="3"></textarea>
+          </div>
+          <div style="grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+            <button type="button" class="btn ghost" id="cancelModal">取消</button>
+            <button type="submit" class="btn" id="saveBtn">儲存</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    /********** Model & Persistence (localStorage) **********/
+    const STORAGE_KEY = 'production_orders_v1';
+    let orders = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || sampleData();
+    let sortState = {key:'id', dir:1}; // 1 asc, -1 desc
+
+    function sampleData(){
+      const today = new Date();
+      const plus = d => new Date(today.getTime() + d*24*3600*1000).toISOString().slice(0,10);
+      return [
+        {id:'PO-1001', product:'齒輪A', qty:500, due:plus(3), status:'Running', owner:'張三', note:'加急'},
+        {id:'PO-1002', product:'軸承B', qty:200, due:plus(7), status:'Pending', owner:'李四', note:''},
+        {id:'PO-1003', product:'螺絲C', qty:1200, due:plus(1), status:'Running', owner:'王五', note:'需檢驗'}
+      ];
+    }
+    function persist(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+    }
+
+    /********** UI Rendering **********/
+    const tbody = document.querySelector('#ordersTable tbody');
+    const searchInput = document.getElementById('search');
+    const filterStatus = document.getElementById('filterStatus');
+
+    function render(){
+      // filters
+      const q = searchInput.value.trim().toLowerCase();
+      const statusFilter = filterStatus.value;
+      let list = orders.filter(o=>{
+        const matchQ = q === '' || [o.id,o.product,o.owner,(o.note||'')].join(' ').toLowerCase().includes(q);
+        const matchStatus = !statusFilter || o.status === statusFilter;
+        return matchQ && matchStatus;
+      });
+
+      // sorting
+      list.sort((a,b)=>{
+        const k = sortState.key;
+        let va = a[k], vb = b[k];
+        if(k === 'qty') { va = Number(va); vb = Number(vb); }
+        if(k === 'due'){ va = new Date(va); vb = new Date(vb); }
+        if(va < vb) return -1 * sortState.dir;
+        if(va > vb) return 1 * sortState.dir;
+        return 0;
+      });
+
+      // render rows
+      tbody.innerHTML = '';
+      if(list.length === 0){
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted)">無符合資料</td></tr>';
+      } else {
+        for(const o of list){
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${escapeHtml(o.id)}</td>
+            <td>${escapeHtml(o.product)}</td>
+            <td>${escapeHtml(o.qty)}</td>
+            <td>${escapeHtml(o.due)}</td>
+            <td><span class="badge ${statusClass(o.status)}">${escapeHtml(o.status)}</span></td>
+            <td>${escapeHtml(o.owner)}</td>
+            <td class="actions">
+              <button class="edit" data-id="${o.id}">編輯</button>
+              <button class="del" data-id="${o.id}">刪除</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        }
+      }
+
+      updateKPI();
+    }
+
+    function statusClass(s){
+      if(s === 'Pending') return 'pending';
+      if(s === 'Running') return 'running';
+      if(s === 'Done') return 'done';
+      return '';
+    }
+
+    function escapeHtml(s = '') {
+      return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+    }
+
+    function updateKPI(){
+      const running = orders.filter(o=>o.status==='Running').length;
+      const todayProd = orders.reduce((acc,o)=>acc + (o.status==='Done'? Number(o.qty):0),0); // 簡化示例
+      const yieldRate = 95; // 假定或計算實際良率
+      const uptime = Math.round((orders.filter(o=>o.status!=='Pending').length / Math.max(1, orders.length)) * 100);
+
+      document.getElementById('kpi-running').textContent = running;
+      document.getElementById('kpi-today').textContent = todayProd;
+      document.getElementById('kpi-yield').textContent = yieldRate + '%';
+      document.getElementById('kpi-uptime').textContent = uptime + '%';
+    }
+
+    /********** Sorting & Table header clicks **********/
+    document.querySelectorAll('#ordersTable th[data-key]').forEach(th=>{
+      th.addEventListener('click', ()=>{
+        const key = th.dataset.key;
+        if(sortState.key === key) sortState.dir *= -1;
+        else { sortState.key = key; sortState.dir = 1; }
+        // update indicator
+        document.querySelectorAll('#ordersTable th').forEach(x=>{
+          if(x.dataset.key) x.textContent = x.textContent.replace(/ ▲| ▼/g,'');
+        });
+        th.textContent = th.textContent + (sortState.dir===1 ? ' ▲' : ' ▼');
+        render();
+      });
+    });
+
+    /********** Add / Edit Modal **********/
+    const modal = document.getElementById('modal');
+    const orderForm = document.getElementById('orderForm');
+    let editingId = null;
+
+    document.getElementById('addBtn').addEventListener('click', ()=>{
+      openModal();
+    });
+    document.getElementById('cancelModal').addEventListener('click', closeModal);
+    modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+
+    function openModal(order){
+      editingId = order ? order.id : null;
+      document.getElementById('modalTitle').textContent = editingId ? '編輯訂單' : '建立訂單';
+      orderForm.product.value = order?.product || '';
+      orderForm.qty.value = order?.qty || 1;
+      orderForm.due.value = order?.due || new Date().toISOString().slice(0,10);
+      orderForm.owner.value = order?.owner || '';
+      orderForm.note.value = order?.note || '';
+      modal.style.display = 'flex';
+    }
+    function closeModal(){
+      modal.style.display = 'none';
+      orderForm.reset();
+      editingId = null;
+    }
+
+    orderForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const data = {
+        product: orderForm.product.value.trim(),
+        qty: Number(orderForm.qty.value),
+        due: orderForm.due.value,
+        owner: orderForm.owner.value.trim(),
+        note: orderForm.note.value.trim()
+      };
+      if(editingId){
+        // update
+        const idx = orders.findIndex(x=>x.id===editingId);
+        if(idx>=0){
+          orders[idx] = {...orders[idx], ...data};
+        }
+      } else {
+        // new id simple generator
+        const next = 'PO-' + (1000 + Math.floor(Math.random()*9000));
+        orders.push({id:next, status:'Pending', ...data});
+      }
+      persist();
+      render();
+      closeModal();
+    });
+
+    /********** Table action delegation (edit / delete / change status) **********/
+    tbody.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button');
+      if(!btn) return;
+      const id = btn.dataset.id;
+      if(btn.classList.contains('edit')){
+        const order = orders.find(o=>o.id === id);
+        if(order) openModal(order);
+      } else if(btn.classList.contains('del')){
+        if(confirm('確定要刪除訂單 ' + id + ' 嗎？')){
+          orders = orders.filter(o=>o.id !== id);
+          persist();
+          render();
+        }
+      }
+    });
+
+    /********** Search & Filter **********/
+    searchInput.addEventListener('input', debounce(render, 250));
+    filterStatus.addEventListener('change', render);
+
+    function debounce(fn, wait=200){
+      let t;
+      return function(...a){ clearTimeout(t); t=setTimeout(()=>fn(...a), wait); }
+    }
+
+    /********** Export CSV **********/
+    document.getElementById('exportBtn').addEventListener('click', ()=>{
+      const rows = [['訂單編號','產品','數量','交期','狀態','負責人','備註']];
+      for(const o of orders){
+        rows.push([o.id,o.product,o.qty,o.due,o.status,o.owner,o.note]);
+      }
+      const csv = rows.map(r=>r.map(v => '"' + String(v).replaceAll('"','""') + '"').join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'production_orders.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    /********** Init render **********/
+    render();
+
+    /********** Utility: Keyboard shortcut to add (N) **********/
+    window.addEventListener('keydown', (e)=>{
+      if(e.key.toLowerCase() === 'n' && (e.ctrlKey || e.metaKey) === false){
+        e.preventDefault();
+        openModal();
+      }
+    });
+
+    /********** Optional: Provide ability to change status from row double-click (quick) **********/
+    tbody.addEventListener('dblclick', (e)=>{
+      const tr = e.target.closest('tr');
+      if(!tr) return;
+      const id = tr.querySelector('button')?.dataset.id;
+      if(!id) return;
+      const idx = orders.findIndex(o=>o.id===id);
+      if(idx<0) return;
+      const order = orders[idx];
+      const next = order.status === 'Pending' ? 'Running' : order.status === 'Running' ? 'Done' : 'Pending';
+      if(confirm(`將 ${id} 的狀態從 ${order.status} 變更為 ${next}？`)){
+        orders[idx].status = next;
+        persist();
+        render();
+      }
+    });
+
+    /********** Small helper: clear sample data from sidebar click (not required) **********/
+    document.querySelectorAll('nav.sidebar li').forEach(li=>{
+      if(li.textContent.includes('清除')){
+        li.addEventListener('click', ()=>{
+          if(confirm('清除本地測試資料？')){ orders=[]; persist(); render(); }
+        });
+      }
+      if(li.textContent.includes('建立新訂單')){
+        li.addEventListener('click', ()=> openModal());
+      }
+    });
+  </script>
+</body>
+</html>
