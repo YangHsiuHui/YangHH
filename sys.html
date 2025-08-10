@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>資訊系統首頁</title>
+    <style>
+
+          /* 網址列樣式 */
+    nav {
+      background-color: #2a5d9f;
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+        body {
+            font-family: "Noto Sans TC", Arial, sans-serif;
+            background: linear-gradient(180deg, #eef2ff, #f8fafc);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        header {
+            background-color: #2563eb;
+            color: white;
+            padding: 20px 0;
+        }
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            padding: 40px 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 260px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+        }
+        .card h2 {
+            font-size: 18px;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        .card p {
+            font-size: 14px;
+            color: #475569;
+            min-height: 40px;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 16px;
+            background-color: #2563eb;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+        footer {
+            font-size: 12px;
+            color: #64748b;
+            padding: 20px;
+            background: #f1f5f9;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 網址列 -->
+  <nav>
+    <a href="index.html">🏠 回管理系統</a>
+  </nav>
+    <header>
+        <h1>資訊系統首頁</h1>
+        <p>依據功能領域分類的資訊系統入口</p>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>生產作業資訊系統</h2>
+            <p>支援生產計畫、排程、品質管理與作業追蹤的系統。</p>
+            <a href="sys0.html" class="btn">進入系統</a>
+        </div>
+
+        <div class="card">
+            <h2>行銷與銷售資訊系統</h2>
+            <p>協助市場分析、客戶關係管理與銷售流程的系統。</p>
+            <a href="sys1.html" class="btn">進入系統</a>
+        </div>
+
+        <div class="card">
+            <h2>財務與會計資訊系統</h2>
+            <p>管理財務報表、成本控制與會計帳務的系統。</p>
+            <a href="sys2.html" class="btn">進入系統</a>
+        </div>
+
+        <div class="card">
+            <h2>人力資源資訊系統</h2>
+            <p>負責員工資料、薪資管理與人力規劃的系統。</p>
+            <a href="sys3.html" class="btn">進入系統</a>
+        </div>
+    </div>
+
+    <footer>
+        © 2025 資訊系統示範首頁 - 本頁為測試版
+    </footer>
+</body>
+</html>
