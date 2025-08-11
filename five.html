@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>五大資訊系統平台</title>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+
+     /* 網址列樣式 */
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+body {
+  font-family: 'Noto Serif TC', serif;
+  margin:0;
+  background:#fdf6f0;
+  color:#5b3a29;
+}
+header {
+  background:#e8b4a2;
+  color:#fff;
+  padding:15px;
+  text-align:center;
+  font-size:2em;
+  font-family: 'Ma Shan Zheng', cursive;
+}
+nav {
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  background:#f5c6aa;
+  padding:8px;
+}
+nav button {
+  margin:4px;
+  padding:8px 14px;
+  background:#d4a373;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  border-radius:4px;
+  font-size:1em;
+  font-family: 'Noto Serif TC', serif;
+}
+nav button.active {
+  background:#c38e70;
+}
+main {
+  max-width:1000px;
+  margin:20px auto;
+  background:#fffaf5;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 0 8px rgba(0,0,0,0.08);
+}
+h2 { margin-top:0; }
+form { margin-bottom:10px; }
+input, button {
+  padding:5px;
+  margin:3px;
+  border:1px solid #ccc;
+  border-radius:4px;
+}
+button[type="submit"] {
+  background:#e5989b;
+  color:#fff;
+  border:none;
+}
+button.action-btn {
+  background:#c38e70;
+  color:#fff;
+  border:none;
+  padding:3px 8px;
+  border-radius:4px;
+}
+table {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+th, td {
+  border:1px solid #ddd;
+  padding:8px;
+}
+canvas {
+  margin-top:20px;
+  display:block;
+  background:#fff7f0;
+  border:1px solid #ddd;
+  border-radius:4px;
+}
+footer {
+  text-align:center;
+  padding:12px;
+  font-size:0.9em;
+  color:#7f675b;
+}
+</style>
+</head>
+<body>
+<header>五大資訊系統平台</header>
+<nav>
+
+ <!-- 網址列 -->
+  <nav>
+    <a href="sys.html"> 🏠 回首頁（資訊系統） </a>
+    <a href="resume.html">。  履歷</a>
+  </nav>
+
+  <button data-topic="交易處理系統" class="active">交易處理系統</button>
+  <button data-topic="管理資訊系統">管理資訊系統</button>
+  <button data-topic="決策支援系統">決策支援系統</button>
+  <button data-topic="知識管理系統">知識管理系統</button>
+  <button data-topic="高階主管資訊系統">高階主管資訊系統</button>
+</nav>
+<main>
+  <h2 id="topic-title"></h2>
+  <p id="topic-desc"></p>
+
+  <form id="item-form">
+    <input type="hidden" id="item-id">
+    名稱：<input id="item-name" required>
+    數量：<input id="item-qty" type="number" min="1" value="1" required>
+    <button type="submit">儲存</button>
+    <button type="button" id="clear-form">清除</button>
+  </form>
+
+  <table id="items-table">
+    <thead><tr><th>名稱</th><th>數量</th><th>操作</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <canvas id="pieChart" width="400" height="300"></canvas>
+</main>
+<footer>© 2025 五大資訊系統範例平台</footer>
+
+<script>
+// 五大主題與範本資料
+const topics = {
+  "交易處理系統": {
+    desc: "帳單、訂單、薪資",
+    data: [
+      {id:"1", name:"帳單", qty:10},
+      {id:"2", name:"訂單", qty:7},
+      {id:"3", name:"薪資", qty:8}
+    ]
+  },
+  "管理資訊系統": {
+    desc: "報表、交易績效、加班費用",
+    data: [
+      {id:"1", name:"報表", qty:8},
+      {id:"2", name:"交易績效", qty:6},
+      {id:"3", name:"加班費用", qty:3}
+    ]
+  },
+  "決策支援系統": {
+    desc: "電子表單、電子公文",
+    data: [
+      {id:"1", name:"電子表單", qty:9},
+      {id:"2", name:"電子公文", qty:4}
+    ]
+  },
+  "知識管理系統": {
+    desc: "知識推論處理知識",
+    data: [
+      {id:"1", name:"知識推論", qty:9},
+      {id:"2", name:"知識處理", qty:7}
+    ]
+  },
+  "高階主管資訊系統": {
+    desc: "掌握企業全局所需的資訊",
+    data: [
+      {id:"1", name:"企業總覽", qty:6},
+      {id:"2", name:"決策摘要", qty:4}
+    ]
+  }
+};
+
+let currentTopic = "交易處理系統";
+
+const titleEl = document.getElementById("topic-title");
+const descEl = document.getElementById("topic-desc");
+const tableBody = document.querySelector("#items-table tbody");
+const form = document.getElementById("item-form");
+const idField = document.getElementById("item-id");
+const nameField = document.getElementById("item-name");
+const qtyField = document.getElementById("item-qty");
+const clearBtn = document.getElementById("clear-form");
+const pieChart = document.getElementById("pieChart");
+
+document.querySelectorAll("nav button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentTopic = btn.getAttribute("data-topic");
+    updateTopic();
+  });
+});
+
+function updateTopic() {
+  titleEl.textContent = currentTopic;
+  descEl.textContent = topics[currentTopic].desc;
+  idField.value = "";
+  nameField.value = "";
+  qtyField.value = 1;
+  render();
+}
+
+function render() {
+  const data = topics[currentTopic].data;
+  tableBody.innerHTML = "";
+  data.forEach(item => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${item.name}</td>
+                    <td>${item.qty}</td>
+                    <td>
+                      <button class="action-btn" onclick="editItem('${item.id}')">編輯</button>
+                      <button class="action-btn" onclick="deleteItem('${item.id}')">刪除</button>
+                    </td>`;
+    tableBody.appendChild(tr);
+  });
+  drawPie(data);
+}
+
+window.editItem = id => {
+  const item = topics[currentTopic].data.find(i => i.id === id);
+  if (item) {
+    idField.value = item.id;
+    nameField.value = item.name;
+    qtyField.value = item.qty;
+  }
+};
+
+window.deleteItem = id => {
+  topics[currentTopic].data = topics[currentTopic].data.filter(i => i.id !== id);
+  render();
+};
+
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  let data = topics[currentTopic].data;
+  if (idField.value) {
+    data = data.map(i => i.id === idField.value ? { ...i, name: nameField.value, qty: Number(qtyField.value) } : i);
+  } else {
+    data.push({ id: Date.now().toString(), name: nameField.value, qty: Number(qtyField.value) });
+  }
+  topics[currentTopic].data = data;
+  idField.value = "";
+  nameField.value = "";
+  qtyField.value = 1;
+  render();
+});
+
+clearBtn.addEventListener("click", () => {
+  idField.value = "";
+  nameField.value = "";
+  qtyField.value = 1;
+});
+
+function drawPie(data) {
+  const ctx = pieChart.getContext("2d");
+  ctx.clearRect(0,0,pieChart.width,pieChart.height);
+  if (!data.length) return;
+  
+  const total = data.reduce((sum, i) => sum + Number(i.qty), 0);
+  let startAngle = 0;
+  const colors = ["#e5989b","#ffb4a2","#d4a373","#c89f9c","#b5838d","#f6bd60","#f7ede2"];
+  
+  data.forEach((item, idx) => {
+    const sliceAngle = (Number(item.qty) / total) * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(pieChart.width/2, pieChart.height/2);
+    ctx.arc(pieChart.width/2, pieChart.height/2, 100, startAngle, startAngle + sliceAngle);
+    ctx.closePath();
+    ctx.fillStyle = colors[idx % colors.length];
+    ctx.fill();
+
+    // 圖表標籤
+    const midAngle = startAngle + sliceAngle / 2;
+    const labelX = pieChart.width/2 + Math.cos(midAngle) * 120;
+    const labelY = pieChart.height/2 + Math.sin(midAngle) * 120;
+    ctx.fillStyle = "#5b3a29";
+    ctx.font = "14px Noto Serif TC";
+    ctx.textAlign = "center";
+    ctx.fillText(item.name, labelX, labelY);
+    
+    startAngle += sliceAngle;
+  });
+}
+
+updateTopic();
+</script>
+</body>
+</html>
