@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>企業管理系統簡介與示範 — MRP / ERP / SCM / CRM</title>
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+
+  /* 網址列樣式 */
+    nav {
+      background-color: #FFF6F3;
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+  :root{
+    --bg:#FFF8F2;
+    --card:#FFF6F3;
+    --accent:#E07A5F; /* warm coral */
+    --accent-2:#F5A882; /* softer */
+    --muted:#8B6A5A;
+    --text:#3B2B2A;
+    --soft:#FBDCCB;
+    --glass: rgba(255,255,255,0.6);
+    font-family: "Noto Sans TC", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial;
+  }
+  body{
+    margin:0;
+    background: linear-gradient(180deg, var(--bg), #FFF4EE);
+    color:var(--text);
+  }
+  /* 固定頂部導覽 */
+  header{
+    position:fixed; top:0; left:0; right:0;
+    height:64px; display:flex; align-items:center;
+    padding:0 20px; box-sizing:border-box;
+    background: linear-gradient(90deg, rgba(224,122,95,0.96), rgba(245,168,130,0.92));
+    color:white; z-index:40; box-shadow:0 2px 8px rgba(0,0,0,0.08);
+  }
+  header h1{ margin:0; font-size:18px; letter-spacing:0.6px; }
+  .container{
+    display:flex; gap:20px;
+    padding:88px 20px 40px 20px;
+    box-sizing:border-box;
+  }
+  /* 側邊選單 */
+  nav.sidebar{
+    width:260px; background:var(--card); border-radius:12px;
+    padding:16px; box-shadow:0 6px 18px rgba(224,122,95,0.06);
+    height:calc(100vh - 120px); overflow:auto;
+    position:sticky; top:80px;
+  }
+  .nav-item{ padding:10px 12px; border-radius:8px; margin-bottom:8px; cursor:pointer; color:var(--muted); display:flex; align-items:center; gap:10px; }
+  .nav-item.active{ background:linear-gradient(90deg,var(--soft),#FFEDE5); color:var(--accent-2); font-weight:600; box-shadow: inset 0 0 0 1px rgba(224,122,95,0.06);}
+  .nav-item:hover{ background:#FFF1EC; color:var(--accent-2); }
+  main.content{
+    flex:1; display:flex; flex-direction:column; gap:18px;
+  }
+  .card{ background:var(--card); padding:16px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.04); }
+  .flex-row{ display:flex; gap:12px; align-items:center; }
+  .space{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  table{ width:100%; border-collapse:collapse; margin-top:12px; font-size:14px; }
+  th,td{ padding:10px 8px; text-align:left; border-bottom:1px solid rgba(0,0,0,0.06); }
+  th{ color:var(--muted); font-weight:700; font-size:13px; }
+  button{ border:0; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; }
+  .btn-primary{ background:var(--accent); color:white; box-shadow: 0 4px 12px rgba(224,122,95,0.12); }
+  .btn-ghost{ background:transparent; color:var(--accent); border:1px solid rgba(224,122,95,0.12); }
+  .icon-btn{ background:transparent; padding:6px 8px; border-radius:8px; color:var(--muted); }
+  .small{ padding:6px 8px; border-radius:6px; font-weight:600; }
+  .muted{ color:var(--muted); font-size:13px; }
+  /* 表單 */
+  .form-row{ display:flex; gap:8px; margin-top:8px; }
+  .form-row input, .form-row select, textarea{ padding:8px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.06); background:transparent; flex:1; }
+  .right-panel{ width:320px; display:flex; flex-direction:column; gap:12px; position:sticky; top:80px; height:calc(100vh - 120px); }
+  /* footer */
+  footer{ padding:12px; text-align:center; color:var(--muted); font-size:13px; margin-top:8px; }
+  @media(max-width:980px){
+    .container{ flex-direction:column; padding:110px 12px 30px 12px; }
+    nav.sidebar{ width:100%; height:auto; position:relative; top:auto; display:flex; overflow-x:auto; }
+    .right-panel{ position:relative; width:100%; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>企業管理系統示範 (MRP / MRP II / ERP / SCM / CRM / EERP)</h1>
+
+<!-- 網址列 -->
+
+    <a href="sys.html">🏠 回首頁（資訊系統）</a>
+    <a href="resume.html">。  履歷</a>
+
+</header>
+
+<div class="container">
+  <nav class="sidebar card" id="menu">
+    <!-- menu items injected by JS -->
+  </nav>
+
+  <main class="content">
+    <section class="card" id="overview">
+      <div class="space">
+        <div>
+          <h2 id="systemTitle" style="margin:0">MRP — 物料需求規劃（示範）</h2>
+          <div class="muted" id="systemSubtitle">生產排程與零件備料管理</div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="btn-primary" id="addBtn">新增筆錄</button>
+          <button class="btn-ghost" id="resetBtn" title="重置範例資料">還原範例</button>
+        </div>
+      </div>
+
+      <p id="systemDesc" style="margin-top:12px; line-height:1.6;">
+        <!-- description injected -->
+      </p>
+    </section>
+
+    <section class="card" id="dataSection">
+      <div class="space">
+        <div><strong>資料列表</strong> <span class="muted" id="listCount"></span></div>
+        <div class="muted">操作：新增 / 編輯 / 刪除（資料儲存在本機）</div>
+      </div>
+
+      <table id="dataTable" aria-label="資料表">
+        <thead>
+          <tr><th>項目</th><th>描述</th><th>數量</th><th>成本</th><th style="width:140px;">操作</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="card" id="notes">
+      <div class="space">
+        <div><strong>系統模組總覽（簡化版）</strong></div>
+        <div class="muted">MRP / MRP II / ERP / SCM / CRM / EERP</div>
+      </div>
+      <div style="margin-top:12px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;">
+        <!-- quick cards -->
+        <div style="background:linear-gradient(180deg,#FFF5F2, #FFF2F0); padding:12px; border-radius:10px;">
+          <strong>MRP</strong>
+          <div class="muted" style="margin-top:6px;">物料需求計算、BOM、排程、領料與採購觸發。</div>
+        </div>
+        <div style="background:linear-gradient(180deg,#FFF8ED,#FFF4EE); padding:12px; border-radius:10px;">
+          <strong>MRP II</strong>
+          <div class="muted" style="margin-top:6px;">擴充 MRP，加入會計與銷售等製造資源規劃模組。</div>
+        </div>
+        <div style="background:linear-gradient(180deg,#FFF6F3,#FFF1EE); padding:12px; border-radius:10px;">
+          <strong>ERP</strong>
+          <div class="muted" style="margin-top:6px;">企業資源整合系統：涵蓋財務、人資、採購、生產等。</div>
+        </div>
+        <div style="background:linear-gradient(180deg,#FFF8F4,#FFF3F0); padding:12px; border-radius:10px;">
+          <strong>SCM</strong>
+          <div class="muted" style="margin-top:6px;">供應商連結、採購需求、報價確認、結算與發票流程。</div>
+        </div>
+        <div style="background:linear-gradient(180deg,#FFF7F3,#FFF1EF); padding:12px; border-radius:10px;">
+          <strong>CRM</strong>
+          <div class="muted" style="margin-top:6px;">管理顧客互動、分群（RFM）、提升顧客終身價值 (LTV)。</div>
+        </div>
+        <div style="background:linear-gradient(180deg,#FFF5F2,#FFF0EE); padding:12px; border-radius:10px;">
+          <strong>EERP</strong>
+          <div class="muted" style="margin-top:6px;">擴充型 ERP：整合 SCM、ERP、CRM 成為跨組織平台。</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <aside class="right-panel">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong>圓餅儀表板</strong>
+        <div class="muted" style="font-size:13px;">系統資料分佈</div>
+      </div>
+      <canvas id="pieChart" style="margin-top:8px; width:100%; height:220px;"></canvas>
+      <div class="muted" style="margin-top:8px;">顏色為暖色系，顯示每個系統的筆數比例。</div>
+    </div>
+
+    <div class="card">
+      <strong>快速操作</strong>
+      <div style="margin-top:10px; display:flex; gap:8px;">
+        <button class="small btn-primary" id="exportBtn">匯出 JSON</button>
+        <button class="small btn-ghost" id="importBtn">匯入 JSON</button>
+      </div>
+      <div class="muted" style="margin-top:8px;">匯出會下載目前 localStorage 的資料。匯入會覆蓋本機資料。</div>
+    </div>
+
+    <div class="card" style="text-align:center;">
+      <div class="muted">示範系統 • 本機測試版</div>
+      <div style="margin-top:8px; font-size:13px; color:var(--muted)">資料不會送出到外網</div>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  若需要我把配色或欄位（例如新增 BOM 欄位、成本計算範例）更細緻化，可直接告訴我想要的欄位與規則。
+</footer>
+
+<!-- 編輯 / 新增對話框 (簡單實作) -->
+<div id="modalRoot" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; z-index:60;">
+  <div style="position:absolute; inset:0; background:rgba(0,0,0,0.2)"></div>
+  <div style="width:720px; max-width:95%; background:white; border-radius:12px; padding:16px; box-shadow:0 20px 60px rgba(0,0,0,0.2); position:relative;">
+    <h3 id="modalTitle" style="margin:0 0 8px 0">新增筆錄</h3>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <div style="flex:1">
+        <label class="muted">項目名稱</label>
+        <input id="f_name" placeholder="例如：CPU" />
+      </div>
+      <div style="width:160px">
+        <label class="muted">數量</label>
+        <input id="f_qty" type="number" min="0" />
+      </div>
+      <div style="width:160px">
+        <label class="muted">成本（每件）</label>
+        <input id="f_cost" type="number" min="0" />
+      </div>
+      <div style="flex-basis:100%;"></div>
+      <div style="flex:1">
+        <label class="muted">描述</label>
+        <input id="f_desc" placeholder="簡短描述或備註" />
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+      <button class="icon-btn" id="cancelModal">取消</button>
+      <button class="btn-primary" id="saveModal">儲存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* --- 常數與範例資料 --- */
+const systems = [
+  {key:'mrp', title:'MRP', subtitle:'物料需求規劃', desc:`支援生產排程與物料備料。根據 BOM（物料表）與訂單數量，計算各零件所需數量，若庫存低於安全庫存則觸發採購或領料。主要輸出：領料單、採購單、物料成本。`},
+  {key:'mrpii', title:'MRP II', subtitle:'製造資源規劃（擴充）', desc:`在 MRP 基礎上，加入更多製造資源管理模組，例如會計、銷售、生產能力規劃，支援更完整的製造排程與成本分析。`},
+  {key:'erp', title:'ERP', subtitle:'企業資源規劃', desc:`整合企業內部資源（財務、人資、採購、生產、銷售等），提供跨部門作業流程與報表。`},
+  {key:'scm', title:'SCM', subtitle:'供應鏈管理', desc:`連結供應商與通路，管理採購請求、報價、訂單確認、付款與發票等，確保物料與零組件供應順暢。`},
+  {key:'crm', title:'CRM', subtitle:'顧客關係管理', desc:`管理顧客互動、分群與忠誠度（例如 RFM 分析），以提高顧客終身價值 (LTV)。`},
+  {key:'eerp', title:'EERP', subtitle:'擴充型 ERP', desc:`EERP = SCM + ERP + CRM。跨組織整合企業與供應鏈、顧客互動等系統以形成完整價值網路。`},
+];
+
+const sampleData = {
+  mrp: [
+    {id:1,name:'CPU', desc:'第3代處理器', qty:100, cost:2500},
+    {id:2,name:'DRAM 8GB', desc:'記憶體模組', qty:800, cost:400},
+    {id:3,name:'SSD 256G', desc:'固態硬碟', qty:150, cost:900},
+  ],
+  mrpii:[
+    {id:1,name:'生產工時', desc:'每週工時估算', qty:120, cost:0},
+    {id:2,name:'生產人員', desc:'班別人數', qty:8, cost:0},
+  ],
+  erp:[
+    {id:1,name:'應收帳款', desc:'月末應收統計', qty:1, cost:500000},
+    {id:2,name:'人事成本', desc:'月薪總額', qty:1, cost:200000},
+  ],
+  scm:[
+    {id:1,name:'供應商A', desc:'主要電源供應商', qty:1, cost:0},
+    {id:2,name:'採購訂單#1001', desc:'5月採購', qty:200, cost:120000},
+  ],
+  crm:[
+    {id:1,name:'VIP 客戶', desc:'年度消費前三名', qty:1, cost:0},
+    {id:2,name:'促銷活動', desc:'會員回饋促銷', qty:1, cost:30000},
+  ],
+  eerp:[
+    {id:1,name:'跨組織專案', desc:'供應鏈整合計畫', qty:1, cost:0},
+  ]
+};
+
+/* --- localStorage key --- */
+const STORAGE_KEY = 'demo_system_data_v1';
+
+/* --- App State --- */
+let state = {
+  current: 'mrp',
+  data: {}
+};
+
+/* --- DOM references --- */
+const menuEl = document.getElementById('menu');
+const systemTitle = document.getElementById('systemTitle');
+const systemSubtitle = document.getElementById('systemSubtitle');
+const systemDesc = document.getElementById('systemDesc');
+const listCount = document.getElementById('listCount');
+const dataTbody = document.querySelector('#dataTable tbody');
+const addBtn = document.getElementById('addBtn');
+const resetBtn = document.getElementById('resetBtn');
+const modalRoot = document.getElementById('modalRoot');
+const modalTitle = document.getElementById('modalTitle');
+const f_name = document.getElementById('f_name');
+const f_qty = document.getElementById('f_qty');
+const f_cost = document.getElementById('f_cost');
+const f_desc = document.getElementById('f_desc');
+const cancelModal = document.getElementById('cancelModal');
+const saveModal = document.getElementById('saveModal');
+const exportBtn = document.getElementById('exportBtn');
+const importBtn = document.getElementById('importBtn');
+
+/* --- Chart --- */
+let pieChart = null;
+const pieCtx = document.getElementById('pieChart').getContext('2d');
+const palette = ['#F6D6C2','#FBC7A4','#F5A882','#E07A5F','#C8553D','#F2E8CF'];
+
+/* --- Functions --- */
+function loadData(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){
+    try{
+      state.data = JSON.parse(raw);
+      // ensure keys exist
+      systems.forEach(s => { if(!state.data[s.key]) state.data[s.key]=[]; });
+      return;
+    }catch(e){
+      console.warn('解析 localStorage 失敗，將還原範例資料');
+    }
+  }
+  // 沒有資料或解析錯誤 -> 使用範例
+  state.data = JSON.parse(JSON.stringify(sampleData));
+  saveData();
+}
+
+function saveData(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+  renderAll();
+}
+
+function resetToSample(){
+  if(!confirm('確定要還原為範例資料？將會覆蓋目前本機資料。')) return;
+  state.data = JSON.parse(JSON.stringify(sampleData));
+  saveData();
+}
+
+function renderMenu(){
+  menuEl.innerHTML = '';
+  systems.forEach(s=>{
+    const div = document.createElement('div');
+    div.className = 'nav-item' + (state.current===s.key ? ' active' : '');
+    div.innerHTML = `<div style="width:10px;height:10px;border-radius:50%;background:${palette[systems.indexOf(s)%palette.length]};"></div>
+                     <div style="flex:1"><strong style="display:block">${s.title}</strong><span class="muted">${s.subtitle}</span></div>`;
+    div.onclick = ()=>{ state.current = s.key; renderAll(); };
+    menuEl.appendChild(div);
+  });
+}
+
+function renderHeader(){
+  const s = systems.find(x=>x.key===state.current);
+  systemTitle.textContent = `${s.title} — ${s.subtitle}`;
+  systemSubtitle.textContent = s.key;
+  systemDesc.textContent = s.desc;
+}
+
+function renderTable(){
+  const rows = state.data[state.current] || [];
+  dataTbody.innerHTML = '';
+  listCount.textContent = `（共 ${rows.length} 筆）`;
+  if(rows.length===0){
+    dataTbody.innerHTML = `<tr><td colspan="5" class="muted">目前沒有資料，請點「新增筆錄」建立。</td></tr>`;
+    return;
+  }
+  rows.forEach(r=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${escapeHtml(r.name)}</td>
+                    <td>${escapeHtml(r.desc||'')}</td>
+                    <td>${r.qty}</td>
+                    <td>${formatCurrency(r.cost)}</td>
+                    <td>
+                      <button class="icon-btn" title="編輯" onclick="openEdit(${r.id})">✏️</button>
+                      <button class="icon-btn" title="刪除" onclick="removeRow(${r.id})">🗑️</button>
+                    </td>`;
+    dataTbody.appendChild(tr);
+  });
+}
+
+function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function formatCurrency(n){ if(!n && n!==0) return '-'; return 'NT$' + Number(n).toLocaleString(); }
+
+function openAdd(){
+  modalTitle.textContent = `新增筆錄 — ${state.current.toUpperCase()}`;
+  f_name.value=''; f_qty.value='1'; f_cost.value='0'; f_desc.value='';
+  modalRoot.style.display='flex';
+  modalRoot.dataset.editId = '';
+}
+function openEdit(id){
+  const rows = state.data[state.current];
+  const item = rows.find(x=>x.id===id);
+  if(!item) return alert('找不到資料');
+  modalTitle.textContent = `編輯筆錄 — ${state.current.toUpperCase()}`;
+  f_name.value = item.name; f_qty.value = item.qty; f_cost.value = item.cost; f_desc.value = item.desc||'';
+  modalRoot.style.display='flex';
+  modalRoot.dataset.editId = id;
+}
+
+function closeModal(){ modalRoot.style.display='none'; modalRoot.dataset.editId=''; }
+
+function saveModalHandler(){
+  const name = f_name.value.trim();
+  const qty = Number(f_qty.value) || 0;
+  const cost = Number(f_cost.value) || 0;
+  const desc = f_desc.value.trim();
+  if(!name) return alert('請填寫項目名稱');
+  const rows = state.data[state.current];
+  const editId = modalRoot.dataset.editId;
+  if(editId){
+    // update
+    const idx = rows.findIndex(x=>x.id==Number(editId));
+    if(idx>=0){
+      rows[idx].name = name; rows[idx].qty = qty; rows[idx].cost = cost; rows[idx].desc = desc;
+    }
+  } else {
+    // new id = max+1
+    const maxId = rows.reduce((m,r)=>Math.max(m,r.id||0),0);
+    rows.push({id:maxId+1, name, qty, cost, desc});
+  }
+  saveData();
+  closeModal();
+}
+
+function removeRow(id){
+  if(!confirm('確定刪除此筆資料？')) return;
+  const rows = state.data[state.current];
+  state.data[state.current] = rows.filter(x=>x.id!==id);
+  saveData();
+}
+
+/* --- EXPORT / IMPORT --- */
+function exportJson(){
+  const blob = new Blob([JSON.stringify(state.data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'system_data_export.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function importJson(){
+  const input = document.createElement('input');
+  input.type='file'; input.accept='application/json';
+  input.onchange = (e)=>{
+    const f = e.target.files[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const parsed = JSON.parse(reader.result);
+        // basic validation: must have keys for systems
+        const keys = Object.keys(parsed);
+        if(!systems.every(s=>keys.includes(s.key))) {
+          if(!confirm('載入的資料不包含所有系統，是否仍然覆蓋本機資料？')) return;
+        }
+        state.data = parsed;
+        saveData();
+        alert('匯入完成');
+      }catch(err){
+        alert('匯入失敗：檔案格式錯誤');
+      }
+    };
+    reader.readAsText(f);
+  };
+  input.click();
+}
+
+/* --- Pie Chart --- */
+function drawChart(){
+  const counts = systems.map(s => (state.data[s.key] && state.data[s.key].length) || 0);
+  const labels = systems.map(s=>s.title);
+  if(pieChart) pieChart.destroy();
+  pieChart = new Chart(pieCtx, {
+    type:'pie',
+    data:{
+      labels,
+      datasets:[{
+        data:counts,
+        backgroundColor: palette,
+        borderColor: '#fff',
+        borderWidth:2
+      }]
+    },
+    options:{
+      plugins:{
+        legend:{ position:'bottom', labels:{boxWidth:12, padding:12} }
+      },
+      maintainAspectRatio:false
+    }
+  });
+}
+
+/* --- render everything --- */
+function renderAll(){
+  renderMenu();
+  renderHeader();
+  renderTable();
+  drawChart();
+}
+
+/* --- events --- */
+addBtn.onclick = ()=> openAdd();
+resetBtn.onclick = ()=> resetToSample();
+cancelModal.onclick = ()=> closeModal();
+saveModal.onclick = ()=> saveModalHandler();
+exportBtn.onclick = ()=> exportJson();
+importBtn.onclick = ()=> importJson();
+
+/* allow modal close when clicking outside inner box */
+modalRoot.addEventListener('click', (e)=>{
+  if(e.target===modalRoot){ closeModal(); }
+});
+
+/* global helpers for inline onclick in rows */
+window.openEdit = openEdit;
+window.removeRow = removeRow;
+
+/* init */
+loadData();
+renderAll();
+
+</script>
+</body>
+</html>
