@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>文件管理系統 — 精美淺色暖色版</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbf8f5;
+    --panel:#ffffff;
+    --muted:#7a6b61;
+    --accent:#b65f2a; /* 暖色主色 */
+    --accent-2: #e9cdbf;
+    --accent-contrast: #fffaf7;
+    --success: #2e8b57;
+    --danger: #d9534f;
+    --glass: rgba(255,255,255,0.6);
+    --sidebar-width: 260px;
+    --radius:12px;
+    --shadow: 0 6px 18px rgba(21,18,15,0.06);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color-scheme: light;
+  }
+
+  /* alternative theme (neutral light) */
+  .theme-neutral {
+    --bg:#f6f6f7;
+    --panel:#ffffff;
+    --muted:#66686e;
+    --accent:#7b5e3e; /* neutral-warm darker */
+    --accent-2:#efe7de;
+    --accent-contrast:#ffffff;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#fff);color:#2b2b2b}
+  a{color:inherit}
+
+  /* layout */
+  .app {
+    display:flex;
+    min-height:100vh;
+  }
+
+  /* sidebar */
+  .sidebar{
+    width:var(--sidebar-width);
+    padding:28px 20px;
+    background:linear-gradient(180deg,var(--panel),var(--accent-contrast));
+    border-right:1px solid rgba(0,0,0,0.04);
+    box-shadow: var(--shadow);
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+
+  .brand {
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+  .logo {
+    width:54px;height:54px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),#f0b087);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:700;font-size:18px;
+    box-shadow: 0 6px 18px rgba(182,95,42,0.18);
+  }
+  .brand h1{font-size:16px;margin:0}
+  .brand p{margin:0;font-size:12px;color:var(--muted)}
+
+  nav.menu{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+  nav .menu-item{
+    padding:10px 12px;border-radius:10px;display:flex;align-items:center;gap:10px;
+    cursor:pointer;font-weight:600;color:var(--accent);
+  }
+  nav .menu-item:hover{background:var(--accent-2)}
+  nav .menu-item.active{background:linear-gradient(90deg,var(--accent-2),rgba(255,255,255,0.6));box-shadow:inset 0 1px 0 rgba(255,255,255,0.6)}
+
+  .sidebar .small{font-size:12px;color:var(--muted);margin-top:auto}
+
+  /* main content */
+  .main {
+    flex:1;padding:24px;
+  }
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;
+  }
+  .topbar .search{
+    flex:1;display:flex;gap:12px;align-items:center;
+    background:var(--panel);padding:10px;border-radius:12px;box-shadow:var(--shadow);
+  }
+  .search input{flex:1;border:0;background:transparent;outline:none;font-size:14px}
+  .actions{display:flex;gap:10px;align-items:center}
+
+  /* card */
+  .card{background:var(--panel);padding:16px;border-radius:var(--radius);box-shadow:var(--shadow)}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:10px;border-bottom:1px solid rgba(0,0,0,0.04);text-align:left}
+  th{font-size:12px;color:var(--muted);font-weight:600}
+  td .chip{display:inline-block;padding:6px 8px;border-radius:999px;font-size:12px}
+  .status-draft{background:#fff6e8;color:#b66d25}
+  .status-review{background:#fff4f4;color:#c64a4a}
+  .status-approved{background:#eef9f2;color:#1f8a52}
+
+  /* buttons */
+  .btn{padding:8px 12px;border-radius:10px;border:0;background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(0,0,0,0.06)}
+  .btn.danger{background:var(--danger)}
+  .btn.small{padding:6px 8px;font-size:13px}
+
+  /* layout columns */
+  .grid {display:grid;grid-template-columns:1fr 420px;gap:18px}
+  .right-panel{display:flex;flex-direction:column;gap:12px}
+
+  /* upload area */
+  .upload-box{border:2px dashed rgba(0,0,0,0.05);padding:14px;border-radius:10px;text-align:center;background:linear-gradient(180deg,transparent,var(--accent-contrast))}
+  input[type=file]{display:none}
+
+  /* user list */
+  .user-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px;border-radius:8px}
+  .role {font-weight:600;font-size:13px;color:var(--muted)}
+
+  /* responsive */
+  @media (max-width:900px){
+    .grid{grid-template-columns:1fr}
+    .sidebar{display:none}
+  }
+
+  /* login overlay */
+  .login-wrap{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(10,10,10,0.12), rgba(10,10,10,0.02));
+  }
+  .login{
+    width:420px;background:var(--panel);padding:22px;border-radius:14px;box-shadow:0 18px 40px rgba(11,9,7,0.12)
+  }
+  .login h2{margin:0 0 8px}
+  .field{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+  .field input, .field select{padding:10px;border-radius:9px;border:1px solid rgba(0,0,0,0.06);outline:none}
+  .small-quiet{font-size:12px;color:var(--muted)}
+
+  /* modal */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(0,0,0,0.32);display:flex;align-items:center;justify-content:center;
+  }
+  .modal{width:720px;background:var(--panel);padding:18px;border-radius:12px}
+  .form-row{display:flex;gap:10px}
+  .form-row > *{flex:1}
+  .muted{color:var(--muted);font-size:13px}
+  .tiny{font-size:12px;color:var(--muted)}
+
+  footer.small{margin-top:18px;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="app" class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">MH</div>
+      <div>
+        <h1>明慧文管系統</h1>
+        <p>文件 & 權限管理平台</p>
+      </div>
+    </div>
+
+    <nav class="menu" id="menu">
+      <div class="menu-item active" data-view="dashboard">📄 文件首頁</div>
+      <div class="menu-item" data-view="upload">⬆️ 上傳文件</div>
+      <div class="menu-item" data-view="users">👥 人員管理</div>
+      <div class="menu-item" data-view="settings">⚙️ 系統設定</div>
+      <div class="menu-item" data-view="about">ℹ️ 說明</div>
+    </nav>
+
+    <div style="margin-top:8px">
+      <button class="btn ghost" id="themeToggle">切換主題</button>
+    </div>
+
+    <div class="small">© 明慧系統</div>
+  </aside>
+
+  <!-- Main area -->
+  <main class="main">
+    <div class="topbar">
+      <div class="search card">
+        <input id="searchInput" placeholder="搜尋文件名稱、上傳人或標籤..." />
+        <div class="actions">
+          <button class="btn ghost" id="newDocBtn">新增空白檔</button>
+          <button class="btn" id="logoutBtn">登出</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="contentArea">
+      <!-- Dashboard view -->
+      <section id="dashboardView" class="grid">
+        <div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h3 style="margin:0">我的文件</h3>
+                <div class="tiny">快速檢視最近上傳與狀態</div>
+              </div>
+              <div class="muted tiny">共 <span id="totalCount">0</span> 筆文件</div>
+            </div>
+
+            <div style="margin-top:12px;overflow:auto">
+              <table id="docTable">
+                <thead>
+                  <tr><th>文件名稱</th><th>上傳者</th><th>更新時間</th><th>狀態</th><th>操作</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="height:14px"></div>
+
+          <div class="card">
+            <h4 style="margin:0 0 8px">活動紀錄</h4>
+            <div id="logList" class="tiny muted">目前尚無活動</div>
+          </div>
+        </div>
+
+        <aside class="right-panel">
+          <div class="card">
+            <h4 style="margin:0 0 8px">上傳快速操作</h4>
+            <label class="upload-box" for="fileInput" id="uploadZone">
+              點擊或拖曳檔案到此處上傳<br><span class="tiny muted">支援任意檔案（模擬上傳）</span>
+              <input type="file" id="fileInput" />
+            </label>
+          </div>
+
+          <div class="card">
+            <h4 style="margin:0 0 8px">篩選</h4>
+            <div style="display:flex;gap:8px">
+              <select id="filterStatus">
+                <option value="">所有狀態</option>
+                <option value="draft">草稿</option>
+                <option value="review">審核中</option>
+                <option value="approved">核准</option>
+              </select>
+              <select id="filterOwner"></select>
+            </div>
+            <div style="margin-top:10px">
+              <button class="btn ghost" id="clearFilters">清除篩選</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4 style="margin:0 0 8px">系統摘要</h4>
+            <div class="tiny muted">使用者：<span id="currentUserDisplay">未登入</span></div>
+            <div class="tiny muted">角色：<span id="currentRoleDisplay">—</span></div>
+            <footer class="small">系統為前端示範，資料保存在瀏覽器 localStorage。</footer>
+          </div>
+        </aside>
+      </section>
+
+      <!-- Upload view -->
+      <section id="uploadView" style="display:none">
+        <div class="card">
+          <h3>上傳新文件</h3>
+          <div class="field">
+            <label>選擇檔案（支援多選）</label>
+            <input type="file" id="multiFileInput" multiple />
+          </div>
+          <div class="field">
+            <label>標題</label>
+            <input id="uploadTitle" placeholder="文件標題（若多檔則為預設標題）" />
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px">
+            <button class="btn" id="doUpload">上傳</button>
+            <button class="btn ghost" id="backToDashboard">回首頁</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Users Management -->
+      <section id="usersView" style="display:none">
+        <div class="card">
+          <h3>人員管理</h3>
+          <div class="tiny muted">僅系統管理員可以新增/移除或變更權限。</div>
+          <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+            <input id="newUserName" placeholder="帳號（例如: alice）" />
+            <select id="newUserRole">
+              <option value="admin">Admin（管理員）</option>
+              <option value="editor">Editor（編輯）</option>
+              <option value="viewer">Viewer（檢視）</option>
+            </select>
+            <button class="btn" id="addUserBtn">新增人員</button>
+          </div>
+
+          <div style="margin-top:12px">
+            <div id="userList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section id="settingsView" style="display:none">
+        <div class="card">
+          <h3>系統設定</h3>
+          <div class="field">
+            <label>系統名稱</label>
+            <input id="sysName" value="明慧文管系統" />
+          </div>
+          <div style="margin-top:10px">
+            <button class="btn" id="saveSys">保存</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- About -->
+      <section id="aboutView" style="display:none">
+        <div class="card">
+          <h3>關於</h3>
+          <p class="muted tiny">
+            這是一個前端模擬的文件管理 UI 範例。功能示範：登入/權限、文件上傳、編輯狀態、使用者管理與檔案下載。實務上請搭配後端 API 與檔案儲存服務。
+          </p>
+          <p class="tiny muted">設計：淺色暖色系，簡潔、專業、友好。</p>
+        </div>
+      </section>
+    </div>
+
+  </main>
+</div>
+
+<!-- Login Overlay -->
+<div id="loginOverlay" class="login-wrap">
+  <div class="login card">
+    <h2>登入 系統</h2>
+    <div class="field">
+      <label>帳號</label>
+      <input id="loginUser" placeholder="輸入帳號（例如 admin）" />
+    </div>
+    <div class="field">
+      <label>密碼</label>
+      <input id="loginPass" type="password" placeholder="任意測試密碼" />
+    </div>
+    <div class="field" style="flex-direction:row;align-items:center;gap:8px;margin-top:12px">
+      <button class="btn" id="loginBtn">登入</button>
+      <div style="margin-left:auto" class="small-quiet">測試帳號：admin/editor/viewer（密碼任意）</div>
+    </div>
+    <div style="margin-top:10px" class="tiny muted">登入後系統會根據角色顯示不同權限。</div>
+  </div>
+</div>
+
+<!-- Modal: Edit Document -->
+<div id="editModal" style="display:none">
+  <div class="modal-backdrop">
+    <div class="modal">
+      <h3 id="editModalTitle">編輯文件</h3>
+      <div class="form-row" style="margin-top:8px">
+        <input id="editTitle" />
+        <select id="editStatus">
+          <option value="draft">草稿</option>
+          <option value="review">審核中</option>
+          <option value="approved">核准</option>
+        </select>
+      </div>
+      <div style="margin-top:10px">
+        <label class="tiny muted">上傳者</label>
+        <div id="editOwner" class="muted tiny"></div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" id="cancelEdit">取消</button>
+        <button class="btn" id="saveEdit">儲存變更</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* --- 初始資料：若 localStorage 無資料則注入範例使用者與文件 --- */
+const DB_KEYS = { USERS: 'dm_users_v1', DOCS:'dm_docs_v1', LOGS:'dm_logs_v1', SYS:'dm_sys_v1' };
+
+function nowISO(){ return new Date().toISOString(); }
+
+function seedIfEmpty(){
+  if(!localStorage.getItem(DB_KEYS.USERS)){
+    const users = [
+      {id: 'admin', role:'admin', name:'系統管理者'},
+      {id: 'editor', role:'editor', name:'編輯人員'},
+      {id: 'viewer', role:'viewer', name:'檢視者'}
+    ];
+    localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
+  }
+  if(!localStorage.getItem(DB_KEYS.DOCS)){
+    const docs = [
+      {id: genId(), title:'公司政策手冊.pdf', owner:'admin', status:'approved', updated: nowISO(), size: '82KB', contentType:'application/pdf', dataBase64: '', note:'範例檔（未含實際二進位）'},
+      {id: genId(), title:'系統需求說明.docx', owner:'editor', status:'review', updated: nowISO(), size:'54KB', contentType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document', dataBase64:'', note:''},
+      {id: genId(), title:'專案進度_2025.xlsx', owner:'editor', status:'draft', updated: nowISO(), size:'24KB', contentType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', dataBase64:'', note:''}
+    ];
+    localStorage.setItem(DB_KEYS.DOCS, JSON.stringify(docs));
+  }
+  if(!localStorage.getItem(DB_KEYS.LOGS)){
+    localStorage.setItem(DB_KEYS.LOGS, JSON.stringify([]));
+  }
+  if(!localStorage.getItem(DB_KEYS.SYS)){
+    localStorage.setItem(DB_KEYS.SYS, JSON.stringify({name:'明慧文管系統', theme:'warm'}));
+  }
+}
+
+function genId(){ return 'd_' + Math.random().toString(36).slice(2,10); }
+seedIfEmpty();
+
+/* --- app state --- */
+let state = {
+  currentUser: null,
+  currentView: 'dashboard',
+  editDocId: null
+};
+
+/* --- helpers to read/write db --- */
+function read(key){ return JSON.parse(localStorage.getItem(key) || 'null'); }
+function write(key,v){ localStorage.setItem(key, JSON.stringify(v)); }
+function logAction(text){
+  const logs = read(DB_KEYS.LOGS) || [];
+  logs.unshift({t: nowISO(), text});
+  write(DB_KEYS.LOGS, logs.slice(0,50));
+  renderLogs();
+}
+
+/* --- UI binding --- */
+const loginOverlay = document.getElementById('loginOverlay');
+const loginBtn = document.getElementById('loginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const loginUser = document.getElementById('loginUser');
+const loginPass = document.getElementById('loginPass');
+const currentUserDisplay = document.getElementById('currentUserDisplay');
+const currentRoleDisplay = document.getElementById('currentRoleDisplay');
+const menuItems = document.querySelectorAll('.menu-item');
+const views = { dashboard: document.getElementById('dashboardView'), upload: document.getElementById('uploadView'), users: document.getElementById('usersView'), settings: document.getElementById('settingsView'), about: document.getElementById('aboutView') };
+const docTableBody = document.querySelector('#docTable tbody');
+const totalCount = document.getElementById('totalCount');
+const fileInput = document.getElementById('fileInput');
+const multiFileInput = document.getElementById('multiFileInput');
+const uploadZone = document.getElementById('uploadZone');
+const filterStatus = document.getElementById('filterStatus');
+const filterOwner = document.getElementById('filterOwner');
+const clearFilters = document.getElementById('clearFilters');
+const searchInput = document.getElementById('searchInput');
+const newDocBtn = document.getElementById('newDocBtn');
+const themeToggle = document.getElementById('themeToggle');
+const editModal = document.getElementById('editModal');
+const editTitle = document.getElementById('editTitle');
+const editStatus = document.getElementById('editStatus');
+const editOwner = document.getElementById('editOwner');
+const saveEdit = document.getElementById('saveEdit');
+const cancelEdit = document.getElementById('cancelEdit');
+const userListEl = document.getElementById('userList');
+const addUserBtn = document.getElementById('addUserBtn');
+const newUserName = document.getElementById('newUserName');
+const newUserRole = document.getElementById('newUserRole');
+const filterOwnerSelect = filterOwner;
+const logList = document.getElementById('logList');
+const newDocBtnTop = document.getElementById('newDocBtn');
+const multiUploadBtn = document.getElementById('doUpload');
+
+const sysName = document.getElementById('sysName');
+const saveSys = document.getElementById('saveSys');
+const backToDashboard = document.getElementById('backToDashboard');
+const totalCountLabel = totalCount;
+
+/* --- navigation --- */
+menuItems.forEach(mi => mi.addEventListener('click', ()=> {
+  menuItems.forEach(m=>m.classList.remove('active'));
+  mi.classList.add('active');
+  showView(mi.dataset.view);
+}));
+
+function showView(name){
+  state.currentView = name;
+  Object.keys(views).forEach(k=>{
+    views[k].style.display = (k===name) ? '' : 'none';
+  });
+}
+
+/* --- theme toggle --- */
+function applyTheme(){
+  const sys = read(DB_KEYS.SYS) || {};
+  if(sys.theme === 'neutral') document.documentElement.classList.add('theme-neutral');
+  else document.documentElement.classList.remove('theme-neutral');
+}
+themeToggle.addEventListener('click', ()=>{
+  const sys = read(DB_KEYS.SYS) || {};
+  sys.theme = (sys.theme === 'neutral') ? 'warm' : 'neutral';
+  write(DB_KEYS.SYS, sys);
+  applyTheme();
+});
+
+/* --- login/logout --- */
+loginBtn.addEventListener('click', ()=>{
+  const u = loginUser.value.trim();
+  if(!u){ alert('請輸入帳號'); return; }
+  const users = read(DB_KEYS.USERS) || [];
+  let found = users.find(x=>x.id===u);
+  // 若不存在，自動建立 viewer（模擬）
+  if(!found){
+    found = {id:u, role:'viewer', name:u};
+    users.push(found);
+    write(DB_KEYS.USERS, users);
+  }
+  state.currentUser = found;
+  loginOverlay.style.display = 'none';
+  currentUserDisplay.textContent = found.name + ' ('+found.id+')';
+  currentRoleDisplay.textContent = found.role;
+  logAction(`使用者 ${found.id} 登入`);
+  renderAll();
+});
+
+logoutBtn.addEventListener('click', ()=>{
+  if(!confirm('確定要登出嗎？')) return;
+  logAction(`使用者 ${state.currentUser?.id || '訪客'} 登出`);
+  state.currentUser = null;
+  loginOverlay.style.display = '';
+  currentUserDisplay.textContent = '未登入';
+  currentRoleDisplay.textContent = '—';
+});
+
+/* --- render documents table --- */
+function getDocs(){
+  const docs = read(DB_KEYS.DOCS) || [];
+  return docs;
+}
+function renderDocs(){
+  const docs = getDocs();
+  const q = (searchInput.value || '').toLowerCase();
+  const statusFilter = filterStatus.value;
+  const ownerFilter = filterOwner.value;
+
+  const filtered = docs.filter(d=>{
+    if(statusFilter && d.status !== statusFilter) return false;
+    if(ownerFilter && d.owner !== ownerFilter) return false;
+    if(!q) return true;
+    return (d.title||'').toLowerCase().includes(q) || (d.owner||'').toLowerCase().includes(q) || (d.note||'').toLowerCase().includes(q);
+  });
+
+  docTableBody.innerHTML = '';
+  filtered.forEach(d=>{
+    const tr = document.createElement('tr');
+    const titleTd = document.createElement('td');
+    titleTd.innerHTML = `<div style="font-weight:600">${escapeHtml(d.title)}</div><div class="tiny muted">${d.size} • ${d.contentType || '—'}</div>`;
+    const ownerTd = document.createElement('td'); ownerTd.textContent = d.owner;
+    const updatedTd = document.createElement('td'); updatedTd.textContent = new Date(d.updated).toLocaleString();
+    const statusTd = document.createElement('td');
+    let statusLabel = '';
+    if(d.status==='draft') statusLabel = `<span class="chip status-draft">草稿</span>`;
+    if(d.status==='review') statusLabel = `<span class="chip status-review">審核中</span>`;
+    if(d.status==='approved') statusLabel = `<span class="chip status-approved">核准</span>`;
+    statusTd.innerHTML = statusLabel;
+
+    const actionsTd = document.createElement('td');
+    // buttons visible by role
+    const role = state.currentUser?.role || 'viewer';
+    // download always available
+    const downBtn = document.createElement('button'); downBtn.className='btn small ghost'; downBtn.textContent='下載'; downBtn.onclick = ()=>downloadDoc(d.id);
+    actionsTd.appendChild(downBtn);
+    if(role === 'admin' || role === 'editor'){
+      const editBtn = document.createElement('button'); editBtn.className='btn small'; editBtn.textContent='編輯'; editBtn.onclick = ()=>openEdit(d.id);
+      actionsTd.appendChild(editBtn);
+    }
+    if(role === 'admin'){
+      const delBtn = document.createElement('button'); delBtn.className='btn small danger'; delBtn.textContent='刪除'; delBtn.onclick = ()=>deleteDoc(d.id);
+      actionsTd.appendChild(delBtn);
+    }
+    tr.appendChild(titleTd);
+    tr.appendChild(ownerTd);
+    tr.appendChild(updatedTd);
+    tr.appendChild(statusTd);
+    tr.appendChild(actionsTd);
+    docTableBody.appendChild(tr);
+  });
+
+  totalCount.textContent = filtered.length;
+}
+
+/* escape */
+function escapeHtml(s){ return (s||'').replace(/[&<>"]/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m])); }
+
+/* download document (reconstruct from base64 if present, otherwise create placeholder) */
+function downloadDoc(id){
+  const docs = getDocs();
+  const d = docs.find(x=>x.id===id);
+  if(!d) return alert('找不到文件');
+  logAction(`下載 ${d.title} (by ${state.currentUser?.id||'guest'})`);
+  // if dataBase64 available, convert
+  if(d.dataBase64){
+    const blob = base64ToBlob(d.dataBase64, d.contentType || 'application/octet-stream');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = d.title || 'download.bin'; document.body.appendChild(a); a.click();
+    a.remove(); URL.revokeObjectURL(url);
+  } else {
+    // create simple text file placeholder
+    const contents = `檔名: ${d.title}\n上傳者: ${d.owner}\n建立時間: ${d.updated}\n狀態: ${d.status}\n\n（此為前端示範檔，實際檔案內容尚未上傳）`;
+    const blob = new Blob([contents], {type:'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href = url; a.download = d.title || 'placeholder.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  }
+}
+
+/* base64 to blob */
+function base64ToBlob(base64, mime){
+  const binStr = atob(base64.split(',').pop());
+  const len = binStr.length;
+  const arr = new Uint8Array(len);
+  for(let i=0;i<len;i++) arr[i]=binStr.charCodeAt(i);
+  return new Blob([arr], {type:mime});
+}
+
+/* open edit modal */
+function openEdit(id){
+  state.editDocId = id;
+  const docs = getDocs();
+  const d = docs.find(x=>x.id===id);
+  if(!d) return;
+  editTitle.value = d.title;
+  editStatus.value = d.status;
+  editOwner.textContent = d.owner;
+  editModal.style.display = '';
+}
+
+/* save edit */
+saveEdit.addEventListener('click', ()=>{
+  const docs = getDocs();
+  const d = docs.find(x=>x.id===state.editDocId);
+  if(!d) return;
+  d.title = editTitle.value || d.title;
+  d.status = editStatus.value;
+  d.updated = nowISO();
+  write(DB_KEYS.DOCS, docs);
+  editModal.style.display = 'none';
+  logAction(`文件 ${d.title} 已更新（${state.currentUser?.id || 'unknown'}）`);
+  renderDocs();
+});
+cancelEdit.addEventListener('click', ()=>{ editModal.style.display = 'none'; });
+
+/* delete */
+function deleteDoc(id){
+  if(!confirm('確定刪除此文件？')) return;
+  const docs = getDocs();
+  const idx = docs.findIndex(x=>x.id===id);
+  if(idx===-1) return;
+  const removed = docs.splice(idx,1)[0];
+  write(DB_KEYS.DOCS, docs);
+  logAction(`文件 ${removed.title} 被刪除（${state.currentUser?.id}）`);
+  renderDocs();
+}
+
+/* upload handling (single file input on sidebar) */
+fileInput.addEventListener('change', async (e) => {
+  const f = e.target.files[0];
+  if(!f) return;
+  await processFileUpload(f);
+  e.target.value='';
+});
+
+/* multi upload */
+multiFileInput.addEventListener('change', async (e)=>{
+  const files = Array.from(e.target.files);
+  const title = document.getElementById('uploadTitle').value || '';
+  for(const f of files){
+    await processFileUpload(f, title);
+  }
+  e.target.value='';
+});
+
+/* drag and drop */
+uploadZone.addEventListener('dragover', (e)=>{ e.preventDefault(); uploadZone.style.opacity=0.9; });
+uploadZone.addEventListener('dragleave', ()=>{ uploadZone.style.opacity=1; });
+uploadZone.addEventListener('drop', async (e)=>{ e.preventDefault(); uploadZone.style.opacity=1;
+  const files = Array.from(e.dataTransfer.files || []);
+  for(const f of files) await processFileUpload(f);
+});
+
+/* process file: read base64 and store */
+async function processFileUpload(file, titleFallback=''){
+  if(!state.currentUser) return alert('請先登入');
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = ()=>{
+    const base64 = reader.result;
+    const docs = getDocs();
+    const doc = {
+      id: genId(),
+      title: titleFallback || file.name,
+      owner: state.currentUser.id,
+      status:'draft',
+      updated: nowISO(),
+      size: Math.round(file.size/1024) + 'KB',
+      contentType: file.type || 'application/octet-stream',
+      dataBase64: base64,
+      note:'上傳檔案'
+    };
+    docs.unshift(doc);
+    write(DB_KEYS.DOCS, docs);
+    logAction(`上傳檔案 ${doc.title}（${state.currentUser.id}）`);
+    renderDocs();
+  };
+}
+
+/* new blank doc */
+newDocBtnTop.addEventListener('click', ()=>{
+  if(!state.currentUser) return alert('請先登入');
+  const docs = getDocs();
+  const d = { id: genId(), title:`新建文件_${new Date().toLocaleString()}`, owner: state.currentUser.id, status:'draft', updated: nowISO(), size:'0KB', contentType:'text/plain', dataBase64: btoa(''), note:'空白文件' };
+  docs.unshift(d); write(DB_KEYS.DOCS, docs);
+  logAction(`建立空白文件 ${d.title}（${state.currentUser.id}）`);
+  renderDocs();
+});
+
+/* search / filters */
+searchInput.addEventListener('input', ()=> renderDocs());
+filterStatus.addEventListener('change', ()=> renderDocs());
+filterOwner.addEventListener('change', ()=> renderDocs());
+clearFilters.addEventListener('click', ()=>{ filterStatus.value=''; filterOwner.value=''; renderDocs(); });
+
+/* render users */
+function renderUsers(){
+  const users = read(DB_KEYS.USERS) || [];
+  userListEl.innerHTML = '';
+  users.forEach(u=>{
+    const div = document.createElement('div');
+    div.className='user-row';
+    div.innerHTML = `<div style="display:flex;gap:12px;align-items:center">
+      <div style="width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#f0b087);color:white;display:flex;align-items:center;justify-content:center;font-weight:700">${u.id[0].toUpperCase()}</div>
+      <div>
+        <div style="font-weight:700">${u.name} <span style="font-size:12px;color:var(--muted)">(${u.id})</span></div>
+        <div class="muted tiny">角色: <span class="role">${u.role}</span></div>
+      </div>
+    </div>`;
+    const controls = document.createElement('div');
+    if(state.currentUser?.role === 'admin'){
+      const roleSel = document.createElement('select');
+      ['admin','editor','viewer'].forEach(r=>{ const o=document.createElement('option'); o.value=r; o.textContent=r; if(u.role===r) o.selected=true; roleSel.appendChild(o); });
+      roleSel.addEventListener('change', ()=>{ u.role = roleSel.value; write(DB_KEYS.USERS, users); logAction(`使用者 ${u.id} 角色變更為 ${u.role}`); renderUsers(); renderDocs(); });
+      const del = document.createElement('button'); del.className='btn small danger'; del.textContent='移除'; del.onclick = ()=>{ if(!confirm('確定移除此人員？')) return; const arr = users.filter(x=>x.id!==u.id); write(DB_KEYS.USERS, arr); logAction(`使用者 ${u.id} 被移除`); renderUsers(); };
+      controls.appendChild(roleSel); controls.appendChild(del);
+    } else {
+      controls.innerHTML = `<div class="tiny muted">無權限變更</div>`;
+    }
+    div.appendChild(controls);
+    userListEl.appendChild(div);
+  });
+}
+
+/* add user */
+addUserBtn.addEventListener('click', ()=>{
+  if(!state.currentUser || state.currentUser.role !== 'admin'){ return alert('僅管理員可新增使用者'); }
+  const id = (newUserName.value||'').trim();
+  const role = newUserRole.value;
+  if(!id) return alert('請輸入帳號');
+  const users = read(DB_KEYS.USERS) || [];
+  if(users.find(x=>x.id===id)) return alert('帳號已存在');
+  users.push({id, role, name:id});
+  write(DB_KEYS.USERS, users);
+  logAction(`新增使用者 ${id}（${role}）`);
+  newUserName.value=''; renderUsers(); populateFilterOwner();
+});
+
+/* populate owner filter */
+function populateFilterOwner(){
+  const users = read(DB_KEYS.USERS) || [];
+  filterOwner.innerHTML = '<option value="">所有人</option>';
+  users.forEach(u => {
+    const opt = document.createElement('option'); opt.value = u.id; opt.textContent = u.name + ' ('+u.id+')'; filterOwner.appendChild(opt);
+  });
+}
+
+/* logs */
+function renderLogs(){
+  const logs = read(DB_KEYS.LOGS) || [];
+  if(!logs.length) return logList.textContent = '目前尚無活動';
+  logList.innerHTML = logs.slice(0,8).map(l=>`<div style="padding:6px 0;border-bottom:1px dashed rgba(0,0,0,0.04)">${new Date(l.t).toLocaleString()} — <span class="muted">${escapeHtml(l.text)}</span></div>`).join('');
+}
+
+/* settings save */
+saveSys.addEventListener('click', ()=>{
+  const s = read(DB_KEYS.SYS) || {};
+  s.name = sysName.value || s.name;
+  write(DB_KEYS.SYS,s);
+  alert('已儲存設定');
+});
+
+/* initial render */
+function renderAll(){
+  applyTheme();
+  populateFilterOwner();
+  renderUsers();
+  renderDocs();
+  renderLogs();
+  const s = read(DB_KEYS.SYS) || {};
+  sysName.value = s.name || sysName.value;
+  // show current user display
+  currentUserDisplay.textContent = state.currentUser ? (state.currentUser.name + ' ('+state.currentUser.id+')') : '未登入';
+  currentRoleDisplay.textContent = state.currentUser ? state.currentUser.role : '—';
+}
+
+/* quick back to dashboard */
+backToDashboard.addEventListener('click', ()=> { showView('dashboard'); menuItems.forEach(m=>m.classList.remove('active')); document.querySelector('.menu-item[data-view="dashboard"]').classList.add('active'); });
+
+/* delete doc via keyboard? Not necessary */
+
+/* simple utility: convert DataURL to base64 string without prefix if needed (we store full dataUrl) */
+
+/* initial */
+renderAll();
+
+/* quick UX: if already logged in from previous session, restore first user as logged in (optional) */
+(function restoreIfSingle(){
+  // no auto-login to respect security; user must login manually
+})();
+
+/* helper: small demo logs */
+if((read(DB_KEYS.LOGS)||[]).length===0){
+  logAction('系統初始化完成');
+}
+
+/* allow downloading placeholder when doc has no data */
+function ensureDocData(doc){
+  if(!doc.dataBase64) doc.dataBase64 = '';
+}
+
+/* small escape for content */
+function safe(s){ return s || ''; }
+
+/* expose some global for debugging (optional) */
+window.__DM = { read, write, getDocs, logAction };
+
+/* render at intervals (for simplicity) */
+setInterval(()=>{ renderDocs(); renderUsers(); renderLogs(); }, 3500);
+
+</script>
+</body>
+</html>
