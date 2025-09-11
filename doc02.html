@@ -1,261 +1,163 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>檔案管理系統</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>檔案文件管理系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#fdfaf7;
+:root{
+  --bg:#fdfbf9;
   --panel:#ffffff;
-  --muted:#6f625a;
-  --accent:#c0703c; /* 暖色 */
-  --accent-light:#f1dfd4;
-  --danger:#d9534f;
-  --success:#2e8b57;
-  --radius:12px;
-  --shadow:0 6px 18px rgba(0,0,0,0.05);
+  --accent:#c97a40;   /* 暖橘色 */
+  --accent-light:#f4e2d6;
+  --text:#2b2b2b;
+  --muted:#7a6b61;
+  --shadow:0 4px 12px rgba(0,0,0,0.08);
+  --radius:10px;
+  --sidebar-width:250px;
+  font-family:"Inter", sans-serif;
 }
-*{box-sizing:border-box;font-family:"Inter",sans-serif;}
-body,html{margin:0;height:100%;background:var(--bg);color:#2b2b2b}
-.app{display:flex;min-height:100vh}
+body,html{margin:0;height:100%;background:var(--bg);color:var(--text);}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit}
 
-/* Sidebar */
+.app{display:flex;height:100vh}
+
+/* sidebar */
 .sidebar{
-  width:240px;background:var(--panel);border-right:1px solid #eee;
-  padding:20px;display:flex;flex-direction:column;box-shadow:var(--shadow)
+  width:var(--sidebar-width);
+  background:var(--panel);
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  padding:20px;
 }
-.logo{
-  width:60px;height:60px;border-radius:12px;
-  background:linear-gradient(135deg,var(--accent),#f0b087);
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-weight:700;font-size:18px;margin-bottom:10px
-}
-.brand{font-size:16px;font-weight:700;margin-bottom:20px}
-.menu{display:flex;flex-direction:column;gap:8px}
-.menu-item{padding:10px;border-radius:10px;cursor:pointer;font-weight:600;color:var(--accent)}
-.menu-item:hover{background:var(--accent-light)}
-.menu-item.active{background:var(--accent-light);box-shadow:inset 0 0 0 1px #e3c9b5}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.logo{width:50px;height:50px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#e3a877);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:18px}
+.brand h1{font-size:16px;margin:0}
+nav.menu{display:flex;flex-direction:column;gap:8px}
+.menu-item{padding:10px;border-radius:var(--radius);font-weight:600;color:var(--accent)}
+.menu-item:hover,.menu-item.active{background:var(--accent-light)}
 
-/* Main */
-.main{flex:1;padding:20px}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+/* main */
+.main{flex:1;padding:20px;overflow:auto}
 .card{background:var(--panel);padding:16px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:20px}
+h2,h3{margin:0 0 12px}
+
+/* table */
 table{width:100%;border-collapse:collapse}
-th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
-th{color:var(--muted);text-align:left;font-size:13px}
-.status{padding:4px 8px;border-radius:999px;font-size:12px}
-.draft{background:#fff3e0;color:#c0703c}
-.review{background:#fdecea;color:#b54b4b}
-.approved{background:#e8f6ef;color:#1f8a52}
+th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}
+.status{padding:4px 8px;border-radius:6px;font-size:12px}
+.status.draft{background:#fff6e8;color:#b66d25}
+.status.review{background:#fff0f0;color:#b94a4a}
+.status.approved{background:#ecf9f0;color:#1f7d4c}
 
-/* Buttons */
-.btn{padding:8px 12px;border:0;border-radius:8px;font-weight:600;cursor:pointer}
+/* buttons */
+.btn{padding:6px 12px;border-radius:8px;border:none;font-weight:600}
 .btn.primary{background:var(--accent);color:#fff}
-.btn.ghost{background:transparent;border:1px solid #ddd;color:var(--accent)}
-.btn.danger{background:var(--danger);color:#fff}
-.btn.small{font-size:12px;padding:5px 8px}
+.btn.ghost{background:transparent;border:1px solid var(--accent);color:var(--accent)}
+.btn.danger{background:#d9534f;color:#fff}
 
-/* Login overlay */
-.login-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2)}
-.login{background:var(--panel);padding:24px;border-radius:12px;box-shadow:var(--shadow);width:360px}
+/* login */
+.login-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.1)}
+.login{background:var(--panel);padding:24px;border-radius:12px;box-shadow:var(--shadow);width:340px}
 .login h2{margin-top:0}
-.field{display:flex;flex-direction:column;gap:6px;margin-top:10px}
-.field input{padding:10px;border-radius:8px;border:1px solid #ccc}
+.field{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.field input{padding:10px;border:1px solid #ccc;border-radius:8px}
 
-/* Responsive */
-@media(max-width:768px){
-  .sidebar{display:none}
-}
+/* responsive */
+@media(max-width:800px){.sidebar{display:none}}
 </style>
 </head>
 <body>
-<div class="app">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="logo">FM</div>
-    <div class="brand">檔案管理系統</div>
-    <div class="menu">
-      <div class="menu-item active" data-view="dashboard">📂 文件首頁</div>
-      <div class="menu-item" data-view="upload">⬆️ 上傳文件</div>
-      <div class="menu-item" data-view="users">👥 人員管理</div>
-      <div class="menu-item" data-view="about">ℹ️ 說明</div>
+<div id="loginPage" class="login-wrap">
+  <div class="login">
+    <h2>登入 檔案文件管理系統</h2>
+    <div class="field"><label>帳號</label><input id="username"></div>
+    <div class="field"><label>密碼</label><input id="password" type="password"></div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn primary" onclick="login()">登入</button>
+      <button class="btn ghost" onclick="guest()">訪客進入</button>
     </div>
+  </div>
+</div>
+
+<div id="app" class="app" style="display:none">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">FM</div>
+      <div>
+        <h1>檔案文件管理系統</h1>
+      </div>
+    </div>
+    <nav class="menu">
+      <div class="menu-item active" onclick="showView('dashboard')">📄 文件首頁</div>
+      <div class="menu-item" onclick="showView('upload')">⬆️ 上傳文件</div>
+      <div class="menu-item" onclick="showView('users')">👥 人員管理</div>
+      <div class="menu-item" onclick="logout()">🚪 登出</div>
+    </nav>
   </aside>
 
-  <!-- Main -->
   <main class="main">
-    <div class="topbar">
-      <h2 id="viewTitle">文件首頁</h2>
-      <button class="btn ghost" id="logoutBtn">登出</button>
-    </div>
-
-    <!-- Dashboard -->
+    <!-- dashboard -->
     <section id="dashboardView" class="card">
-      <h3>我的文件</h3>
-      <table id="docTable">
-        <thead><tr><th>文件名稱</th><th>上傳者</th><th>狀態</th><th>操作</th></tr></thead>
-        <tbody></tbody>
+      <h2>我的文件</h2>
+      <table>
+        <thead><tr><th>名稱</th><th>上傳者</th><th>時間</th><th>狀態</th><th>操作</th></tr></thead>
+        <tbody id="docTable">
+          <tr>
+            <td>專案需求.docx</td><td>Admin</td><td>2025-09-11</td>
+            <td><span class="status draft">草稿</span></td>
+            <td>
+              <button class="btn ghost small">編輯</button>
+              <button class="btn danger small">刪除</button>
+              <button class="btn primary small">下載</button>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </section>
 
-    <!-- Upload -->
+    <!-- upload -->
     <section id="uploadView" class="card" style="display:none">
-      <h3>上傳文件</h3>
-      <div class="field"><input type="file" id="fileInput" /></div>
-      <button class="btn primary" id="uploadBtn">上傳</button>
+      <h2>上傳文件</h2>
+      <div class="field"><label>選擇檔案</label><input type="file" multiple></div>
+      <div style="margin-top:12px"><button class="btn primary">上傳</button></div>
     </section>
 
-    <!-- Users -->
+    <!-- users -->
     <section id="usersView" class="card" style="display:none">
-      <h3>人員管理</h3>
-      <div class="field"><input id="newUser" placeholder="輸入帳號"/></div>
-      <select id="newRole">
-        <option value="admin">Admin</option>
-        <option value="editor">Editor</option>
-        <option value="viewer">Viewer</option>
-      </select>
-      <button class="btn primary" id="addUser">新增人員</button>
-      <div id="userList" style="margin-top:12px"></div>
-    </section>
-
-    <!-- About -->
-    <section id="aboutView" class="card" style="display:none">
-      <h3>關於</h3>
-      <p>這是「檔案管理系統」前端範例。包含文件上傳、下載、狀態管理、編輯刪除與人員管理。</p>
+      <h2>人員管理</h2>
+      <div class="field"><label>新增人員</label><input placeholder="帳號名稱"></div>
+      <div style="margin-top:12px"><button class="btn primary">新增</button></div>
+      <h3 style="margin-top:20px">現有人員</h3>
+      <ul>
+        <li>Admin（管理員）</li>
+        <li>Editor（編輯）</li>
+        <li>Viewer（檢視）</li>
+      </ul>
     </section>
   </main>
 </div>
 
-<!-- Login -->
-<div id="loginOverlay" class="login-wrap">
-  <div class="login">
-    <h2>登入檔案管理系統</h2>
-    <div class="field"><label>帳號</label><input id="loginUser"></div>
-    <div class="field"><label>密碼</label><input id="loginPass" type="password"></div>
-    <button class="btn primary" id="loginBtn">登入</button>
-    <p style="font-size:12px;color:var(--muted)">測試帳號：admin / editor / viewer (密碼任意)</p>
-  </div>
-</div>
-
 <script>
-const DB_USERS="fm_users",DB_DOCS="fm_docs";
-function initData(){
-  if(!localStorage.getItem(DB_USERS)){
-    localStorage.setItem(DB_USERS,JSON.stringify([
-      {id:"admin",role:"admin"},
-      {id:"editor",role:"editor"},
-      {id:"viewer",role:"viewer"}
-    ]));
-  }
-  if(!localStorage.getItem(DB_DOCS)){
-    localStorage.setItem(DB_DOCS,JSON.stringify([]));
-  }
+function login(){
+  document.getElementById("loginPage").style.display="none";
+  document.getElementById("app").style.display="flex";
 }
-initData();
-
-let currentUser=null;
-const loginOverlay=document.getElementById("loginOverlay");
-document.getElementById("loginBtn").onclick=()=>{
-  const u=document.getElementById("loginUser").value.trim();
-  const users=JSON.parse(localStorage.getItem(DB_USERS));
-  const found=users.find(x=>x.id===u);
-  if(found){currentUser=found;loginOverlay.style.display="none";renderDocs();renderUsers();}
-  else alert("無此帳號");
-};
-document.getElementById("logoutBtn").onclick=()=>{currentUser=null;loginOverlay.style.display="flex";};
-
-/* Navigation */
-document.querySelectorAll(".menu-item").forEach(item=>{
-  item.onclick=()=>{
-    document.querySelectorAll(".menu-item").forEach(i=>i.classList.remove("active"));
-    item.classList.add("active");
-    const v=item.dataset.view;
-    document.getElementById("viewTitle").innerText=item.innerText;
-    ["dashboardView","uploadView","usersView","aboutView"].forEach(id=>document.getElementById(id).style.display="none");
-    if(v==="dashboard")document.getElementById("dashboardView").style.display="block";
-    if(v==="upload")document.getElementById("uploadView").style.display="block";
-    if(v==="users")document.getElementById("usersView").style.display="block";
-    if(v==="about")document.getElementById("aboutView").style.display="block";
-  };
-});
-
-/* Documents */
-function renderDocs(){
-  const docs=JSON.parse(localStorage.getItem(DB_DOCS));
-  const tbody=document.querySelector("#docTable tbody");
-  tbody.innerHTML="";
-  docs.forEach((d,i)=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${d.name}</td><td>${d.owner}</td>
-      <td><span class="status ${d.status}">${d.status}</span></td>
-      <td>
-        <button class="btn small ghost" onclick="downloadDoc(${i})">下載</button>
-        ${currentUser.role!=="viewer"?`
-        <button class="btn small" onclick="editDoc(${i})">編輯</button>
-        <button class="btn small danger" onclick="deleteDoc(${i})">刪除</button>`:""}
-      </td>`;
-    tbody.appendChild(tr);
+function guest(){login();}
+function logout(){
+  document.getElementById("loginPage").style.display="flex";
+  document.getElementById("app").style.display="none";
+}
+function showView(id){
+  ["dashboard","upload","users"].forEach(v=>{
+    document.getElementById(v+"View").style.display=(v===id)?"block":"none";
   });
+  document.querySelectorAll(".menu-item").forEach(el=>el.classList.remove("active"));
+  event.target.classList.add("active");
 }
-function downloadDoc(i){
-  alert("模擬下載："+JSON.parse(localStorage.getItem(DB_DOCS))[i].name);
-}
-function editDoc(i){
-  const docs=JSON.parse(localStorage.getItem(DB_DOCS));
-  const d=docs[i];
-  const newStatus=prompt("輸入新狀態 draft/review/approved",d.status);
-  if(newStatus)d.status=newStatus;
-  localStorage.setItem(DB_DOCS,JSON.stringify(docs));
-  renderDocs();
-}
-function deleteDoc(i){
-  const docs=JSON.parse(localStorage.getItem(DB_DOCS));
-  docs.splice(i,1);
-  localStorage.setItem(DB_DOCS,JSON.stringify(docs));
-  renderDocs();
-}
-document.getElementById("uploadBtn").onclick=()=>{
-  const f=document.getElementById("fileInput").files[0];
-  if(!f)return alert("請選檔");
-  const docs=JSON.parse(localStorage.getItem(DB_DOCS));
-  docs.push({name:f.name,owner:currentUser.id,status:"draft"});
-  localStorage.setItem(DB_DOCS,JSON.stringify(docs));
-  renderDocs();
-  alert("上傳完成");
-};
-
-/* Users */
-function renderUsers(){
-  const users=JSON.parse(localStorage.getItem(DB_USERS));
-  const list=document.getElementById("userList");
-  list.innerHTML="";
-  users.forEach((u,i)=>{
-    const div=document.createElement("div");
-    div.textContent=u.id+" ("+u.role+")";
-    if(currentUser.role==="admin" && u.id!=="admin"){
-      const del=document.createElement("button");
-      del.textContent="刪除";del.className="btn small danger";del.onclick=()=>{
-        users.splice(i,1);
-        localStorage.setItem(DB_USERS,JSON.stringify(users));
-        renderUsers();
-      };
-      div.appendChild(del);
-    }
-    list.appendChild(div);
-  });
-}
-document.getElementById("addUser").onclick=()=>{
-  if(currentUser.role!=="admin")return alert("只有Admin可新增");
-  const id=document.getElementById("newUser").value.trim();
-  const role=document.getElementById("newRole").value;
-  if(!id)return;
-  const users=JSON.parse(localStorage.getItem(DB_USERS));
-  users.push({id,role});
-  localStorage.setItem(DB_USERS,JSON.stringify(users));
-  renderUsers();
-};
 </script>
 </body>
 </html>
