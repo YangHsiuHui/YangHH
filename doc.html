@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>精美文件管理系統 — Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --accent:#ff7a59; --muted:#98a0b3; --glass: rgba(255,255,255,0.03);
+      --success:#4ade80; --danger:#ff6b6b;
+      --sidebar-w:260px;
+      --radius:12px;
+      color-scheme: dark;
+    }
+    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#081026,#071224);color:#e6eef8;}
+    .app{display:flex;height:100vh;gap:24px;padding:28px;}
+    /* SIDEBAR */
+    .sidebar{width:var(--sidebar-w);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:var(--radius);padding:20px;box-shadow:0 8px 30px rgba(2,6,23,0.6);display:flex;flex-direction:column;align-items:stretch;}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+    .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#ffc98a);display:flex;align-items:center;justify-content:center;color:#111;font-weight:800;font-size:20px;box-shadow:0 6px 18px rgba(255,122,89,0.18);}
+    .brand h1{font-size:15px;margin:0;letter-spacing:0.2px}
+    .brand p{margin:0;font-size:12px;color:var(--muted)}
+    nav{display:flex;flex-direction:column;gap:8px;margin-top:6px;}
+    .nav-item{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;color:var(--muted);cursor:pointer;}
+    .nav-item:hover{background:rgba(255,255,255,0.02);color:#fff;}
+    .nav-item.active{background:linear-gradient(90deg, rgba(255,122,89,0.12), rgba(255,122,89,0.06));color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02);}
+    .nav-item svg{width:16px;height:16px;opacity:0.9}
+    .spacer{flex:1}
+    .side-footer{font-size:12px;color:var(--muted);text-align:center;padding-top:10px;border-top:1px solid rgba(255,255,255,0.02);}
+    /* MAIN */
+    .main{flex:1;display:flex;flex-direction:column;gap:18px;}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:14px;box-shadow:0 6px 24px rgba(2,6,23,0.5);}
+    .title{font-size:18px;margin:0 0 6px 0}
+    .subtitle{font-size:13px;color:var(--muted);margin:0}
+    .controls{display:flex;gap:12px;align-items:center;}
+    .btn{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;color:#111;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(255,122,89,0.12);}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);box-shadow:none}
+    .search{display:flex;align-items:center;gap:8px;background:var(--glass);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);min-width:240px;}
+    .search input{background:transparent;border:0;color:inherit;outline:none;width:100%}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;}
+    /* DOCUMENT TABLE */
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{padding:12px 10px;text-align:left;border-bottom:1px dashed rgba(255,255,255,0.03);vertical-align:middle}
+    th{font-size:13px;color:var(--muted);font-weight:600}
+    td.actions{display:flex;gap:8px}
+    .chip{padding:6px 8px;border-radius:999px;font-size:12px;background:rgba(255,255,255,0.02);color:var(--muted);border:1px solid rgba(255,255,255,0.02)}
+    .status-editing{background:rgba(255,200,90,0.12);color:#ffd9a6;border:1px solid rgba(255,200,90,0.06)}
+    .status-final{background:rgba(120,200,255,0.06);color:#cfeeff;border:1px solid rgba(120,200,255,0.03)}
+    /* Right panel */
+    .panel{display:flex;flex-direction:column;gap:12px;}
+    .meta{display:flex;gap:12px;align-items:center;}
+    .meta .avatar{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#ffd6c2,#ffd6c2);display:flex;align-items:center;justify-content:center;color:#2b1a10;font-weight:700;font-size:22px}
+    .meta .info{flex:1}
+    .list-compact{display:flex;flex-direction:column;gap:10px}
+    .user-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.01);}
+    .small{font-size:13px;color:var(--muted)}
+    /* MODALS & FORMS */
+    .modal-back{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:none;align-items:center;justify-content:center;z-index:40}
+    .modal{width:740px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015));padding:18px;border-radius:12px;box-shadow:0 20px 60px rgba(2,6,23,0.7);}
+    .modal h3{margin:0 0 10px 0}
+    .form-row{display:flex;gap:12px;margin-bottom:10px}
+    .form-row input, .form-row select, textarea{flex:1;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit;outline:none}
+    .file-drop{border:2px dashed rgba(255,255,255,0.03);padding:18px;border-radius:10px;text-align:center;color:var(--muted);cursor:pointer}
+    label.file-btn{display:inline-block;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);cursor:pointer;margin-top:8px}
+    /* LOGIN */
+    .login-wrap{display:flex;justify-content:center;align-items:center;height:100vh;background:linear-gradient(180deg,#f6f2ff00,#00000000);}
+    .login-card{width:420px;padding:22px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 20px 60px rgba(2,6,23,0.7);}
+    .role-badge{padding:6px 10px;border-radius:10px;background:rgba(255,255,255,0.02);font-weight:600;color:var(--muted);}
+    /* responsive */
+    @media (max-width:980px){
+      .grid{grid-template-columns:1fr}
+      .sidebar{display:none}
+      .app{padding:12px}
+    }
+  </style>
+</head>
+<body>
+  <!-- LOGIN LAYER -->
+  <div id="login" class="login-wrap" aria-hidden="false">
+    <div class="login-card card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="logo" style="width:48px;height:48px;font-size:18px">D</div>
+            <div>
+              <h2 style="margin:0">文件管理系統</h2>
+              <div class="small">請以人員帳號登入以開始 (Demo)</div>
+            </div>
+          </div>
+        </div>
+        <div class="role-badge">Demo 版</div>
+      </div>
+
+      <div style="margin-top:12px">
+        <label class="small">帳號</label>
+        <input id="login-username" placeholder="例如: admin / editor / viewer" style="width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit" />
+      </div>
+      <div style="margin-top:8px">
+        <label class="small">密碼</label>
+        <input id="login-password" type="password" placeholder="任何示範密碼" style="width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit" />
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+        <div style="font-size:13px;color:var(--muted)">示範帳號: <strong>admin</strong> / <strong>editor</strong> / <strong>viewer</strong></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" onclick="fillDemo('admin')">填 admin</button>
+          <button class="btn" onclick="doLogin()">登入</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app" class="app" style="display:none;">
+    <aside class="sidebar card">
+      <div class="brand">
+        <div class="logo">DM</div>
+        <div>
+          <h1>文件管控平台</h1>
+          <p>Document Management</p>
+        </div>
+      </div>
+
+      <nav id="menu">
+        <div class="nav-item active" data-view="docs"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7a2 2 0 0 1 2-2h6l4 4v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>文件管理</div>
+        <div class="nav-item" data-view="people"><svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.2"/></svg>人員管理</div>
+        <div class="nav-item" data-view="settings"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06A2 2 0 1 1 3.28 18.9l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82L3.3 3.28A2 2 0 1 1 6.13.45l.06.06a1.65 1.65 0 0 0 1.82.33H8a1.65 1.65 0 0 0 1-1.51V0a2 2 0 1 1 4 0v.09c.13.66.57 1.18 1 1.51h.99a1.65 1.65 0 0 0 1.82-.33l.06-.06A2 2 0 1 1 20.72 3.1l-.06.06a1.65 1.65 0 0 0-.33 1.82v.99c.33.43.87.87 1.51 1H24a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>系統設定</div>
+      </nav>
+
+      <div class="spacer"></div>
+      <div class="side-footer small">版本: Demo • 由您管理權限</div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div class="card" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px">
+            <div style="font-weight:700">目前使用者: <span id="current-user">-</span></div>
+            <div class="chip" id="current-role">-</div>
+          </div>
+          <div class="search card" style="padding:8px 10px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <input id="q" placeholder="搜尋文件名稱、標籤或上傳人員..." oninput="renderTable()" />
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn ghost" onclick="openUserModal()">人員管理</button>
+          <button class="btn" onclick="openUpload()">上傳文件</button>
+          <button class="btn ghost" onclick="logout()">登出</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <section class="card">
+          <h3 class="title">文件目錄</h3>
+          <p class="subtitle">管理、編輯、下載或刪除文件 — 權限依帳號設定。</p>
+
+          <div style="margin-top:12px;overflow:auto;max-height:62vh">
+            <table id="docs-table">
+              <thead>
+                <tr><th>檔名</th><th>上傳者</th><th>日期</th><th>狀態</th><th>大小</th><th>操作</th></tr>
+              </thead>
+              <tbody id="docs-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <aside class="panel card">
+          <div class="meta">
+            <div class="avatar" id="avatar">Y</div>
+            <div class="info">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div id="profile-name" style="font-weight:700">訪客</div>
+                  <div class="small" id="profile-role">未登入</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card small">
+            <div style="display:flex;justify-content:space-between;align-items:center"><strong>統計</strong><span class="small">即時</span></div>
+            <div style="display:flex;gap:10px;margin-top:10px">
+              <div style="flex:1">
+                <div style="font-size:18px;font-weight:700" id="stat-count">0</div>
+                <div class="small">文件總數</div>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:18px;font-weight:700" id="stat-space">0 KB</div>
+                <div class="small">佔用空間</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card small">
+            <div style="display:flex;justify-content:space-between;align-items:center"><strong>最近活動</strong></div>
+            <div id="recent-acts" style="margin-top:10px"></div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODALS -->
+  <div id="modal-back" class="modal-back">
+    <div class="modal card" role="dialog" aria-modal="true">
+      <h3 id="modal-title">上傳文件</h3>
+      <div id="modal-body">
+        <div class="file-drop" id="file-drop" onclick="pickFile()">點擊或拖曳檔案到此</div>
+        <input id="file-input" type="file" style="display:none" />
+        <div style="margin-top:10px" id="meta-form">
+          <div class="form-row">
+            <input id="doc-title" placeholder="文件標題 (可修改)" />
+            <select id="doc-status"><option value="editing">編輯中</option><option value="final">最終版</option></select>
+          </div>
+          <div class="form-row">
+            <input id="doc-tags" placeholder="標籤，逗號分隔 (例如: 合約, 重要)"/>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button class="btn ghost" onclick="closeModal()">取消</button>
+        <button class="btn" onclick="confirmUpload()">確定上傳</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="user-modal" class="modal-back">
+    <div class="modal card" role="dialog" aria-modal="true" style="width:640px">
+      <h3>人員管理</h3>
+      <div style="display:flex;gap:12px">
+        <div style="flex:1">
+          <div style="margin-bottom:8px">
+            <input id="new-username" placeholder="新帳號 (例如: alice)" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit" />
+          </div>
+          <div style="display:flex;gap:8px">
+            <select id="new-role" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit">
+              <option value="admin">系統管理 (admin)</option>
+              <option value="editor">編輯 (editor)</option>
+              <option value="viewer">檢視 (viewer)</option>
+            </select>
+            <button class="btn" onclick="addUser()">新增</button>
+          </div>
+          <div style="margin-top:12px;max-height:300px;overflow:auto">
+            <div id="user-list"></div>
+          </div>
+        </div>
+        <div style="width:220px">
+          <div style="font-weight:700;margin-bottom:8px">說明</div>
+          <div class="small">權限說明:</div>
+          <ul class="small" style="padding-left:18px;margin-top:6px;color:var(--muted)">
+            <li><strong>admin</strong>：可新增/刪除/修改文件與人員。</li>
+            <li><strong>editor</strong>：可上傳/修改文件，但無法變動人員。</li>
+            <li><strong>viewer</strong>：只有檢視與下載權限。</li>
+          </ul>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button class="btn ghost" onclick="closeUserModal()">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* Demo in-memory data */
+    const demoUsers = [
+      {username:'admin',role:'admin',display:'系統管理員'},
+      {username:'editor',role:'editor',display:'內容編輯'},
+      {username:'viewer',role:'viewer',display:'一般檢視'}
+    ];
+    let users = JSON.parse(localStorage.getItem('dms_users')) || demoUsers;
+    let docs = JSON.parse(localStorage.getItem('dms_docs')) || [];
+    let currentUser = null;
+
+    // UI helpers
+    function $(id){return document.getElementById(id)}
+    function saveState(){localStorage.setItem('dms_users', JSON.stringify(users)); localStorage.setItem('dms_docs', JSON.stringify(docs));}
+    function humanSize(n){ if(n<1024) return n+' B'; if(n<1024*1024) return Math.round(n/1024)+' KB'; return (n/1024/1024).toFixed(2)+' MB'; }
+
+    // Login
+    function fillDemo(u){ $('login-username').value=u; $('login-password').value='demo'; }
+    function doLogin(){
+      const uname = $('login-username').value.trim();
+      if(!uname){alert('請輸入帳號名稱'); return;}
+      const u = users.find(x=>x.username===uname);
+      if(!u){ alert('找不到此帳號，請先在「人員管理」建立新帳號 (Demo)'); return; }
+      currentUser = u;
+      $('login').style.display='none';
+      $('app').style.display='flex';
+      renderProfile();
+      renderUsers();
+      renderTable();
+      persistState();
+    }
+    function logout(){ currentUser=null; $('app').style.display='none'; $('login').style.display='flex'; }
+
+    function renderProfile(){
+      $('current-user').textContent = currentUser.username;
+      $('current-role').textContent = currentUser.role;
+      $('profile-name').textContent = currentUser.display || currentUser.username;
+      $('profile-role').textContent = currentUser.role;
+      $('avatar').textContent = (currentUser.display||currentUser.username).slice(0,1).toUpperCase();
+    }
+
+    // Docs table
+    function renderTable(){
+      const q = $('q').value.trim().toLowerCase();
+      const tbody = $('docs-body'); tbody.innerHTML='';
+      let space=0;
+      const filtered = docs.filter(d=> {
+        if(!q) return true;
+        return (d.name||'').toLowerCase().includes(q) || (d.tags||'').toLowerCase().includes(q) || (d.uploader||'').toLowerCase().includes(q);
+      });
+      filtered.sort((a,b)=> new Date(b.date)-new Date(a.date));
+      for(const d of filtered){
+        space += d.size || 0;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><div style="font-weight:600">${escapeHtml(d.name)}</div><div class="small">${escapeHtml(d.desc||'')}</div></td>
+          <td>${escapeHtml(d.uploader)}</td>
+          <td>${new Date(d.date).toLocaleString()}</td>
+          <td><span class="chip ${d.status==='editing'?'status-editing':'status-final'}">${d.status==='editing'?'編輯中':'最終版'}</span></td>
+          <td>${humanSize(d.size||0)}</td>
+          <td class="actions">
+            <button class="btn ghost" onclick="downloadDoc('${d.id}')">下載</button>
+            <button class="btn ghost" onclick="openEdit('${d.id}')" ${can('edit')? '' : 'disabled'}>編輯</button>
+            <button class="btn ghost" onclick="confirmDelete('${d.id}')" ${can('delete')? '' : 'disabled'}>刪除</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+      $('stat-count').textContent = docs.length;
+      $('stat-space').textContent = humanSize(space);
+      renderRecent();
+    }
+
+    function escapeHtml(s){ return (s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+    // Upload flow
+    let uploadFile = null;
+    function openUpload(){ if(!currentUser){alert('請先登入'); return;} $('modal-title').textContent='上傳文件'; $('modal-back').style.display='flex'; $('file-drop').textContent='點擊或拖曳檔案到此'; uploadFile=null; $('file-input').value=''; $('doc-title').value=''; $('doc-tags').value=''; }
+    function closeModal(){ $('modal-back').style.display='none'; }
+    function pickFile(){ $('file-input').click(); }
+    $('file-input').addEventListener('change', (e)=>{ handlePicked(e.target.files[0]); });
+    document.getElementById('file-drop').addEventListener('dragover', e=>{ e.preventDefault(); e.dataTransfer.dropEffect='copy'; });
+    document.getElementById('file-drop').addEventListener('drop', e=>{ e.preventDefault(); handlePicked(e.dataTransfer.files[0]); });
+
+    function handlePicked(f){
+      if(!f) return;
+      uploadFile = f;
+      $('file-drop').textContent = `${f.name} (${humanSize(f.size)})`;
+      $('doc-title').value = f.name.replace(/\.[^/.]+$/, "");
+    }
+    function confirmUpload(){
+      if(!uploadFile){ alert('請先選擇檔案'); return; }
+      const id = 'doc_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+      const reader = new FileReader();
+      reader.onload = function(evt){
+        const data = evt.target.result; // base64
+        const doc = {
+          id, name: $('doc-title').value || uploadFile.name, desc: '', tags: $('doc-tags').value, status: $('doc-status').value, uploader: currentUser.username, date: new Date().toISOString(), size: uploadFile.size, mime: uploadFile.type, data
+        };
+        docs.push(doc); saveState(); renderTable(); closeModal(); alert('已上傳 (Demo：檔案儲存在本機瀏覽器)');
+      };
+      reader.readAsDataURL(uploadFile);
+    }
+
+    // Download
+    function downloadDoc(id){
+      const d = docs.find(x=>x.id===id); if(!d) return;
+      const a = document.createElement('a'); a.href = d.data; a.download = d.name; document.body.appendChild(a); a.click(); a.remove();
+    }
+
+    // Edit
+    function openEdit(id){
+      const d = docs.find(x=>x.id===id); if(!d) return;
+      $('modal-title').textContent='編輯文件資訊';
+      $('modal-back').style.display='flex';
+      uploadFile = null;
+      $('file-drop').textContent = '(若不更換檔案則保留原檔)';
+      $('doc-title').value = d.name;
+      $('doc-status').value = d.status;
+      $('doc-tags').value = d.tags || '';
+      // override confirm to save edits
+      const oldConfirm = confirmUpload;
+      confirmUpload = function(){
+        d.name = $('doc-title').value; d.status = $('doc-status').value; d.tags = $('doc-tags').value; d.date = new Date().toISOString();
+        saveState(); renderTable(); closeModal();
+        confirmUpload = oldConfirm;
+      };
+    }
+
+    function confirmDelete(id){
+      if(!confirm('確定要刪除此文件？此動作會從本機資料移除（Demo）')) return;
+      docs = docs.filter(x=>x.id!==id); saveState(); renderTable();
+    }
+
+    // User management
+    function openUserModal(){ if(!currentUser || currentUser.role!=='admin'){ alert('僅系統管理者可管理人員 (Demo)'); return; } $('user-modal').style.display='flex'; renderUsers(); }
+    function closeUserModal(){ $('user-modal').style.display='none'; }
+    function renderUsers(){
+      const list = $('user-list'); list.innerHTML='';
+      for(const u of users){
+        const div = document.createElement('div'); div.className='user-row';
+        div.innerHTML = `<div style="display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#ffd6c2,#ffd6c2);display:flex;align-items:center;justify-content:center;color:#2b1a10;font-weight:700">${u.username.slice(0,1).toUpperCase()}</div><div><div style="font-weight:700">${u.username}</div><div class="small">${u.display||''}</div></div></div><div style="display:flex;gap:8px;align-items:center"><select onchange="changeRole('${u.username}', this.value)"><option ${u.role==='admin'?'selected':''} value="admin">admin</option><option ${u.role==='editor'?'selected':''} value="editor">editor</option><option ${u.role==='viewer'?'selected':''} value="viewer">viewer</option></select><button class="btn ghost" onclick="removeUser('${u.username}')">刪除</button></div>`;
+        list.appendChild(div);
+      }
+      $('user-list').scrollTop = 0;
+      // also update top menu
+      const menu = document.querySelectorAll('#menu .nav-item');
+      menu.forEach(n=> n.onclick = ()=>{ document.querySelectorAll('#menu .nav-item').forEach(x=>x.classList.remove('active')); n.classList.add('active'); const view=n.dataset.view; if(view==='people') openUserModal(); });
+    }
+
+    function addUser(){
+      const u = $('new-username').value.trim(); const r = $('new-role').value;
+      if(!u) { alert('請輸入帳號'); return; }
+      if(users.find(x=>x.username===u)){ alert('帳號已存在'); return; }
+      users.push({username:u,role:r,display:''}); saveState(); renderUsers(); $('new-username').value=''; alert('新增完成 (Demo)');
+    }
+    function removeUser(username){
+      if(!confirm('確認刪除此人員？')) return;
+      users = users.filter(x=>x.username!==username); saveState(); renderUsers();
+    }
+    function changeRole(username, role){
+      const u = users.find(x=>x.username===username); if(!u) return; u.role=role; saveState(); renderUsers();
+    }
+
+    // permissions helper
+    function can(action){
+      if(!currentUser) return false;
+      if(currentUser.role==='admin') return true;
+      if(currentUser.role==='editor') return (action!=='delete' && action!=='manageUsers');
+      if(currentUser.role==='viewer') return (action==='download' || action==='view');
+      return false;
+    }
+
+    // recent activities
+    function renderRecent(){
+      const el = $('recent-acts'); el.innerHTML='';
+      const last = docs.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+      for(const d of last){
+        const div = document.createElement('div'); div.style.padding='8px'; div.style.borderRadius='8px'; div.style.background='rgba(255,255,255,0.01)'; div.innerHTML = `<div style="font-weight:700">${escapeHtml(d.name)}</div><div class="small">${d.uploader} • ${new Date(d.date).toLocaleString()}</div>`;
+        el.appendChild(div);
+      }
+    }
+
+    function persistState(){ saveState(); }
+
+    // utilities & startup
+    function escapeHtml(s){ return (s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+    // initial
+    (function init(){
+      // demo: create a sample doc if none
+      if(docs.length===0){
+        docs.push({ id:'doc_demo_1', name:'範例合約書.pdf', desc:'示範檔案', tags:'合約,重要', status:'final', uploader:'admin', date:new Date().toISOString(), size:23456, mime:'application/pdf', data:'' });
+        saveState();
+      }
+      // attach modal close handling
+      document.querySelectorAll('.modal-back').forEach(m=> m.addEventListener('click', (e)=>{ if(e.target===m) m.style.display='none'; }));
+      // menu click
+      document.querySelectorAll('#menu .nav-item').forEach(n=> n.addEventListener('click', ()=>{ document.querySelectorAll('#menu .nav-item').forEach(x=>x.classList.remove('active')); n.classList.add('active'); const view=n.dataset.view; if(view==='people') openUserModal(); }));
+    })();
+  </script>
+</body>
+</html>
+
+
