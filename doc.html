@@ -7,77 +7,108 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0f1724; --card:#0b1220; --accent:#ff7a59; --muted:#98a0b3; --glass: rgba(255,255,255,0.03);
-      --success:#4ade80; --danger:#ff6b6b;
-      --sidebar-w:260px;
-      --radius:12px;
-      color-scheme: dark;
-    }
-    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,#081026,#071224);color:#e6eef8;}
-    .app{display:flex;height:100vh;gap:24px;padding:28px;}
-    /* SIDEBAR */
-    .sidebar{width:var(--sidebar-w);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:var(--radius);padding:20px;box-shadow:0 8px 30px rgba(2,6,23,0.6);display:flex;flex-direction:column;align-items:stretch;}
-    .brand{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
-    .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#ffc98a);display:flex;align-items:center;justify-content:center;color:#111;font-weight:800;font-size:20px;box-shadow:0 6px 18px rgba(255,122,89,0.18);}
-    .brand h1{font-size:15px;margin:0;letter-spacing:0.2px}
-    .brand p{margin:0;font-size:12px;color:var(--muted)}
-    nav{display:flex;flex-direction:column;gap:8px;margin-top:6px;}
-    .nav-item{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;color:var(--muted);cursor:pointer;}
-    .nav-item:hover{background:rgba(255,255,255,0.02);color:#fff;}
-    .nav-item.active{background:linear-gradient(90deg, rgba(255,122,89,0.12), rgba(255,122,89,0.06));color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02);}
-    .nav-item svg{width:16px;height:16px;opacity:0.9}
-    .spacer{flex:1}
-    .side-footer{font-size:12px;color:var(--muted);text-align:center;padding-top:10px;border-top:1px solid rgba(255,255,255,0.02);}
-    /* MAIN */
-    .main{flex:1;display:flex;flex-direction:column;gap:18px;}
-    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:14px;box-shadow:0 6px 24px rgba(2,6,23,0.5);}
-    .title{font-size:18px;margin:0 0 6px 0}
-    .subtitle{font-size:13px;color:var(--muted);margin:0}
-    .controls{display:flex;gap:12px;align-items:center;}
-    .btn{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;color:#111;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(255,122,89,0.12);}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);box-shadow:none}
-    .search{display:flex;align-items:center;gap:8px;background:var(--glass);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);min-width:240px;}
-    .search input{background:transparent;border:0;color:inherit;outline:none;width:100%}
-    .grid{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;}
-    /* DOCUMENT TABLE */
-    table{width:100%;border-collapse:collapse;font-size:14px}
-    th,td{padding:12px 10px;text-align:left;border-bottom:1px dashed rgba(255,255,255,0.03);vertical-align:middle}
-    th{font-size:13px;color:var(--muted);font-weight:600}
-    td.actions{display:flex;gap:8px}
-    .chip{padding:6px 8px;border-radius:999px;font-size:12px;background:rgba(255,255,255,0.02);color:var(--muted);border:1px solid rgba(255,255,255,0.02)}
-    .status-editing{background:rgba(255,200,90,0.12);color:#ffd9a6;border:1px solid rgba(255,200,90,0.06)}
-    .status-final{background:rgba(120,200,255,0.06);color:#cfeeff;border:1px solid rgba(120,200,255,0.03)}
-    /* Right panel */
-    .panel{display:flex;flex-direction:column;gap:12px;}
-    .meta{display:flex;gap:12px;align-items:center;}
-    .meta .avatar{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#ffd6c2,#ffd6c2);display:flex;align-items:center;justify-content:center;color:#2b1a10;font-weight:700;font-size:22px}
-    .meta .info{flex:1}
-    .list-compact{display:flex;flex-direction:column;gap:10px}
-    .user-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.01);}
-    .small{font-size:13px;color:var(--muted)}
-    /* MODALS & FORMS */
-    .modal-back{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:none;align-items:center;justify-content:center;z-index:40}
-    .modal{width:740px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015));padding:18px;border-radius:12px;box-shadow:0 20px 60px rgba(2,6,23,0.7);}
-    .modal h3{margin:0 0 10px 0}
-    .form-row{display:flex;gap:12px;margin-bottom:10px}
-    .form-row input, .form-row select, textarea{flex:1;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit;outline:none}
-    .file-drop{border:2px dashed rgba(255,255,255,0.03);padding:18px;border-radius:10px;text-align:center;color:var(--muted);cursor:pointer}
-    label.file-btn{display:inline-block;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);cursor:pointer;margin-top:8px}
-    /* LOGIN */
-    .login-wrap{display:flex;justify-content:center;align-items:center;height:100vh;background:linear-gradient(180deg,#f6f2ff00,#00000000);}
-    .login-card{width:420px;padding:22px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 20px 60px rgba(2,6,23,0.7);}
-    .role-badge{padding:6px 10px;border-radius:10px;background:rgba(255,255,255,0.02);font-weight:600;color:var(--muted);}
-    /* responsive */
-    @media (max-width:980px){
-      .grid{grid-template-columns:1fr}
-      .sidebar{display:none}
-      .app{padding:12px}
-    }
+  --bg:#0f1724; --card:#0b1220; --accent:#ff7a59; --muted:#98a0b3; --glass: rgba(255,255,255,0.03);
+  --success:#4ade80; --danger:#ff6b6b;
+  --sidebar-w:260px;
+  --radius:12px;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,#081026,#071224);color:#e6eef8;}
+/* 🔹修正：留出 navbar 高度避免內容被遮 */
+body{padding-top:56px;}
+.app{display:flex;height:100vh;gap:24px;padding:28px;}
+
+/* NAVBAR */
+.navbar{
+  position:fixed;top:0;left:0;right:0;height:56px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.5);
+}
+.navbar .logo{font-weight:700;font-size:18px;color:#fff;}
+.navbar nav{display:flex;gap:20px;}
+.navbar a{color:#e6eef8;text-decoration:none;font-weight:500;}
+.navbar a:hover{color:var(--accent);}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:var(--radius);padding:20px;box-shadow:0 8px 30px rgba(2,6,23,0.6);display:flex;flex-direction:column;align-items:stretch;}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#ffc98a);display:flex;align-items:center;justify-content:center;color:#111;font-weight:800;font-size:20px;box-shadow:0 6px 18px rgba(255,122,89,0.18);}
+.brand h1{font-size:15px;margin:0;letter-spacing:0.2px}
+.brand p{margin:0;font-size:12px;color:var(--muted)}
+nav{display:flex;flex-direction:column;gap:8px;margin-top:6px;}
+.nav-item{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;color:var(--muted);cursor:pointer;}
+.nav-item:hover{background:rgba(255,255,255,0.02);color:#fff;}
+.nav-item.active{background:linear-gradient(90deg, rgba(255,122,89,0.12), rgba(255,122,89,0.06));color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02);}
+.nav-item svg{width:16px;height:16px;opacity:0.9}
+.spacer{flex:1}
+.side-footer{font-size:12px;color:var(--muted);text-align:center;padding-top:10px;border-top:1px solid rgba(255,255,255,0.02);}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;gap:18px;}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:14px;box-shadow:0 6px 24px rgba(2,6,23,0.5);}
+.title{font-size:18px;margin:0 0 6px 0}
+.subtitle{font-size:13px;color:var(--muted);margin:0}
+.controls{display:flex;gap:12px;align-items:center;}
+.btn{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;color:#111;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(255,122,89,0.12);}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);box-shadow:none}
+.search{display:flex;align-items:center;gap:8px;background:var(--glass);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);min-width:240px;}
+.search input{background:transparent;border:0;color:inherit;outline:none;width:100%}
+.grid{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;}
+
+/* DOCUMENT TABLE */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:12px 10px;text-align:left;border-bottom:1px dashed rgba(255,255,255,0.03);vertical-align:middle}
+th{font-size:13px;color:var(--muted);font-weight:600}
+td.actions{display:flex;gap:8px}
+.chip{padding:6px 8px;border-radius:999px;font-size:12px;background:rgba(255,255,255,0.02);color:var(--muted);border:1px solid rgba(255,255,255,0.02)}
+.status-editing{background:rgba(255,200,90,0.12);color:#ffd9a6;border:1px solid rgba(255,200,90,0.06)}
+.status-final{background:rgba(120,200,255,0.06);color:#cfeeff;border:1px solid rgba(120,200,255,0.03)}
+
+/* Right panel */
+.panel{display:flex;flex-direction:column;gap:12px;}
+.meta{display:flex;gap:12px;align-items:center;}
+.meta .avatar{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#ffd6c2,#ffd6c2);display:flex;align-items:center;justify-content:center;color:#2b1a10;font-weight:700;font-size:22px}
+.meta .info{flex:1}
+.list-compact{display:flex;flex-direction:column;gap:10px}
+.user-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.01);}
+.small{font-size:13px;color:var(--muted)}
+
+/* MODALS & FORMS */
+.modal-back{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:none;align-items:center;justify-content:center;z-index:40}
+.modal{width:740px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.015));padding:18px;border-radius:12px;box-shadow:0 20px 60px rgba(2,6,23,0.7);}
+.modal h3{margin:0 0 10px 0}
+.form-row{display:flex;gap:12px;margin-bottom:10px}
+.form-row input, .form-row select, textarea{flex:1;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit;outline:none}
+.file-drop{border:2px dashed rgba(255,255,255,0.03);padding:18px;border-radius:10px;text-align:center;color:var(--muted);cursor:pointer}
+label.file-btn{display:inline-block;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);cursor:pointer;margin-top:8px}
+
+/* LOGIN */
+.login-wrap{display:flex;justify-content:center;align-items:center;height:100vh;background:linear-gradient(180deg,#f6f2ff00,#00000000);}
+.login-card{width:420px;padding:22px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 20px 60px rgba(2,6,23,0.7);}
+.role-badge{padding:6px 10px;border-radius:10px;background:rgba(255,255,255,0.02);font-weight:600;color:var(--muted);}
+
+/* responsive */
+@media (max-width:980px){
+  .grid{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .app{padding:12px}
+}
   </style>
 </head>
 <body>
+      <nav>
+      <a href="#">.</a>
+      <a href="#">.</a>
+      <a href="index.html">🏠 首頁（四大系統）</a>//有遮住
+      <a href="resume.html">📄 履歷</a>
+      <a href="doc01.html">📂 文件管理1</a>
+      <a href="doc02.html">👥 文件管理2</a>
+      <a href="sys.html">⚙ 資訊系統管理</a>
+    </nav>
   <!-- LOGIN LAYER -->
   <div id="login" class="login-wrap" aria-hidden="false">
     <div class="login-card card">
