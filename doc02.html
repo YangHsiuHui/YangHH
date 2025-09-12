@@ -22,15 +22,28 @@ body,html{margin:0;height:100%;background:var(--bg);color:var(--text);}
 a{color:inherit;text-decoration:none}
 button{cursor:pointer;font-family:inherit}
 
-.app{display:flex;height:100vh}
+/* 🔹 NAVBAR */
+.navbar{
+  position:fixed;top:0;left:0;right:0;height:56px;
+  background:linear-gradient(90deg,var(--accent),#e3a877);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;z-index:1000;
+  color:#fff;font-weight:600;box-shadow:0 2px 6px rgba(0,0,0,0.12);
+}
+.navbar .brand{font-size:16px}
+.navbar .links{display:flex;gap:16px;font-size:14px}
+.navbar a{color:#fff;opacity:.9;text-decoration:none}
+.navbar a:hover{opacity:1}
+
+/* layout */
+.app{display:flex;height:calc(100vh - 56px);margin-top:56px}
 
 /* sidebar */
 .sidebar{
   width:var(--sidebar-width);
   background:var(--panel);
   box-shadow:var(--shadow);
-  display:flex;
-  flex-direction:column;
+  display:flex;flex-direction:column;
   padding:20px;
 }
 .brand{display:flex;align-items:center;gap:10px;margin-bottom:20px}
@@ -71,6 +84,18 @@ th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}
 </style>
 </head>
 <body>
+<!-- 🔹 NAVBAR -->
+<header class="navbar">
+  <div class="brand">📂 檔案文件管理系統</div>
+  <div class="links">
+    <a href="sys.html" onclick="showView('sys')">回首頁（資訊系統）</a>
+    <a href="resume.html" onclick="showView('resume')">履歷</a>
+    <a href="doc.html" onclick="showView('doc')">文件管理系統</a>
+    <a href="doc01.html" onclick="showView('doc01')">文件管理系統1</a>
+    <a href="index.html" onclick="showView('index')">四大主題管理系統</a>
+  </div>
+</header>
+
 <div id="loginPage" class="login-wrap">
   <div class="login">
     <h2>登入 檔案文件管理系統</h2>
@@ -87,9 +112,7 @@ th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}
   <aside class="sidebar">
     <div class="brand">
       <div class="logo">FM</div>
-      <div>
-        <h1>檔案文件管理系統</h1>
-      </div>
+      <div><h1>檔案文件管理系統</h1></div>
     </div>
     <nav class="menu">
       <div class="menu-item active" onclick="showView('dashboard')">📄 文件首頁</div>
