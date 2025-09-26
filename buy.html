@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>進銷存管理系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f8fb;
+    --card:#ffffff;
+    --accent:#2b9edb;
+    --muted:#6b7280;
+    --glass: rgba(255,255,255,0.85);
+    --radius:14px;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background: linear-gradient(180deg,#eef6fb 0%, #ffffff 100%);
+    color:#111827;
+    -webkit-font-smoothing:antialiased;
+  }
+  .container{
+    max-width:1100px;
+    margin:36px auto;
+    padding:28px;
+    background:var(--glass);
+    border-radius:18px;
+    box-shadow: 0 10px 30px rgba(13,38,59,0.08);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(15,40,60,0.06);
+  }
+
+  header{
+    display:flex;
+    gap:20px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .logo{
+    width:72px;height:72px;border-radius:14px;
+    background:linear-gradient(135deg,var(--accent), #6dd3ff);
+    display:flex;align-items:center;justify-content:center;
+    color:white;font-weight:700;font-size:20px;
+    box-shadow: 0 6px 18px rgba(43,158,219,0.18);
+  }
+  header h1{font-size:20px;margin:0}
+  header p{margin:0;color:var(--muted);font-size:13px}
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 380px;
+    gap:20px;
+    align-items:start;
+  }
+
+  /* 主卡片 */
+  .card{
+    background:var(--card);
+    border-radius:12px;
+    padding:18px;
+    box-shadow: 0 6px 18px rgba(13,38,59,0.04);
+    border:1px solid rgba(15,40,60,0.03);
+  }
+  .section-title{
+    display:flex;align-items:center;gap:10px;margin-bottom:12px;
+  }
+  .section-title h2{margin:0;font-size:16px}
+  .meta{color:var(--muted);font-size:13px}
+
+  /* 功能列表 */
+  ul.features{
+    list-style:none;padding:0;margin:8px 0 0 0;display:grid;gap:8px;
+  }
+  ul.features li{
+    padding:10px 12px;border-radius:10px;background:linear-gradient(180deg,#fbfdff,#f6fbff);
+    border:1px solid rgba(43,158,219,0.08);font-size:14px;color:#0f1724;
+  }
+
+  /* 圖片預覽 */
+  .flow-images{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+  .flow-images img{width:100%;max-width:320px;border-radius:10px;box-shadow:0 8px 20px rgba(2,6,23,0.06);border:1px solid rgba(0,0,0,0.03)}
+
+  /* 手風琴 */
+  .accordion{margin-top:14px}
+  .acc-item{border-radius:10px;overflow:hidden;border:1px solid rgba(15,40,60,0.04)}
+  .acc-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:linear-gradient(180deg,#fff,#fbfdff);cursor:pointer}
+  .acc-header h3{margin:0;font-size:14px}
+  .acc-body{padding:12px 14px;background:#fff;border-top:1px solid rgba(15,40,60,0.02);display:none;font-size:14px;color:var(--muted)}
+
+  /* 右側欄 */
+  .side .card{position:sticky;top:28px}
+  .vendor-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+  .vendor{
+    display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg,#ffffff,#f8fbff);
+    border:1px solid rgba(0,0,0,0.03)
+  }
+  .vendor img{width:52px;height:52px;border-radius:8px;object-fit:cover}
+  .vendor .info{font-size:13px}
+  .vendor .info b{display:block;font-size:14px}
+
+  /* 表單 */
+  form{display:grid;gap:10px}
+  form .row{display:flex;gap:10px}
+  label{font-size:13px;color:var(--muted)}
+  input[type=text],select,textarea{
+    padding:10px;border-radius:8px;border:1px solid rgba(15,40,60,0.06);font-size:14px;width:100%;
+    background:#fff;
+  }
+  .btn{
+    display:inline-block;padding:10px 14px;border-radius:10px;background:var(--accent);color:#fff;text-decoration:none;border:none;font-weight:600;cursor:pointer;
+    box-shadow: 0 8px 20px rgba(43,158,219,0.18);
+  }
+
+  footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+
+  /* 小螢幕 */
+  @media (max-width:980px){
+    .grid{grid-template-columns:1fr; }
+    .side .card{position:static}
+    .flow-images img{max-width:100%}
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">進</div>
+      <div>
+        <h1>進銷存管理系統</h1>
+        <p class="meta">包含：採購管理、銷售管理、庫存管理 — 介面示範與說明頁面</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- left: main content -->
+      <main>
+        <section class="card">
+          <div class="section-title">
+            <h2>系統簡介</h2>
+            <div class="meta">採購管理系統功能總覽</div>
+          </div>
+
+          <p style="color:var(--muted);line-height:1.6;font-size:14px">
+            顧名思義，進銷存管理系統包含採購管理系統、銷售管理系統、庫存管理系統三個子系統。以下為採購管理模組主要功能說明與範例介面。
+          </p>
+
+          <ul class="features">
+            <li>提供原物料、材料、設備、零件及各種資產等的請購與採購功能</li>
+            <li>請購單：建立、修正、列印與查詢，並可結轉至採購作業</li>
+            <li>採購單：建立、修正、列印、查詢與簽核流程</li>
+            <li>可連結國外採購信用狀(L/C)管理</li>
+            <li>採購驗收與採購退貨資料管理</li>
+            <li>廠商管理：交貨準時性、品質、價格比較</li>
+            <li>專案採購與採購合約資料管理</li>
+          </ul>
+
+          <div style="margin-top:14px">
+            <div class="section-title"><h2>相關作業流程圖</h2></div>
+            <div class="flow-images">
+  <!-- 請購作業流程圖 -->
+  <img src="https://drive.google.com/uc?export=view&id=1UTe0q8VeEPWxIssjZUot5wJQVCFdo-2j" 
+       alt="請購作業流程圖" width="600">
+
+  <!-- 決定廠商與採購作業流程圖 -->
+  <img src="https://drive.google.com/uc?export=view&id=1QyVPdaNyM-lvyxMEORriJNs1GvkXRBIU" 
+       alt="決定廠商與採購作業流程圖" width="600">
+</div>
+
+<p class="meta" style="margin-top:8px">
+  圖說：圖5-11 請購作業流程 / 圖5-12 決定廠商與價格作業流程 / 圖5-13 採購作業流程
+</p>
+
+</div>
+
+          <div class="accordion" style="margin-top:14px">
+            <div class="acc-item">
+              <div class="acc-header" data-target="acc1"><h3>請購作業重點</h3><div class="meta">點擊展開</div></div>
+              <div class="acc-body" id="acc1">
+                • 使用者填寫請購單（自動或手工輸入）→ 請購主檔建立 → 請購單修正或列印查詢 → 請購單簽核 → 結轉採購作業並建立採購單。<br>
+                • 提醒：請購單應含：品名、數量、需求日期、預算科目、申請單位與申請人等欄位。
+              </div>
+            </div>
+
+            <div class="acc-item" style="margin-top:8px">
+              <div class="acc-header" data-target="acc2"><h3>廠商決定與比價</h3><div class="meta">點擊展開</div></div>
+              <div class="acc-body" id="acc2">
+                • 報價作業：供應商回傳報價單 → 報價資料彙整 → 嚴格的比價作業與評分機制（價格、品質、交期）→ 決定廠商 → 建立合約。<br>
+                • 系統應記錄廠商的歷史表現（交貨準時率、品質不良率、價格變動）。
+              </div>
+            </div>
+
+            <div class="acc-item" style="margin-top:8px">
+              <div class="acc-header" data-target="acc3"><h3>採購簽核與驗收</h3><div class="meta">點擊展開</div></div>
+              <div class="acc-body" id="acc3">
+                • 採購單簽核可採分層簽核（依金額或專案）→ 供應商交貨後進行驗收（生產料件需做IQC）→ 建立採購驗收單 → 若不合格，啟動退貨流程或申請索賠。
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 採購表單範例 -->
+        <section class="card" style="margin-top:16px">
+          <div class="section-title">
+            <h2>範例：建立請購單 (示範表單)</h2>
+            <div class="meta">按送出僅示範前端行為（不連後端）</div>
+          </div>
+
+          <form id="prForm" onsubmit="event.preventDefault(); handleSubmit();">
+            <div class="row">
+              <div style="flex:1">
+                <label>申請單位</label>
+                <input type="text" id="dept" placeholder="例如：工程部" required>
+              </div>
+              <div style="width:150px">
+                <label>需求日期</label>
+                <input type="text" id="needDate" placeholder="YYYY-MM-DD" required>
+              </div>
+            </div>
+
+            <div>
+              <label>品名 / 規格</label>
+              <input type="text" id="item" placeholder="例如：伺服器、螺絲" required>
+            </div>
+
+            <div class="row">
+              <div style="width:120px">
+                <label>數量</label>
+                <input type="text" id="qty" placeholder="數量" required>
+              </div>
+              <div>
+                <label>預算科目</label>
+                <input type="text" id="acct" placeholder="例如：設備購置">
+              </div>
+            </div>
+
+            <div>
+              <label>申請理由 / 備註</label>
+              <textarea id="remark" rows="3" placeholder="說明用途或必要性"></textarea>
+            </div>
+
+            <div style="display:flex;gap:10px;align-items:center;margin-top:8px;">
+              <button class="btn" type="submit">建立請購單</button>
+              <div id="formMsg" style="color:var(--muted);font-size:13px"></div>
+            </div>
+          </form>
+        </section>
+
+        <footer>系統示範頁面 • 可依需求延伸 API、簽核流程、報表與權限控管</footer>
+      </main>
+
+      <!-- right: sidebar -->
+      <aside class="side">
+        <div class="card">
+          <div class="section-title"><h2>廠商管理 (示範)</h2><div class="meta">供應商績效比較</div></div>
+
+          <div class="vendor-list">
+            <div class="vendor">
+              <img src="https://picsum.photos/seed/1/200/200" alt="vendor">
+              <div class="info">
+                <b>巨匯企業</b>
+                交貨準時率：92% · 平均價格：中等
+              </div>
+            </div>
+
+            <div class="vendor">
+              <img src="https://picsum.photos/seed/2/200/200" alt="vendor">
+              <div class="info">
+                <b>恒豐科技</b>
+                交貨準時率：85% · 平均價格：偏高
+              </div>
+            </div>
+
+            <div class="vendor">
+              <img src="https://picsum.photos/seed/3/200/200" alt="vendor">
+              <div class="info">
+                <b>大成五金</b>
+                交貨準時率：96% · 平均價格：低
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <a class="btn" href="#" onclick="alert('示範：導向廠商績效報表');return false">檢視完整績效報表</a>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="section-title"><h2>採購 KPI</h2><div class="meta">追蹤重點</div></div>
+          <ul style="padding-left:18px;color:var(--muted);line-height:1.8">
+            <li>採購週期時間 (PR→PO→交貨)</li>
+            <li>廠商交期準時率</li>
+            <li>採購差異成本 (預算 vs 實際)</li>
+            <li>退貨率與品質不良率</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+  // 手風琴行為
+  document.querySelectorAll('.acc-header').forEach(h=>{
+    h.addEventListener('click', e=>{
+      const tid = h.getAttribute('data-target');
+      const body = document.getElementById(tid);
+      const open = body.style.display === 'block';
+      // 關閉其他
+      document.querySelectorAll('.acc-body').forEach(b=>b.style.display='none');
+      if(!open) body.style.display='block';
+    });
+  });
+
+  // 範例表單送出
+  function handleSubmit(){
+    const dept = document.getElementById('dept').value.trim();
+    const item = document.getElementById('item').value.trim();
+    const qty = document.getElementById('qty').value.trim();
+    const msg = document.getElementById('formMsg');
+    if(!dept || !item || !qty){ msg.textContent = '請完整填寫申請單必要欄位'; return; }
+    // 示範：在前端建立一個簡單的「請購單編號」
+    const prNo = 'PR' + Date.now().toString().slice(-6);
+    msg.textContent = '已建立請購單：' + prNo + '（僅示範）';
+    msg.style.color = 'green';
+    // 清空表單（示範）
+    setTimeout(()=>{ document.getElementById('prForm').reset(); }, 900);
+  }
+</script>
+</body>
+</html>
