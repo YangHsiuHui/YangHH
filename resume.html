@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>楊琇惠 履歷表</title>
 <style>
-  
-
-
    /* 網址列樣式 */
     nav {
       background-color: #2a5d9f;
@@ -17,6 +14,7 @@
       left: 0;
       width: 100%; /* 佔滿全寬 */
       z-index: 999;
+      text-align: center; /* 導覽列文字置中 */
     }
     nav a {
       color: white;
@@ -36,6 +34,8 @@
     background: white;
     margin: 0;
     padding-top: 50px; /* nav 高度 */
+    display: flex;
+    justify-content: center; /* 讓整體內容水平置中 */
   }
 
   .container {
@@ -43,6 +43,8 @@
     min-height: 297mm; /* A4 高度 */
     padding: 25mm;
     box-sizing: border-box;
+    margin: 0 auto; /* 水平置中 */
+    text-align: center; /* 讓內容區塊內的文字也置中（標題、段落） */
   }
 
   h1 {
@@ -62,19 +64,21 @@
     padding-bottom: 6px;
     margin-top: 30px;
     margin-bottom: 15px;
+    display: inline-block; /* 讓標題底線長度符合文字 */
   }
 
   p {
     margin: 8px 0 12px 0;
-    text-indent: 2em;
+    text-indent: 0; /* 移除縮排 */
+    text-align: left; /* 段落文字改回靠左，閱讀比較自然 */
+    display: inline-block;
+    max-width: 90%; /* 限制段落寬度，避免太長 */
   }
 
-  /* 強調文字 */
   strong {
     color: #004080;
   }
 
-  /* 頁尾版權或日期等 (如有需要) */
   footer {
     font-size: 9pt;
     color: #999;
@@ -82,7 +86,6 @@
     margin-top: 40px;
   }
 
-  /* 列印最佳化 */
   @media print {
     body, .container {
       margin: 0;
@@ -99,7 +102,7 @@
 
 <!-- 網址列 -->
   <nav>
-    <a href="index.html">展示作品</a>
+    <a href="https://yanghsiuhui.github.io/YangHH/index.html">展示作品</a>
   </nav>
 
   <div class="container">
