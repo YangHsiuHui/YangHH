@@ -127,24 +127,24 @@
     // 範例奏摺資料（可以自行擴充、改寫成更古文的風格）
     const memorials = [
       {title:"河道決堤，百姓無家", body:"今臣聞境內河道氾濫，村舍被淹，百姓流離失所。奏請敕令撥銀修堤，並徵調民夫勘查災情。", effects:{
-        allow:{people:+8,stability:+5,treasury:+12},
+        allow:{people:+8,stability:+5,treasury:-12},
         reject:{people:-12,stability:-8,treasury:+0},
         hold:{people:-3,stability:-2,treasury:-4}
       }},
       {title:"地方吏員貪污案", body:"某府吏員受賄，市井民怨上升，請求嚴懲以示公道，並整頓吏治。", effects:{
-        allow:{people:+5,stability:+6,treasury:+4},
+        allow:{people:+5,stability:+6,treasury:-4},
         reject:{people:-10,stability:-12,treasury:+0},
         hold:{people:-2,stability:-5,treasury:-1}
       }},
       {title:"進貢珍奇博物", body:"西域來使進獻珍奇異獸，請令入宮陳列以增彩。", effects:{
-        allow:{people:+3,stability:+2,treasury:+6},
+        allow:{people:+3,stability:+2,treasury:-6},
         reject:{people:-2,stability:-1,treasury:+0},
         hold:{people:0,stability:0,treasury:-2}
       }},
       {title:"賦稅議案：加徵奢侈稅", body:"為補國庫，擬對奢侈品加徵稅賦，恐影響商賈與民心。", effects:{
         allow:{people:-8,stability:-4,treasury:+15},
-        reject:{people:+4,stability:+2,treasury:6},
-        hold:{people:+1,stability:0,treasury:+2}
+        reject:{people:+4,stability:+2,treasury:-6},
+        hold:{people:-1,stability:0,treasury:+2}
       }},
       {title:"邊關有虜患接近", body:"邊關消息：有賊寇騷擾。請下令加強軍備或封鎖邊境。", effects:{
         allow:{people:-2,stability:+10,treasury:-10},
