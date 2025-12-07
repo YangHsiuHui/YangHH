@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>皇上批奏摺 — 皇上母湯喔？</title>
+  <style>
+    body{
+      font-family: "Noto Sans TC", system-ui, -apple-system, "Microsoft JhengHei", "PingFang TC", Arial;
+      background: linear-gradient(180deg,#fffbe6,#fff);
+      color:#222;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:24px;
+    }
+    .card{
+      width:760px;
+      background:#ffffffcc;
+      border-radius:12px;
+      box-shadow:0 8px 30px rgba(0,0,0,0.08);
+      padding:18px;
+      backdrop-filter: blur(4px);
+    }
+    header{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    h1{margin:0;font-size:1.25rem;}
+    .subtitle{color:#666;font-size:0.95rem;}
+    .panels{display:flex;gap:12px;margin-top:12px;}
+    .left{flex:2;}
+    .right{flex:1;}
+    .memorial{
+      background:#fff8e6;
+      border:1px solid #ffe7b3;
+      padding:14px;border-radius:8px;
+      min-height:160px;
+      line-height:1.6;
+      white-space:pre-wrap;
+    }
+    .controls{display:flex;gap:8px;margin-top:12px;}
+    button{
+      flex:1;padding:10px 12px;border-radius:8px;border:none;
+      font-size:1rem;cursor:pointer;
+      box-shadow:0 4px 12px rgba(0,0,0,0.06);
+    }
+    .btn-allow{background:#e8f7e8;color:#0a6b0a;}
+    .btn-reject{background:#ffecec;color:#a10b0b;}
+    .btn-hold{background:#eef6ff;color:#084b8f;}
+    .stats{display:grid;gap:8px;}
+    .stat{
+      background:#fff;border-radius:8px;padding:8px;border:1px solid #f0f0f0;
+    }
+    .bar{
+      height:10px;background:#eee;border-radius:6px;margin-top:6px;overflow:hidden;
+    }
+    .bar > i{display:block;height:100%;background:linear-gradient(90deg,#ffd36b,#ff7a7a);width:50%;}
+    .log{margin-top:12px;max-height:120px;overflow:auto;background:#fafafa;padding:8px;border-radius:6px;border:1px solid #f0f0f0;}
+    .footer{margin-top:12px;color:#666;font-size:0.9rem;}
+    .yahoo {font-weight:700;color:#ff6600;margin-left:8px;}
+    .big-toast{
+      position:fixed;left:50%;top:18%;transform:translateX(-50%);
+      background:rgba(0,0,0,0.8);color:#fff;padding:12px 18px;border-radius:10px;font-size:1.05rem;
+      display:none;z-index:9999;
+    }
+    .hint{font-size:0.9rem;color:#777;margin-top:8px;}
+  </style>
+</head>
+<body>
+  <div class="card" role="application" aria-label="皇上批奏摺遊戲">
+    <header>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Emperor%27s_crown.svg" alt="" width="44" height="44">
+      <div>
+        <h1>皇上批奏摺 — 皇上母湯喔？<span class="yahoo">yahOO!</span></h1>
+        <div class="subtitle">審閱奏摺，選擇：允（approve） / 駁（reject） / 留中（hold）。嘗試保持國家平衡。</div>
+      </div>
+    </header>
+
+    <div class="panels">
+      <div class="left">
+        <div class="memorial" id="memorial">
+          <!-- 奏摺內容會顯示在這裡 -->
+        </div>
+
+        <div class="controls" aria-hidden="false">
+          <button class="btn-allow" id="btnAllow">允 ✅</button>
+          <button class="btn-reject" id="btnReject">駁 ❌</button>
+          <button class="btn-hold" id="btnHold">留中 ⏳</button>
+        </div>
+
+        <div class="hint">提示：有些奏摺會觸發特殊事件，例如「邊境饑荒」或「吏治貪污」。小心別讓三項指標同時掉到 0 哦～</div>
+
+        <div class="log" id="log" aria-live="polite"></div>
+      </div>
+
+      <div class="right">
+        <div class="stats">
+          <div class="stat">
+            <div>安定（Stability） <span id="sVal">60</span></div>
+            <div class="bar"><i id="sBar" style="width:60%"></i></div>
+          </div>
+          <div class="stat">
+            <div>民心（People） <span id="pVal">60</span></div>
+            <div class="bar"><i id="pBar" style="width:60%"></i></div>
+          </div>
+          <div class="stat">
+            <div>國庫（Treasury） <span id="tVal">60</span></div>
+            <div class="bar"><i id="tBar" style="width:60%"></i></div>
+          </div>
+          <div class="stat">
+            <div>回合：<span id="turn">1</span> / 20</div>
+            <div style="font-size:0.9rem;color:#666;margin-top:6px;">目標：用 20 回合維持三項指標 > 0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">小遊戲示範版 — 想要更多奏摺、事件或中文古文風味我可以再加。按下按鈕就會顯示決策結果喔～</div>
+  </div>
+
+  <div class="big-toast" id="toast"></div>
+
+  <script>
+    // 範例奏摺資料（可以自行擴充、改寫成更古文的風格）
+    const memorials = [
+      {title:"河道決堤，百姓無家", body:"今臣聞境內河道氾濫，村舍被淹，百姓流離失所。奏請敕令撥銀修堤，並徵調民夫勘查災情。", effects:{
+        allow:{people:+8,stability:+5,treasury:+12},
+        reject:{people:-12,stability:-8,treasury:+0},
+        hold:{people:-3,stability:-2,treasury:-4}
+      }},
+      {title:"地方吏員貪污案", body:"某府吏員受賄，市井民怨上升，請求嚴懲以示公道，並整頓吏治。", effects:{
+        allow:{people:+5,stability:+6,treasury:+4},
+        reject:{people:-10,stability:-12,treasury:+0},
+        hold:{people:-2,stability:-5,treasury:-1}
+      }},
+      {title:"進貢珍奇博物", body:"西域來使進獻珍奇異獸，請令入宮陳列以增彩。", effects:{
+        allow:{people:+3,stability:+2,treasury:+6},
+        reject:{people:-2,stability:-1,treasury:+0},
+        hold:{people:0,stability:0,treasury:-2}
+      }},
+      {title:"賦稅議案：加徵奢侈稅", body:"為補國庫，擬對奢侈品加徵稅賦，恐影響商賈與民心。", effects:{
+        allow:{people:-8,stability:-4,treasury:+15},
+        reject:{people:+4,stability:+2,treasury:6},
+        hold:{people:+1,stability:0,treasury:+2}
+      }},
+      {title:"邊關有虜患接近", body:"邊關消息：有賊寇騷擾。請下令加強軍備或封鎖邊境。", effects:{
+        allow:{people:-2,stability:+10,treasury:-10},
+        reject:{people:-10,stability:-15,treasury:0},
+        hold:{people:-4,stability:-6,treasury:-2}
+      }},
+      {title:"民間藝人求獎助", body:"民間樂師申請官費，以振興文化、娛樂百姓。", effects:{
+        allow:{people:+4,stability:+1,treasury:-3},
+        reject:{people:-1,stability:-1,treasury:0},
+        hold:{people:0,stability:0,treasury:0}
+      }},
+      // 可以加入更多...
+    ];
+
+    // 遊戲狀態
+    let state = {
+      stability: 60,
+      people: 60,
+      treasury: 60,
+      turn: 1,
+      maxTurns: 20
+    };
+
+    // DOM
+    const memorialEl = document.getElementById('memorial');
+    const logEl = document.getElementById('log');
+    const sVal = document.getElementById('sVal'), pVal = document.getElementById('pVal'), tVal = document.getElementById('tVal');
+    const sBar = document.getElementById('sBar'), pBar = document.getElementById('pBar'), tBar = document.getElementById('tBar');
+    const turnEl = document.getElementById('turn');
+    const toast = document.getElementById('toast');
+
+    // 隨機抽取奏摺
+    function getRandomMemorial(){
+      const idx = Math.floor(Math.random()*memorials.length);
+      return JSON.parse(JSON.stringify(memorials[idx])); // copy
+    }
+
+    let current = getRandomMemorial();
+
+    function renderMemorial(){
+      memorialEl.innerHTML = `<strong>【${current.title}】</strong>\n\n${current.body}`;
+    }
+
+    function updateStats(){
+      sVal.textContent = state.stability;
+      pVal.textContent = state.people;
+      tVal.textContent = state.treasury;
+      sBar.style.width = Math.max(0, Math.min(100,state.stability)) + '%';
+      pBar.style.width = Math.max(0, Math.min(100,state.people)) + '%';
+      tBar.style.width = Math.max(0, Math.min(100,state.treasury)) + '%';
+      turnEl.textContent = state.turn;
+    }
+
+    function appendLog(text){
+      const line = document.createElement('div');
+      line.textContent = `回合 ${state.turn}：` + text;
+      logEl.prepend(line);
+    }
+
+    function showToast(text, dur=2000){
+      toast.textContent = text;
+      toast.style.display='block';
+      setTimeout(()=>{ toast.style.display='none'; }, dur);
+    }
+
+    function applyEffect(type){
+      const eff = current.effects[type];
+      state.people += eff.people || 0;
+      state.stability += eff.stability || 0;
+      state.treasury += eff.treasury || 0;
+
+      // clamp 0..100
+      state.people = Math.max(-20, Math.min(120, state.people));
+      state.stability = Math.max(-20, Math.min(120, state.stability));
+      state.treasury = Math.max(-20, Math.min(120, state.treasury));
+    }
+
+    function checkSpecial(){
+      // 如果三項都很差 -> 顯示「皇上母湯喔？」
+      if(state.people <= 10 && state.stability <= 10 && state.treasury <= 10){
+        showToast('皇上母湯喔？國事三線崩壞！⚠️', 3000);
+      }
+      // 若國庫過高 -> 慎防揮霍提示
+      if(state.treasury >= 110){
+        appendLog('國庫盈餘過多，宮中有揮霍風險。');
+        showToast('銀兩過多，留心奢靡。',1800);
+      }
+    }
+
+    // 決策處理
+    function decide(mode){ // mode: 'allow'|'reject'|'hold'
+      const label = mode === 'allow' ? '允' : mode === 'reject' ? '駁' : '留中';
+      applyEffect(mode);
+
+      appendLog(`對《${current.title}》選擇「${label}」。效果：安定 ${state.stability}、民心 ${state.people}、國庫 ${state.treasury}`);
+      checkSpecial();
+
+      // 下一回合
+      state.turn++;
+      if(state.turn > state.maxTurns){
+        endGame();
+        return;
+      }
+      current = getRandomMemorial();
+      renderMemorial();
+      updateStats();
+    }
+
+    function endGame(){
+      // 基本勝敗判定
+      let message = '';
+      if(state.stability > 20 && state.people > 20 && state.treasury > 20){
+        message = `恭喜皇上！國家安穩 — 任期結束。民心 ${state.people}、安定 ${state.stability}、國庫 ${state.treasury}`;
+      } else {
+        message = `唉唷皇上，局勢危險——任期結束。民心 ${state.people}、安定 ${state.stability}、國庫 ${state.treasury}`;
+      }
+      showToast(message, 6000);
+      appendLog('遊戲結束。' + message);
+      // 禁用按鈕
+      document.getElementById('btnAllow').disabled = true;
+      document.getElementById('btnReject').disabled = true;
+      document.getElementById('btnHold').disabled = true;
+    }
+
+    // 綁定按鈕
+    document.getElementById('btnAllow').addEventListener('click', ()=> decide('allow'));
+    document.getElementById('btnReject').addEventListener('click', ()=> decide('reject'));
+    document.getElementById('btnHold').addEventListener('click', ()=> decide('hold'));
+
+    // 初始渲染
+    renderMemorial();
+    updateStats();
+    appendLog('皇上即位，開始審閱奏摺。祝君明察秋毫！');
+  </script>
+</body>
+</html>
