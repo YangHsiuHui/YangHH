@@ -13,7 +13,6 @@ html, body {
   color:#5a3e1b;
   display:flex;
   flex-direction:column;
-  -webkit-font-smoothing: antialiased;
 }
 header {
   padding:12px;
@@ -25,13 +24,7 @@ header {
   flex-shrink:0;
 }
 .stat span { margin-right:10px; }
-
-.container {
-  flex:1 1 auto;
-  overflow-y:auto;
-  padding:15px;
-  padding-bottom:200px; /* 留空給 footer */
-}
+.container { flex:1 1 auto; overflow-y:auto; padding:15px; padding-bottom:220px; }
 
 .panel {
   background:#fff3e0;
@@ -61,12 +54,12 @@ button {
   bottom:0;
   left:0;
   width:100%;
-  background-color:#ffcc80; 
+  background-color:#ffcc80;
   display:flex;
   border-top:1px solid #e0a96d;
   z-index:9999;
   flex-shrink:0;
-  transform: translateZ(0); 
+  transform: translateZ(0);
 }
 .footer button {
   flex:1;
@@ -86,24 +79,8 @@ button {
   cursor:pointer;
 }
 
-.task-record {
-  margin-top:10px;
-  padding:10px;
-  background:#ffe0b2;
-  border:1px solid #e0a96d;
-  border-radius:6px;
-  font-size:14px;
-}
-.filter-btn {
-  display:inline-block;
-  margin:3px;
-  padding:4px 8px;
-  background:#ffa726;
-  color:#fff;
-  border-radius:4px;
-  cursor:pointer;
-  font-size:12px;
-}
+.task-record { margin-top:10px; padding:10px; background:#ffe0b2; border:1px solid #e0a96d; border-radius:6px; font-size:14px; }
+.filter-btn { display:inline-block; margin:3px; padding:4px 8px; background:#ffa726; color:#fff; border-radius:4px; cursor:pointer; font-size:12px; }
 </style>
 </head>
 <body>
@@ -120,14 +97,17 @@ button {
 
 <div class="container">
 
+<!-- 御書房 -->
 <div id="court" class="panel">
   <h2>御書房・奏摺</h2>
   <p id="memoTitle"></p>
   <p id="memoText"></p>
   <div id="memoBtns"></div>
   <button class="btn-gray" onclick="nextSeason()">▶ 推進一季</button>
+  <button class="btn-green" onclick="aiProposal()">💡 AI 宰相提案</button>
 </div>
 
+<!-- 六部 -->
 <div id="six" class="panel hidden">
   <h2>皇帝六部</h2>
   <div class="official" onclick="openTask('吏部','王守德')">吏部尚書 王守德<span>整飭官僚</span></div>
@@ -138,12 +118,14 @@ button {
   <div class="official" onclick="openTask('工部','班魚達')">工部尚書 班魚達<span>工程建設</span></div>
 </div>
 
+<!-- 任務面板 -->
 <div id="taskPanel" class="panel hidden">
   <h2 id="taskTitle"></h2>
   <div id="taskBtns"></div>
   <button class="btn-red" onclick="closeTask()">返回</button>
 </div>
 
+<!-- 任務列表與歷史 -->
 <div id="taskList" class="panel hidden">
   <h2>📋 進行中任務</h2>
   <div id="tasks">目前無任務</div>
@@ -154,22 +136,41 @@ button {
   </div>
 </div>
 
+<!-- 後宮 / 皇位 -->
+<div id="palace" class="panel hidden">
+  <h2>🏰 後宮子嗣 & 皇位風險</h2>
+  <p id="heirs">子嗣：0</p>
+  <p id="succession">皇位風險：安全</p>
+</div>
+
+<!-- 存檔 -->
+<div class="panel">
+  <button class="btn-green" onclick="saveGame()">💾 存檔</button>
+  <button class="btn-gray" onclick="loadGame()">📂 讀檔</button>
+  <button class="btn-red" onclick="resetGame()">🔄 重置</button>
+</div>
+
 </div>
 
 <div class="footer">
   <button onclick="showPanel('court')">上朝</button>
   <button onclick="showPanel('six')">六部</button>
   <button onclick="showPanel('taskList')">任務</button>
+  <button onclick="showPanel('palace')">後宮</button>
 </div>
 
 <script>
+/* ===== 基本數值 ===== */
 let year=1, seasons=["春","夏","秋","冬"], si=0;
 let gold=43000, people=100, army=80, fame=100;
+let heirs=0, succession="安全";
 
 const goldEl=document.getElementById("gold"),
       peopleEl=document.getElementById("people"),
       armyEl=document.getElementById("army"),
-      fameEl=document.getElementById("fame");
+      fameEl=document.getElementById("fame"),
+      heirsEl=document.getElementById("heirs"),
+      successionEl=document.getElementById("succession");
 
 function updateStats(){
   goldEl.innerText=`💰 ${gold}`;
@@ -179,7 +180,7 @@ function updateStats(){
 }
 function updateTime(){document.getElementById("time").innerText=`第 ${year} 年・${seasons[si]}`;}
 
-/* 奏摺 */
+/* ===== 奏摺 ===== */
 const memos=[
 {title:"戶部奏請清查逃稅",text:"近年商賈隱匿稅銀，國課流失，請旨徹查。",
  opts:[{t:"嚴查徵稅",g:3000,p:-5},{t:"緩查安民",g:1000,p:+2},{t:"暫不處理",g:0,p:-2}]},
@@ -197,25 +198,21 @@ function loadMemo(){
     b.className="btn-green";
     b.innerText=o.t;
     b.onclick=()=>{
-      gold+=o.g||0;
-      people+=o.p||0;
-      army+=o.a||0;
-      fame+=o.f||0;
-      updateStats();
-      loadMemo();
+      gold+=o.g||0; people+=o.p||0; army+=o.a||0; fame+=o.f||0;
+      updateStats(); loadMemo();
     };
     memoBtns.appendChild(b);
   });
 }
 
-/* 六部任務 */
+/* ===== 六部任務 ===== */
 const deptTasks={
-"吏部":[{task:"整頓冗官", g:0, p:+2, a:0, f:+1}],
-"戶部":[{task:"清查賦稅", g:2000, p:0, a:0, f:0},{task:"招募胡商", g:1000, p:0, a:+5, f:0}],
-"禮部":[{task:"修宗廟", g:0, p:+1, a:0, f:+3}],
-"兵部":[{task:"邊防演練", g:0, p:0, a:+3, f:0}],
-"刑部":[{task:"整頓法紀", g:0, p:+2, a:0, f:0}],
-"工部":[{task:"修築水利", g:0, p:+1, a:0, f:0}]
+"吏部":[{task:"整頓冗官", g:0,p:2,a:0,f:1}],
+"戶部":[{task:"清查賦稅", g:2000,p:0,a:0,f:0},{task:"招募胡商", g:1000,p:0,a:5,f:0}],
+"禮部":[{task:"修宗廟", g:0,p:1,a:0,f:3}],
+"兵部":[{task:"邊防演練", g:0,p:0,a:3,f:0}],
+"刑部":[{task:"整頓法紀", g:0,p:2,a:0,f:0}],
+"工部":[{task:"修築水利", g:0,p:1,a:0,f:0}]
 };
 let activeTasks=[], current={}, taskHistory=[];
 
@@ -233,7 +230,6 @@ function openTask(dept,name){
   });
   document.getElementById("taskPanel").classList.remove("hidden");
 }
-
 function closeTask(){document.getElementById("taskPanel").classList.add("hidden");}
 
 function assignTask(t){
@@ -250,9 +246,8 @@ function updateTaskList(){
   
   if(taskHistory.length===0) histDiv.innerText="目前無歷史紀錄";
   else {
-    histDiv.innerHTML=taskHistory.map(h=>`【${h.dept}】${h.officer}－${h.task} → 成果: 💰${h.g>=0?'+':''}${h.g}，😊${h.p>=0?'+':''}${h.p}，⚔️${h.a>=0?'+':''}${h.a}，⭐${h.f>=0?'+':''}${h.f}（完成: 第${h.year}年${seasons[h.si]}）`).join("<br>");
+    histDiv.innerHTML=taskHistory.map(h=>`【${h.dept}】${h.officer}－${h.task} → 💰${h.g>=0?'+':''}${h.g}，😊${h.p>=0?'+':''}${h.p}，⚔️${h.a>=0?'+':''}${h.a}，⭐${h.f>=0?'+':''}${h.f}（完成: 第${h.year}年${seasons[h.si]}）`).join("<br>");
   }
-  generateFilterButtons();
 }
 
 /* 過濾按鈕 */
@@ -275,22 +270,34 @@ function generateFilterButtons(){
     filterDiv.appendChild(allBtn);
   }
 }
-
 function filterHistory(dept){
   const histDiv=document.getElementById("taskHistory");
   let filtered=dept?taskHistory.filter(h=>h.dept===dept):taskHistory;
   if(filtered.length===0){histDiv.innerText="無紀錄";}
-  else {
-    histDiv.innerHTML=filtered.map(h=>`【${h.dept}】${h.officer}－${h.task} → 成果: 💰${h.g>=0?'+':''}${h.g}，😊${h.p>=0?'+':''}${h.p}，⚔️${h.a>=0?'+':''}${h.a}，⭐${h.f>=0?'+':''}${h.f}（完成: 第${h.year}年${seasons[h.si]}）`).join("<br>");
+  else histDiv.innerHTML=filtered.map(h=>`【${h.dept}】${h.officer}－${h.task} → 💰${h.g>=0?'+':''}${h.g}，😊${h.p>=0?'+':''}${h.p}，⚔️${h.a>=0?'+':''}${h.a}，⭐${h.f>=0?'+':''}${h.f}（完成: 第${h.year}年${seasons[h.si]}）`).join("<br>");
+}
+
+/* AI 宰相 */
+function aiProposal(){
+  if(!memos.length) return;
+  const choice=Math.floor(Math.random()*memos.length);
+  const m=memos[choice];
+  if(m.opts.length>0){
+    const opt=m.opts[Math.floor(Math.random()*m.opts.length)];
+    gold+=opt.g||0; people+=opt.p||0; army+=opt.a||0; fame+=opt.f||0;
+    updateStats();
+    alert("AI 宰相提案:\n"+m.title+"\n採取: "+opt.t);
   }
 }
 
 /* 推進季節與任務完成 */
 function nextSeason(){
   si++; if(si>=4){si=0; year++;}
-  let completed = [];
-  activeTasks.forEach(t=>t.remain--);
+  // 每季可能出生子嗣
+  if(Math.random()<0.3){heirs++; updateHeirs();}
   // 任務完成
+  let completed=[];
+  activeTasks.forEach(t=>t.remain--);
   activeTasks=activeTasks.filter(t=>{
     if(t.remain<=0){
       gold+=t.g; people+=t.p; army+=t.a; fame+=t.f;
@@ -301,19 +308,46 @@ function nextSeason(){
     return true;
   });
   if(completed.length>0) alert("任務完成:\n"+completed.join("\n"));
-  updateTaskList();
-  updateStats();
-  updateTime();
+  updateStats(); updateTime(); updateTaskList();
+  updateSuccession();
+}
+
+function updateHeirs(){ heirsEl.innerText=`子嗣：${heirs}`; }
+
+function updateSuccession(){
+  let risk=(fame<30 || people<50)? "不穩": "安全";
+  successionEl.innerText=`皇位風險：${risk}`;
+}
+
+/* 存檔系統 */
+function saveGame(){
+  const data={year,si,gold,people,army,fame,activeTasks,taskHistory,heirs};
+  localStorage.setItem("emperorSave",JSON.stringify(data));
+  alert("遊戲已存檔！");
+}
+function loadGame(){
+  const data=JSON.parse(localStorage.getItem("emperorSave"));
+  if(data){
+    ({year,si,gold,people,army,fame,activeTasks,taskHistory,heirs}=data);
+    updateStats(); updateTime(); updateTaskList(); updateHeirs(); updateSuccession();
+    alert("遊戲已讀檔！");
+  } else alert("無存檔！");
+}
+function resetGame(){
+  if(confirm("確定重置遊戲？")){
+    localStorage.removeItem("emperorSave");
+    location.reload();
+  }
 }
 
 /* 切換面板 */
 function showPanel(id){
-  ['court','six','taskList','taskPanel'].forEach(p=>document.getElementById(p).classList.add('hidden'));
+  ['court','six','taskList','taskPanel','palace'].forEach(p=>document.getElementById(p).classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
 }
 
 /* 初始化 */
-updateTime(); updateStats(); loadMemo(); updateTaskList();
+updateTime(); updateStats(); loadMemo(); updateTaskList(); updateHeirs(); updateSuccession();
 </script>
 
 </body>
