@@ -58,8 +58,6 @@ button {
   display:flex;
   border-top:1px solid #e0a96d;
   z-index:9999;
-  flex-shrink:0;
-  transform: translateZ(0);
 }
 .footer button {
   flex:1;
@@ -68,7 +66,6 @@ button {
   border:none;
   padding:12px;
   font-size:14px;
-  pointer-events:auto;
 }
 
 .official {
@@ -79,8 +76,24 @@ button {
   cursor:pointer;
 }
 
-.task-record { margin-top:10px; padding:10px; background:#ffe0b2; border:1px solid #e0a96d; border-radius:6px; font-size:14px; }
-.filter-btn { display:inline-block; margin:3px; padding:4px 8px; background:#ffa726; color:#fff; border-radius:4px; cursor:pointer; font-size:12px; }
+.task-record { 
+  margin-top:10px; 
+  padding:10px; 
+  background:#ffe0b2; 
+  border:1px solid #e0a96d; 
+  border-radius:6px; 
+  font-size:14px; 
+}
+.filter-btn { 
+  display:inline-block; 
+  margin:3px; 
+  padding:4px 8px; 
+  background:#ffa726; 
+  color:#fff; 
+  border-radius:4px; 
+  cursor:pointer; 
+  font-size:12px; 
+}
 </style>
 </head>
 <body>
@@ -130,10 +143,8 @@ button {
   <h2>📋 進行中任務</h2>
   <div id="tasks">目前無任務</div>
   <h2>✅ 任務歷史紀錄</h2>
-  <div>
-    <div id="filterBtns"></div>
-    <div id="taskHistory">目前無歷史紀錄</div>
-  </div>
+  <div id="filterBtns"></div>
+  <div id="taskHistory">目前無歷史紀錄</div>
 </div>
 
 <!-- 後宮 / 皇位 -->
@@ -163,7 +174,7 @@ button {
 /* ===== 基本數值 ===== */
 let year=1, seasons=["春","夏","秋","冬"], si=0;
 let gold=43000, people=100, army=80, fame=100;
-let heirs=0, succession="安全";
+let heirs=0;
 
 const goldEl=document.getElementById("gold"),
       peopleEl=document.getElementById("people"),
@@ -179,6 +190,11 @@ function updateStats(){
   fameEl.innerText=`⭐ ${fame}`;
 }
 function updateTime(){document.getElementById("time").innerText=`第 ${year} 年・${seasons[si]}`;}
+function updateHeirs(){ heirsEl.innerText=`子嗣：${heirs}`; }
+function updateSuccession(){
+  let risk=(fame<30 || people<50)? "不穩": "安全";
+  successionEl.innerText=`皇位風險：${risk}`;
+}
 
 /* ===== 奏摺 ===== */
 const memos=[
@@ -207,12 +223,12 @@ function loadMemo(){
 
 /* ===== 六部任務 ===== */
 const deptTasks={
-"吏部":[{task:"整頓冗官", g:0,p:2,a:0,f:1}],
-"戶部":[{task:"清查賦稅", g:2000,p:0,a:0,f:0},{task:"招募胡商", g:1000,p:0,a:5,f:0}],
-"禮部":[{task:"修宗廟", g:0,p:1,a:0,f:3}],
-"兵部":[{task:"邊防演練", g:0,p:0,a:3,f:0}],
-"刑部":[{task:"整頓法紀", g:0,p:2,a:0,f:0}],
-"工部":[{task:"修築水利", g:0,p:1,a:0,f:0}]
+"吏部":[{task:"整頓冗官", g:0,p:2,a:0,f:1,desc:"整頓冗官，提升官僚效率"}],
+"戶部":[{task:"清查賦稅", g:2000,p:0,a:0,f:0,desc:"清查賦稅，增加財政收入"},{task:"招募胡商", g:1000,p:0,a:5,f:0,desc:"招募胡商，增加軍力"}],
+"禮部":[{task:"修宗廟", g:0,p:1,a:0,f:3,desc:"修繕宗廟，提升民心與聲望"}],
+"兵部":[{task:"邊防演練", g:0,p:0,a:3,f:0,desc:"邊防演練，提高軍力"}],
+"刑部":[{task:"整頓法紀", g:0,p:2,a:0,f:0,desc:"整頓法紀，提升民心"}],
+"工部":[{task:"修築水利", g:0,p:1,a:0,f:0,desc:"修築水利，改善民生"}]
 };
 let activeTasks=[], current={}, taskHistory=[];
 
@@ -238,19 +254,21 @@ function assignTask(t){
   closeTask();
 }
 
+/* 任務更新與歷史紀錄 */
 function updateTaskList(){
   const tasksDiv=document.getElementById("tasks");
   const histDiv=document.getElementById("taskHistory");
   if(activeTasks.length===0){tasksDiv.innerText="目前無任務";}
   else tasksDiv.innerHTML=activeTasks.map(t=>`【${t.dept}】${t.officer}－${t.task}（剩 ${t.remain} 季）`).join("<br>");
   
-  if(taskHistory.length===0) histDiv.innerText="目前無歷史紀錄";
+  if(taskHistory.length===0){histDiv.innerText="目前無歷史紀錄";}
   else {
-    histDiv.innerHTML=taskHistory.map(h=>`【${h.dept}】${h.officer}－${h.task} → 💰${h.g>=0?'+':''}${h.g}，😊${h.p>=0?'+':''}${h.p}，⚔️${h.a>=0?'+':''}${h.a}，⭐${h.f>=0?'+':''}${h.f}（完成: 第${h.year}年${seasons[h.si]}）`).join("<br>");
+    histDiv.innerHTML=taskHistory.map(h=>`【${h.dept}】${h.officer}－${h.task}：${h.desc} → 💰${h.g>=0?'+':''}${h.g}，😊${h.p>=0?'+':''}${h.p}，⚔️${h.a>=0?'+':''}${h.a}，⭐${h.f>=0?'+':''}${h.f}（完成: 第${h.year}年${seasons[h.si]}）`).join("<br>");
   }
+  generateFilterButtons();
 }
 
-/* 過濾按鈕 */
+/* 任務分類過濾 */
 function generateFilterButtons(){
   const filterDiv=document.getElementById("filterBtns");
   const depts=[...new Set(taskHistory.map(h=>h.dept))];
@@ -274,7 +292,7 @@ function filterHistory(dept){
   const histDiv=document.getElementById("taskHistory");
   let filtered=dept?taskHistory.filter(h=>h.dept===dept):taskHistory;
   if(filtered.length===0){histDiv.innerText="無紀錄";}
-  else histDiv.innerHTML=filtered.map(h=>`【${h.dept}】${h.officer}－${h.task} → 💰${h.g>=0?'+':''}${h.g}，😊${h.p>=0?'+':''}${h.p}，⚔️${h.a>=0?'+':''}${h.a}，⭐${h.f>=0?'+':''}${h.f}（完成: 第${h.year}年${seasons[h.si]}）`).join("<br>");
+  else histDiv.innerHTML=filtered.map(h=>`【${h.dept}】${h.officer}－${h.task}：${h.desc} → 💰${h.g>=0?'+':''}${h.g}，😊${h.p>=0?'+':''}${h.p}，⚔️${h.a>=0?'+':''}${h.a}，⭐${h.f>=0?'+':''}${h.f}（完成: 第${h.year}年${seasons[h.si]}）`).join("<br>");
 }
 
 /* AI 宰相 */
@@ -293,7 +311,7 @@ function aiProposal(){
 /* 推進季節與任務完成 */
 function nextSeason(){
   si++; if(si>=4){si=0; year++;}
-  // 每季可能出生子嗣
+  // 後宮子嗣
   if(Math.random()<0.3){heirs++; updateHeirs();}
   // 任務完成
   let completed=[];
@@ -302,21 +320,13 @@ function nextSeason(){
     if(t.remain<=0){
       gold+=t.g; people+=t.p; army+=t.a; fame+=t.f;
       taskHistory.push({...t, year, si});
-      completed.push(`【${t.dept}】${t.officer}－${t.task} → 💰${t.g>=0?'+':''}${t.g}，😊${t.p>=0?'+':''}${t.p}，⚔️${t.a>=0?'+':''}${t.a}，⭐${t.f>=0?'+':''}${t.f}`);
+      completed.push(`【${t.dept}】${t.officer}－${t.task}完成！`);
       return false;
     }
     return true;
   });
   if(completed.length>0) alert("任務完成:\n"+completed.join("\n"));
-  updateStats(); updateTime(); updateTaskList();
-  updateSuccession();
-}
-
-function updateHeirs(){ heirsEl.innerText=`子嗣：${heirs}`; }
-
-function updateSuccession(){
-  let risk=(fame<30 || people<50)? "不穩": "安全";
-  successionEl.innerText=`皇位風險：${risk}`;
+  updateStats(); updateTime(); updateTaskList(); updateSuccession();
 }
 
 /* 存檔系統 */
@@ -334,10 +344,7 @@ function loadGame(){
   } else alert("無存檔！");
 }
 function resetGame(){
-  if(confirm("確定重置遊戲？")){
-    localStorage.removeItem("emperorSave");
-    location.reload();
-  }
+  if(confirm("確定重置遊戲？")){localStorage.removeItem("emperorSave"); location.reload();}
 }
 
 /* 切換面板 */
