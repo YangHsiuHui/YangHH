@@ -33,6 +33,7 @@
     .panels{display:flex;gap:12px;margin-top:12px;}
     .left{flex:2;}
     .right{flex:1;}
+<!--
     .memorial{
       background:#fff8e6;
       border:1px solid #ffe7b3;
@@ -41,6 +42,45 @@
       line-height:1.6;
       white-space:pre-wrap;
     }
+
+
+-->
+/* 將原本 .memorial 改成這樣 */
+.memorial{
+  background:#fff8e6;
+  border:1px solid #ffe7b3;
+  padding:14px;
+  border-radius:8px;
+
+  /* 固定框大小 */
+  height:320px;          /* 固定高度 */
+  max-height:320px;
+  min-height:320px;
+
+  /* 內容超出可捲動 */
+  overflow-y:auto;
+
+  /* 保持換行 */
+  line-height:1.8;
+  white-space:pre-wrap;
+  word-break:break-word;
+
+  /* 視覺穩定 */
+  box-sizing:border-box;
+}
+
+/* 美化卷軸（可選） */
+.memorial::-webkit-scrollbar{
+  width:8px;
+}
+.memorial::-webkit-scrollbar-thumb{
+  background:#d6b46b;
+  border-radius:8px;
+}
+.memorial::-webkit-scrollbar-track{
+  background:#f7ecd1;
+}
+
     .controls{display:flex;gap:8px;margin-top:12px;}
     button{
       flex:1;padding:10px 12px;border-radius:8px;border:none;
