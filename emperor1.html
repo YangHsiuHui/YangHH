@@ -219,6 +219,167 @@
       }},
 
       // 可以加入更多...
+
+// 新增 50 篇奏摺（現代高普考 / 公務改革 / 國際局勢 / 科技資安 / 臺海 / 烏俄 / 美伊）
+// 設計原則：
+// 1. allow（允）多數不再大量扣國庫，常以改革、投資、增收、穩定為主
+// 2. reject（駁）通常短期省錢但傷民心或安定
+// 3. hold（留中）中庸但拖延有代價
+
+{title:"高普考錄取率過低，士子哀鴻", body:"今歲高普考報考者眾，然錄取門檻偏狹，寒窗士子多有怨言。臣請增設合理缺額，廣納賢才，以安民志。", effects:{
+  allow:{people:+10,stability:+7,treasury:+3},
+  reject:{people:-12,stability:-6,treasury:+5},
+  hold:{people:-4,stability:-2,treasury:0}
+}},
+
+{title:"公務員離職潮漸起", body:"各部院呈報：基層公務繁重，待遇與壓力失衡，離退者漸增。請修制度、減冗務、留人才。", effects:{
+  allow:{people:+7,stability:+10,treasury:-2},
+  reject:{people:-8,stability:-10,treasury:+3},
+  hold:{people:-3,stability:-4,treasury:0}
+}},
+
+{title:"AI治國新策", body:"工部與學士院聯名：可引AI助行政、簡化文書、減少人力浪費。然亦恐資安外洩。", effects:{
+  allow:{people:+5,stability:+8,treasury:+8},
+  reject:{people:-2,stability:-3,treasury:0},
+  hold:{people:0,stability:-1,treasury:+1}
+}},
+
+{title:"臺海軍演頻仍", body:"海疆奏報：東南海域局勢緊張，民間憂懼。請強化防備、穩民心、保商運。", effects:{
+  allow:{people:+2,stability:+12,treasury:-4},
+  reject:{people:-10,stability:-18,treasury:+2},
+  hold:{people:-4,stability:-8,treasury:-1}
+}},
+
+{title:"烏俄戰火延燒，糧價震盪", body:"外洋戰事未歇，穀物與能源價格波動。戶部建議預先屯糧、穩價。", effects:{
+  allow:{people:+6,stability:+8,treasury:+4},
+  reject:{people:-8,stability:-7,treasury:+2},
+  hold:{people:-3,stability:-3,treasury:0}
+}},
+
+{title:"美伊衝突升高，油路不靖", body:"西域商道傳聞油價將漲，百工成本恐升。請及早部署替代能源與物資。", effects:{
+  allow:{people:+4,stability:+7,treasury:+6},
+  reject:{people:-6,stability:-5,treasury:+1},
+  hold:{people:-2,stability:-2,treasury:0}
+}},
+
+{title:"青年失業率攀升", body:"戶部查報：青年求職艱難，學用落差甚鉅。請推技能培訓與產業媒合。", effects:{
+  allow:{people:+11,stability:+6,treasury:+2},
+  reject:{people:-10,stability:-7,treasury:+3},
+  hold:{people:-4,stability:-2,treasury:0}
+}},
+
+{title:"少子化危機", body:"近年新生兒數銳減，長遠恐傷國本。臣請育兒補助、居住減壓。", effects:{
+  allow:{people:+8,stability:+5,treasury:-1},
+  reject:{people:-7,stability:-4,treasury:+2},
+  hold:{people:-2,stability:-1,treasury:0}
+}},
+
+{title:"房價高漲，民怨漸生", body:"京畿房價節節高升，庶民難居。請整飭炒作、增建可負擔居所。", effects:{
+  allow:{people:+12,stability:+8,treasury:+2},
+  reject:{people:-12,stability:-8,treasury:+4},
+  hold:{people:-5,stability:-3,treasury:0}
+}},
+
+{title:"詐騙橫行，百姓受害", body:"刑部奏：假投資、假差事、虛擬幣詐術四起。請嚴打詐團並強化宣導。", effects:{
+  allow:{people:+14,stability:+10,treasury:+3},
+  reject:{people:-15,stability:-12,treasury:+1},
+  hold:{people:-6,stability:-5,treasury:0}
+}},
+
+{title:"資安漏洞，官署遭駭", body:"太史局通報：數部衙門資料疑遭外敵探測。請升級資安與備援。", effects:{
+  allow:{people:+4,stability:+11,treasury:+1},
+  reject:{people:-8,stability:-14,treasury:+2},
+  hold:{people:-3,stability:-6,treasury:0}
+}},
+
+{title:"醫護人力不足", body:"太醫院奏：地方醫館醫護短缺，偏鄉救治不及。", effects:{
+  allow:{people:+10,stability:+5,treasury:-2},
+  reject:{people:-12,stability:-6,treasury:+2},
+  hold:{people:-4,stability:-2,treasury:0}
+}},
+
+{title:"電力供應告急", body:"工部上書：夏暑將至，用電劇增，恐現限電。", effects:{
+  allow:{people:+6,stability:+9,treasury:+4},
+  reject:{people:-9,stability:-10,treasury:+1},
+  hold:{people:-3,stability:-4,treasury:0}
+}},
+
+{title:"淨零碳排改革", body:"百國倡議減碳，若不轉型恐失商機。", effects:{
+  allow:{people:+5,stability:+6,treasury:+6},
+  reject:{people:-2,stability:-3,treasury:+1},
+  hold:{people:-1,stability:-1,treasury:0}
+}},
+
+{title:"高鐵捷運擴建", body:"交通使奏：新線可通地方經濟，然需規劃周延。", effects:{
+  allow:{people:+8,stability:+7,treasury:+5},
+  reject:{people:-5,stability:-4,treasury:+1},
+  hold:{people:-2,stability:-1,treasury:0}
+}},
+
+{title:"教育雙語政策", body:"學部請示：推雙語與國際競爭力。", effects:{
+  allow:{people:+7,stability:+4,treasury:+1},
+  reject:{people:-4,stability:-3,treasury:0},
+  hold:{people:-1,stability:-1,treasury:0}
+}},
+
+{title:"網軍假訊息亂政", body:"近有外勢操弄輿情，分裂朝野。", effects:{
+  allow:{people:+4,stability:+10,treasury:+2},
+  reject:{people:-7,stability:-12,treasury:0},
+  hold:{people:-2,stability:-5,treasury:0}
+}},
+
+{title:"外資撤離警訊", body:"商部急報：部分外商觀望局勢。", effects:{
+  allow:{people:+5,stability:+8,treasury:+10},
+  reject:{people:-6,stability:-8,treasury:-2},
+  hold:{people:-2,stability:-3,treasury:0}
+}},
+
+{title:"半導體技術保衛", body:"機密產業恐遭挖角。", effects:{
+  allow:{people:+3,stability:+11,treasury:+8},
+  reject:{people:-5,stability:-9,treasury:0},
+  hold:{people:-1,stability:-4,treasury:0}
+}},
+
+{title:"地方選舉紛擾", body:"各州府競選激烈，民心浮動。", effects:{
+  allow:{people:+6,stability:+7,treasury:+1},
+  reject:{people:-8,stability:-8,treasury:0},
+  hold:{people:-3,stability:-3,treasury:0}
+}},
+
+// 以下再補 30 篇
+{title:"長照負擔日增", body:"老齡者增，家庭照護壓力甚巨。", effects:{allow:{people:+9,stability:+5,treasury:-1},reject:{people:-8,stability:-4,treasury:+2},hold:{people:-3,stability:-1,treasury:0}}},
+{title:"校園數位落差", body:"偏鄉學子設備不足。", effects:{allow:{people:+8,stability:+4,treasury:+1},reject:{people:-6,stability:-3,treasury:0},hold:{people:-2,stability:-1,treasury:0}}},
+{title:"海纜中斷危機", body:"通訊恐受阻。", effects:{allow:{people:+3,stability:+10,treasury:+2},reject:{people:-7,stability:-12,treasury:0},hold:{people:-2,stability:-4,treasury:0}}},
+{title:"糧食自給不足", body:"外糧受制於人。", effects:{allow:{people:+7,stability:+7,treasury:+5},reject:{people:-7,stability:-5,treasury:0},hold:{people:-2,stability:-2,treasury:0}}},
+{title:"公宅興建爭議", body:"民需與財政並衡。", effects:{allow:{people:+10,stability:+6,treasury:+1},reject:{people:-9,stability:-5,treasury:+2},hold:{people:-3,stability:-2,treasury:0}}},
+{title:"水庫見底", body:"旱象再現。", effects:{allow:{people:+9,stability:+8,treasury:+2},reject:{people:-10,stability:-8,treasury:0},hold:{people:-4,stability:-3,treasury:0}}},
+{title:"颱風防災整備", body:"風季將至。", effects:{allow:{people:+8,stability:+8,treasury:+1},reject:{people:-11,stability:-9,treasury:0},hold:{people:-4,stability:-3,treasury:0}}},
+{title:"國營事業改革", body:"效能低落。", effects:{allow:{people:+4,stability:+7,treasury:+12},reject:{people:-3,stability:-4,treasury:0},hold:{people:-1,stability:-2,treasury:0}}},
+{title:"最低工資調整", body:"庶民盼增薪。", effects:{allow:{people:+11,stability:+5,treasury:+2},reject:{people:-10,stability:-6,treasury:+1},hold:{people:-3,stability:-2,treasury:0}}},
+{title:"外交盟友訪朝", body:"可拓國際聲勢。", effects:{allow:{people:+4,stability:+9,treasury:+4},reject:{people:-2,stability:-4,treasury:0},hold:{people:-1,stability:-2,treasury:0}}},
+{title:"假學歷官員案", body:"朝綱受損。", effects:{allow:{people:+8,stability:+10,treasury:+1},reject:{people:-12,stability:-10,treasury:0},hold:{people:-4,stability:-4,treasury:0}}},
+{title:"國軍募兵不足", body:"兵源漸缺。", effects:{allow:{people:+2,stability:+12,treasury:+1},reject:{people:-7,stability:-14,treasury:0},hold:{people:-3,stability:-5,treasury:0}}},
+{title:"網購稅制改革", body:"商路新變。", effects:{allow:{people:+4,stability:+4,treasury:+10},reject:{people:-3,stability:-2,treasury:0},hold:{people:-1,stability:-1,treasury:0}}},
+{title:"山林火災", body:"森林告急。", effects:{allow:{people:+7,stability:+6,treasury:+1},reject:{people:-8,stability:-7,treasury:0},hold:{people:-3,stability:-2,treasury:0}}},
+{title:"青年創業基金", body:"新創待扶。", effects:{allow:{people:+9,stability:+5,treasury:+8},reject:{people:-5,stability:-3,treasury:0},hold:{people:-2,stability:-1,treasury:0}}},
+{title:"觀光復甦計畫", body:"旅宿待振。", effects:{allow:{people:+8,stability:+4,treasury:+10},reject:{people:-4,stability:-2,treasury:0},hold:{people:-1,stability:-1,treasury:0}}},
+{title:"疫病再起傳聞", body:"防疫不可懈。", effects:{allow:{people:+8,stability:+8,treasury:-1},reject:{people:-12,stability:-10,treasury:0},hold:{people:-4,stability:-4,treasury:0}}},
+{title:"司法改革呼聲", body:"百姓盼公正。", effects:{allow:{people:+10,stability:+9,treasury:+1},reject:{people:-11,stability:-9,treasury:0},hold:{people:-4,stability:-3,treasury:0}}},
+{title:"網紅亂象與兒少", body:"輿情紛亂。", effects:{allow:{people:+5,stability:+6,treasury:0},reject:{people:-4,stability:-5,treasury:0},hold:{people:-2,stability:-2,treasury:0}}},
+{title:"高齡再就業", body:"勞動力再活化。", effects:{allow:{people:+7,stability:+5,treasury:+5},reject:{people:-5,stability:-3,treasury:0},hold:{people:-2,stability:-1,treasury:0}}},
+{title:"防洪城市更新", body:"暴雨頻仍。", effects:{allow:{people:+9,stability:+8,treasury:+3},reject:{people:-9,stability:-8,treasury:0},hold:{people:-3,stability:-3,treasury:0}}},
+{title:"數位身分制度", body:"便民與隱私並存。", effects:{allow:{people:+6,stability:+7,treasury:+6},reject:{people:-3,stability:-3,treasury:0},hold:{people:-1,stability:-2,treasury:0}}},
+{title:"地方黑金介入", body:"選政不清。", effects:{allow:{people:+9,stability:+11,treasury:+2},reject:{people:-12,stability:-12,treasury:0},hold:{people:-4,stability:-4,treasury:0}}},
+{title:"海外留才政策", body:"人才外流。", effects:{allow:{people:+8,stability:+6,treasury:+7},reject:{people:-6,stability:-4,treasury:0},hold:{people:-2,stability:-1,treasury:0}}},
+{title:"核能延役爭議", body:"能源抉擇。", effects:{allow:{people:+3,stability:+9,treasury:+10},reject:{people:-5,stability:-7,treasury:0},hold:{people:-2,stability:-3,treasury:0}}},
+{title:"偏鄉交通斷鏈", body:"地方孤立。", effects:{allow:{people:+8,stability:+6,treasury:+2},reject:{people:-7,stability:-5,treasury:0},hold:{people:-2,stability:-2,treasury:0}}},
+{title:"國防無人機發展", body:"新戰備趨勢。", effects:{allow:{people:+3,stability:+12,treasury:+6},reject:{people:-6,stability:-10,treasury:0},hold:{people:-2,stability:-4,treasury:0}}},
+{title:"校園心理健康", body:"學子壓力增。", effects:{allow:{people:+9,stability:+4,treasury:-1},reject:{people:-7,stability:-4,treasury:0},hold:{people:-2,stability:-1,treasury:0}}},
+{title:"高齡詐騙防治", body:"長者屢遭詐。", effects:{allow:{people:+11,stability:+8,treasury:+2},reject:{people:-10,stability:-7,treasury:0},hold:{people:-3,stability:-3,treasury:0}}},
+{title:"皇城資料中心升級", body:"數位國本。", effects:{allow:{people:+4,stability:+9,treasury:+8},reject:{people:-4,stability:-6,treasury:0},hold:{people:-1,stability:-2,treasury:0}}},
+
+
+
     ];
 
     // 遊戲狀態
