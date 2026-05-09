@@ -54,9 +54,11 @@ button:hover{
 .center{
   flex:1;
   display:flex;
-  align-items:center;
-  justify-content:center;
   flex-direction:column;
+  align-items:center;
+  justify-content:flex-start; /* 改這裡 */
+  padding-top:30px;
+  overflow-y:auto;
 }
 
 /* 佛王NPC */
@@ -104,6 +106,40 @@ button:hover{
   font-size:14px;
   color:#555;
 }
+
+/* ===== 響應式設計 ===== */
+@media (max-width: 768px){
+
+  .container{
+    flex-direction:column;
+  }
+
+  .left{
+    width:100%;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    border-right:none;
+    border-bottom:1px solid #ddd;
+  }
+
+  .left button{
+    width:48%;
+    font-size:14px;
+  }
+
+  .left a{
+    width:100%;
+  }
+
+  .center{
+    padding-top:10px;
+  }
+}
+
+
+
+
 </style>
 </head>
 
