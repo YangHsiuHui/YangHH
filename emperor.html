@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>皇帝管理首頁</title>
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:"Noto Serif TC","Microsoft JhengHei",serif;
+  background:
+    linear-gradient(rgba(92,45,0,0.35), rgba(40,20,0,0.55)),
+    url('https://images.unsplash.com/photo-1547981609-4b6bf67db7cf?auto=format&fit=crop&w=1600&q=80');
+  background-size:cover;
+  background-position:center;
+  min-height:100vh;
+  color:#fff8e1;
+  display:flex;
+  flex-direction:column;
+}
+
+header{
+  text-align:center;
+  padding:50px 20px 30px;
+  background:rgba(92,45,0,0.45);
+  backdrop-filter:blur(4px);
+  border-bottom:2px solid rgba(255,215,128,0.35);
+}
+
+header h1{
+  font-size:3rem;
+  letter-spacing:4px;
+  color:#ffd54f;
+  text-shadow:2px 2px 8px rgba(0,0,0,0.5);
+}
+
+header p{
+  margin-top:12px;
+  font-size:1.1rem;
+  color:#fff3cd;
+}
+
+.container{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:40px 20px;
+}
+
+.dashboard{
+  width:min(1000px,95%);
+  background:rgba(255,248,225,0.12);
+  border:1px solid rgba(255,224,178,0.35);
+  border-radius:20px;
+  backdrop-filter:blur(10px);
+  padding:35px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.35);
+}
+
+.section-title{
+  text-align:center;
+  font-size:2rem;
+  color:#ffe082;
+  margin-bottom:30px;
+}
+
+.link-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:25px;
+}
+
+.card{
+  background:linear-gradient(180deg, rgba(255,224,178,0.22), rgba(255,183,77,0.18));
+  border:1px solid rgba(255,224,178,0.4);
+  border-radius:16px;
+  padding:24px;
+  text-align:center;
+  transition:all .3s ease;
+}
+
+.card:hover{
+  transform:translateY(-8px) scale(1.02);
+  box-shadow:0 10px 25px rgba(255,193,7,0.25);
+}
+
+.card h2{
+  color:#ffd54f;
+  margin-bottom:12px;
+  font-size:1.5rem;
+}
+
+.card p{
+  color:#fff8dc;
+  line-height:1.7;
+  min-height:72px;
+}
+
+.card a{
+  display:inline-block;
+  margin-top:18px;
+  padding:10px 20px;
+  text-decoration:none;
+  background:linear-gradient(to bottom,#ffd54f,#ffb300);
+  color:#5d4037;
+  font-weight:bold;
+  border-radius:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.2);
+  transition:all .25s ease;
+}
+
+.card a:hover{
+  background:linear-gradient(to bottom,#ffe082,#ffa000);
+  transform:scale(1.05);
+}
+
+.quick-nav{
+  margin-top:35px;
+  padding-top:20px;
+  border-top:1px solid rgba(255,224,178,0.25);
+  text-align:center;
+}
+
+.quick-nav a{
+  display:inline-block;
+  margin:8px;
+  padding:10px 16px;
+  text-decoration:none;
+  color:#fff8dc;
+  background:rgba(255,193,7,0.18);
+  border:1px solid rgba(255,224,178,0.35);
+  border-radius:8px;
+  transition:.25s;
+}
+
+.quick-nav a:hover{
+  background:rgba(255,193,7,0.35);
+}
+
+footer{
+  text-align:center;
+  padding:16px;
+  background:rgba(50,25,0,0.45);
+  color:#ffe0b2;
+  font-size:0.95rem;
+}
+
+@media (max-width:768px){
+  header h1{
+    font-size:2.2rem;
+  }
+  .dashboard{
+    padding:22px;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>👑 皇帝管理天下首頁 👑</h1>
+  <p>執掌朝政、批閱奏摺、治理天下、六部運作，開啟您的盛世帝王之路</p>
+</header>
+
+<div class="container">
+  <div class="dashboard">
+    <div class="section-title">御前系統入口</div>
+
+    <div class="link-grid">
+
+      <div class="card">
+        <h2>🏯 皇帝·極盛治世</h2>
+        <p>
+          體驗皇帝四季治理、六部尚書、任務系統、後宮子嗣、
+          財政與軍政平衡，打造盛世王朝。
+        </p>
+        <a href="01.html">進入 皇帝·極盛治世 </a>
+      </div>
+
+      <div class="card">
+        <h2>📜 皇帝批摺</h2>
+        <p>
+          每日批閱奏章，面對災荒、軍政、民生與外交，
+          一念之間決定帝國興衰。
+        </p>
+        <a href="emperor1.html">進入 皇帝批摺 </a>
+      </div>
+
+      <div class="card">
+        <h2>⚖️ 帝國總覽</h2>
+        <p>
+          作為皇帝管理總入口，可整合更多內政、軍事、
+          經濟與文化系統擴充。
+        </p>
+        <a href="#">敬請擴建</a>
+      </div>
+
+    </div>
+
+    <div class="quick-nav">
+      <a href="01.html">📂 皇帝·極盛治世</a>
+      <a href="emperor1.html">📂 皇帝批摺</a>
+      <a href="#">📂 後續擴充</a>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  皇帝管理首頁 ｜ 天子臨朝・萬邦來賀 ｜ 一頁式總入口
+</footer>
+
+</body>
+</html>
