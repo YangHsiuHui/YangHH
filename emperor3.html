@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>NPC 佛王審判系統</title>
+
+<style>
+body{
+  margin:0;
+  font-family:"Microsoft JhengHei";
+  background:linear-gradient(to bottom,#fff,#f7f1dc,#e9f2ff);
+  color:#333;
+}
+
+/* 上方標題 */
+header{
+  text-align:center;
+  padding:16px;
+  font-size:20px;
+  font-weight:bold;
+  background:#ffffffcc;
+  border-bottom:2px solid #e0c36a;
+}
+
+/* 主畫面 */
+.container{
+  display:flex;
+  height:100vh;
+}
+
+/* 左側操作 */
+.left{
+  width:260px;
+  background:#ffffffdd;
+  backdrop-filter: blur(6px);
+  border-right:1px solid #ddd;
+  padding:12px;
+}
+
+button{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  background:#f5f5f5;
+}
+button:hover{
+  background:#fff3cd;
+}
+
+/* 中央審判區 */
+.center{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+}
+
+/* 佛王NPC */
+.npc{
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff,#ffe9b3,#e0c36a);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  box-shadow:0 0 20px rgba(255,215,0,0.4);
+  margin-bottom:20px;
+  animation:glow 2s infinite;
+}
+
+@keyframes glow{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.05);}
+  100%{transform:scale(1);}
+}
+
+/* 審判結果 */
+.panel{
+  background:white;
+  padding:16px;
+  border-radius:12px;
+  width:360px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  text-align:center;
+}
+
+/* 六道顯示 */
+.result{
+  font-size:18px;
+  font-weight:bold;
+  margin-top:10px;
+  color:#8a6d1d;
+}
+
+/* NPC對話框 */
+.dialog{
+  margin-top:10px;
+  font-size:14px;
+  color:#555;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+🧿 NPC 佛王審判系統｜因果判定 × 六道輪迴 × 業力審核
+</header>
+
+<div class="container">
+
+<!-- 左側操作 -->
+<div class="left">
+
+<a href="emperor.html" style="
+  display:block;
+  text-decoration:none;
+  text-align:center;
+  padding:10px;
+  margin-bottom:10px;
+  background:#e0c36a;
+  color:#333;
+  border-radius:8px;
+  font-weight:bold;
+">
+🔙 回皇帝管理首頁
+</a>
+
+  <button onclick="addGood()">🙏 登記善行</button>
+  <button onclick="addBad()">⚠ 登記惡業</button>
+  <button onclick="addMeditation()">📿 修行記錄</button>
+  <button onclick="judge()">⚖ 佛王審判</button>
+  <button onclick="reset()">🔄 清空業簿</button>
+</div>
+
+<!-- 中央 -->
+<div class="center">
+
+  <div class="npc">👑 佛王NPC</div>
+
+  <div class="panel">
+    <div>📜 業力報告</div>
+
+    <div id="status">
+      功德：0<br>
+      業力：0<br>
+      修行：0
+    </div>
+
+    <div class="result" id="result">
+      尚未審判
+    </div>
+
+    <div class="dialog" id="dialog">
+      佛王：「眾生所作，一切皆記錄於因果簿。」
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+
+<script>
+
+let good = 0;
+let bad = 0;
+let med = 0;
+
+/* 更新顯示 */
+function update(){
+  document.getElementById("status").innerHTML =
+  "功德：" + good +
+  "<br>業力：" + bad +
+  "<br>修行：" + med;
+}
+
+/* 登記善行 */
+function addGood(){
+  good += 10;
+  update();
+}
+
+/* 惡業 */
+function addBad(){
+  bad += 10;
+  update();
+}
+
+/* 修行 */
+function addMeditation(){
+  med += 5;
+  good += 3;
+  update();
+}
+
+/* 佛王審判 */
+function judge(){
+
+  let score = good + med - bad;
+
+  let result = "";
+  let speak = "";
+
+  if(score > 60){
+    result = "🪷 極樂世界（蓮花化生）";
+    speak = "佛王：「善業圓滿，可入清淨佛國。」";
+  }
+  else if(score > 30){
+    result = "🌤 天道";
+    speak = "佛王：「福報尚足，但仍有執著。」";
+  }
+  else if(score > 0){
+    result = "👤 人道";
+    speak = "佛王：「人身難得，宜修正道。」";
+  }
+  else if(score > -30){
+    result = "🐶 畜生道";
+    speak = "佛王：「心念昏沉，隨業流轉。」";
+  }
+  else if(score > -60){
+    result = "👻 餓鬼道";
+    speak = "佛王：「貪執甚重，苦報現前。」";
+  }
+  else{
+    result = "🔥 地獄道";
+    speak = "佛王：「重業難解，須深懺悔。」";
+  }
+
+  document.getElementById("result").innerHTML = result;
+  document.getElementById("dialog").innerHTML = "佛王：「" + speak + "」";
+}
+
+/* 重置 */
+function reset(){
+  good = 0;
+  bad = 0;
+  med = 0;
+  update();
+  document.getElementById("result").innerHTML = "已清空業簿";
+  document.getElementById("dialog").innerHTML = "佛王：「業簿重新開始記錄。」";
+}
+
+update();
+
+</script>
+
+</body>
+</html>
