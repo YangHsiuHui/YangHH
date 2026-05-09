@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>皇帝治國系統｜三省六部・天下時事奏摺</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:"Microsoft JhengHei",serif;
+  background:linear-gradient(to bottom,#fff8dc,#ffe4b5,#fffaf0,#f5f5dc);
+  color:#4b2e19;
+}
+header{
+  text-align:center;
+  padding:30px 20px;
+  background:linear-gradient(to right,#d4af37,#fff4c4,#d4af37);
+  border-bottom:4px solid #8b7500;
+}
+header h1{
+  font-size:3rem;
+  color:#8b0000;
+  letter-spacing:4px;
+}
+header p{
+  margin-top:10px;
+  font-size:1.1rem;
+}
+
+/* 統計 */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;
+  width:95%;
+  margin:20px auto;
+}
+.card{
+  background:#fffdf5;
+  border:2px solid #d4af37;
+  border-radius:12px;
+  text-align:center;
+  padding:15px;
+}
+.card h3{color:#8b0000;}
+.value{
+  font-size:1.5rem;
+  font-weight:bold;
+  margin-top:8px;
+}
+
+/* 三省六部 */
+.section{
+  width:95%;
+  margin:auto;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:15px;
+  margin-bottom:25px;
+}
+.box{
+  background:#fffdf5;
+  border:2px solid #c89b3c;
+  border-radius:14px;
+  padding:18px;
+}
+.box h2,.box h3{
+  color:#8b0000;
+  margin-bottom:10px;
+}
+.box h4{
+  color:#b8860b;
+}
+.box ul{
+  padding-left:20px;
+  line-height:1.8;
+}
+
+/* 主體 */
+.main{
+  width:95%;
+  margin:20px auto;
+  display:grid;
+  grid-template-columns:1.15fr 0.85fr;
+  gap:20px;
+}
+
+/* 聖旨 */
+.edict{
+  background:linear-gradient(to bottom,#fff8dc,#f5deb3);
+  border:8px double #d4af37;
+  border-radius:15px;
+  padding:25px;
+  min-height:780px;
+  position:relative;
+}
+.dragon{
+  text-align:center;
+  font-size:4rem;
+  color:#d4af37;
+}
+.edict-title{
+  text-align:center;
+  font-size:2rem;
+  color:#8b0000;
+  margin:10px 0 20px;
+  letter-spacing:8px;
+}
+#memorialTitle{
+  color:#8b0000;
+  margin-bottom:15px;
+  font-size:1.4rem;
+}
+#memorialBody{
+  line-height:2.1;
+  font-size:1.08rem;
+  min-height:360px;
+}
+.seal{
+  position:absolute;
+  right:25px;
+  bottom:25px;
+  width:150px;
+  height:150px;
+  border:8px solid #b30000;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#b30000;
+  font-size:1.5rem;
+  font-weight:bold;
+  transform:rotate(-12deg);
+}
+
+/* 按鈕 */
+.actions{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:20px;
+}
+button{
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  font-size:1rem;
+  font-weight:bold;
+  cursor:pointer;
+}
+.approve{background:#90ee90;}
+.reject{background:#ff9999;}
+.hold{background:#f7d774;}
+
+/* 紀錄 */
+.log{
+  background:#fffdf5;
+  border:3px solid #c89b3c;
+  border-radius:15px;
+  padding:20px;
+  max-height:780px;
+  overflow-y:auto;
+}
+.log h2{
+  color:#8b0000;
+  margin-bottom:15px;
+}
+.log-entry{
+  border-bottom:1px dashed #b8860b;
+  padding:10px 0;
+  line-height:1.8;
+}
+.red{
+  color:#8b0000;
+  font-weight:bold;
+}
+
+/* 圖表 */
+.chart-box{
+  margin-top:20px;
+  background:#fffdf5;
+  border:3px solid #d4af37;
+  border-radius:15px;
+  padding:15px;
+}
+
+@media(max-width:1100px){
+  .main{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>皇帝治國系統</h1>
+  <p>三省六部・天官地官・春夏秋冬官・全球時事奏摺版</p>
+
+<!-- 👇 新增首頁連結條 -->
+
+  <div style="margin-top:15px;">
+
+    <a href="emperor.html"
+
+       style="
+
+         display:inline-block;
+
+         padding:10px 18px;
+
+         background:linear-gradient(45deg,#d4af37,#fff4c4,#d4af37);
+
+         border:2px solid #8b7500;
+
+         border-radius:10px;
+
+         text-decoration:none;
+
+         color:#8b0000;
+
+         font-weight:bold;
+
+         box-shadow:0 3px 6px rgba(0,0,0,0.2);
+
+       ">🏛 返回皇帝管理首頁</a>
+
+  </div>
+
+
+
+</header>
+
+<!-- 分數 -->
+<section class="stats">
+  <div class="card"><h3>國庫</h3><div class="value" id="treasury">12000</div></div>
+  <div class="card"><h3>政治</h3><div class="value" id="politics">85</div></div>
+  <div class="card"><h3>軍事</h3><div class="value" id="military">88</div></div>
+  <div class="card"><h3>經濟</h3><div class="value" id="economy">90</div></div>
+  <div class="card"><h3>文化</h3><div class="value" id="culture">82</div></div>
+  <div class="card"><h3>宗教</h3><div class="value" id="religion">80</div></div>
+  <div class="card"><h3>民生</h3><div class="value" id="life">84</div></div>
+</section>
+
+<div class="section">
+
+<!-- 三省 -->
+<div class="grid">
+  <div class="box">
+    <h2>中書省</h2>
+    <ul><li>國策草擬</li><li>皇帝詔令起草</li><li>戰略規劃</li></ul>
+  </div>
+  <div class="box">
+    <h2>門下省</h2>
+    <ul><li>審議封駁</li><li>政策監察</li><li>權力制衡</li></ul>
+  </div>
+  <div class="box">
+    <h2>尚書省</h2>
+    <ul><li>統領六部</li><li>執行政務</li><li>天下治理</li></ul>
+  </div>
+</div>
+
+<!-- 六部 -->
+<div class="grid">
+  <div class="box"><h3>天官・吏部尚書</h3><h4>官員考核</h4><ul><li>選官任賢</li><li>官場整頓</li></ul></div>
+  <div class="box"><h3>地官・戶部尚書</h3><h4>財政國庫</h4><ul><li>關稅、稅收</li><li>財政盈餘最大化</li></ul></div>
+  <div class="box"><h3>春官・禮部尚書</h3><h4>文化外交</h4><ul><li>教育科技</li><li>外交關係</li></ul></div>
+  <div class="box"><h3>夏官・兵部尚書</h3><h4>軍事國防</h4><ul><li>臺海、美伊、烏俄</li><li>國防安全</li></ul></div>
+  <div class="box"><h3>秋官・刑部尚書</h3><h4>法律秩序</h4><ul><li>數位監管</li><li>國安法制</li></ul></div>
+  <div class="box"><h3>冬官・工部尚書</h3><h4>建設科技</h4><ul><li>AI、晶片、能源</li><li>交通建設</li></ul></div>
+</div>
+
+</div>
+
+<!-- 批奏摺 -->
+<section class="main">
+
+<div>
+  <div class="edict">
+    <div class="dragon">🐉</div>
+    <div class="edict-title">奉天承運 皇帝詔曰</div>
+    <h2 id="memorialTitle">奏摺標題</h2>
+    <div id="memorialBody">奏摺內容載入中...</div>
+    <div class="seal">皇帝御璽</div>
+  </div>
+
+  <div class="actions">
+    <button class="approve" onclick="decide('approve')">准奏</button>
+    <button class="reject" onclick="decide('reject')">駁回</button>
+    <button class="hold" onclick="decide('hold')">留中</button>
+  </div>
+
+  <div class="chart-box">
+    <canvas id="empireChart"></canvas>
+  </div>
+</div>
+
+<div class="log" id="log">
+  <h2>御批紀錄</h2>
+</div>
+
+</section>
+
+<script>
+
+/* =========================
+   均衡版：每折增加國庫 + 六部全面平衡成長
+   直接取代原本 <script> 裡 memorials 生成與 state 部分
+   ========================= */
+
+const topics = [
+"美伊局勢升溫與中東油價波動",
+"烏俄戰爭影響全球糧食能源",
+"臺海軍事風險與國防預算",
+"全球關稅政策變動",
+"AI晶片科技競爭",
+"數位貨幣監管",
+"國際原油價格上漲",
+"半導體出口戰略",
+"網路安全與資安法",
+"全球供應鏈重組"
+];
+
+const memorials = [];
+
+/* 五十道奏摺：每道都國庫增加，且六部/天下六維度均衡 */
+for(let i=1;i<=50;i++){
+  let topic = topics[Math.floor(Math.random()*topics.length)];
+
+  /* 基礎收益 */
+  let treasuryGain = 800 + (i * 25);
+
+  memorials.push({
+    title:`第${i}奏：${topic}`,
+    body:`臣啟陛下：近日「${topic}」牽動天下政治、軍事、經濟、文化、宗教與民生。若朝廷善加應對，可同步提升六部政績、強化國本，並增加國庫 ${treasuryGain} 萬兩，使天官、地官、春夏秋冬官均衡發展。請陛下聖裁。`,
+    
+    effects:{
+      /* 准奏：全面平衡 + 國庫最大 */
+      approve:{
+        treasury:treasuryGain,
+        politics:3,
+        military:3,
+        economy:4,
+        culture:3,
+        religion:2,
+        life:3
+      },
+
+      /* 駁回：仍保守小幅成長，避免衰退 */
+      reject:{
+        treasury:200,
+        politics:1,
+        military:1,
+        economy:1,
+        culture:1,
+        religion:1,
+        life:1
+      },
+
+      /* 留中：中度成長 */
+      hold:{
+        treasury:450,
+        politics:2,
+        military:2,
+        economy:2,
+        culture:2,
+        religion:2,
+        life:2
+      }
+    }
+  });
+}
+
+/* 隨機抽20張 */
+const selected = memorials.sort(()=>0.5-Math.random()).slice(0,20);
+
+/* 初始國家分數 */
+let state = {
+  treasury:12000,
+  politics:85,   // 吏部 / 中書
+  military:88,   // 兵部
+  economy:90,    // 戶部
+  culture:82,    // 禮部
+  religion:80,   // 禮制宗教
+  life:84        // 工部/刑部/民生
+};
+
+let current = 0;
+
+/* 分數上限控制 */
+function capScores(){
+  for(let key in state){
+    if(key !== "treasury"){
+      if(state[key] > 200) state[key] = 200;
+      if(state[key] < 0) state[key] = 0;
+    }
+  }
+}
+
+/* 畫面更新 */
+function render(){
+  capScores();
+
+  for(let key in state){
+    document.getElementById(key).innerText = state[key];
+  }
+
+  chart.data.datasets[0].data = [
+    state.politics,
+    state.military,
+    state.economy,
+    state.culture,
+    state.religion,
+    state.life
+  ];
+
+  chart.update();
+}
+
+/* 載入奏摺 */
+function loadMemorial(){
+  if(current >= selected.length){
+    document.getElementById("memorialTitle").innerText = "二十道天下奏摺批閱完成";
+    document.getElementById("memorialBody").innerHTML =
+      `陛下萬歲萬歲萬萬歲！<br>
+       最終國庫累積：${state.treasury} 萬兩<br>
+       六部均衡昌盛・天下大治`;
+    return;
+  }
+
+  document.getElementById("memorialTitle").innerText = selected[current].title;
+  document.getElementById("memorialBody").innerText = selected[current].body;
+}
+
+/* 批改 */
+function decide(choice){
+  if(current >= selected.length) return;
+
+  const m = selected[current];
+  const effect = m.effects[choice];
+
+  for(let key in effect){
+    state[key] += effect[key];
+  }
+
+  capScores();
+
+  let result =
+    choice==="approve" ? "准奏" :
+    choice==="reject" ? "駁回" : "留中";
+
+  document.getElementById("log").innerHTML += `
+    <div class="log-entry">
+      <strong>${m.title}</strong><br>
+      <span class="red">【御批】${result}</span><br>
+      國庫：+${effect.treasury} 萬兩<br>
+      政治:+${effect.politics} 軍事:+${effect.military} 經濟:+${effect.economy}<br>
+      文化:+${effect.culture} 宗教:+${effect.religion} 民生:+${effect.life}
+    </div>
+  `;
+
+  current++;
+  render();
+  loadMemorial();
+}
+
+/* 雷達圖 */
+const ctx = document.getElementById("empireChart");
+const chart = new Chart(ctx,{
+  type:"radar",
+  data:{
+    labels:["政治(吏部)","軍事(兵部)","經濟(戶部)","文化(禮部)","宗教","民生(工刑)"],
+    datasets:[{
+      label:"帝國六部均衡治理指數",
+      data:[
+        state.politics,
+        state.military,
+        state.economy,
+        state.culture,
+        state.religion,
+        state.life
+      ],
+      borderWidth:3
+    }]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:true,
+    scales:{
+      r:{
+        min:0,
+        max:200
+      }
+    }
+  }
+});
+
+render();
+loadMemorial();
+
+</script>
+
+</body>
+</html>
