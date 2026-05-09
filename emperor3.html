@@ -4,67 +4,50 @@
 <meta charset="UTF-8">
 <title>NPC 佛王審判系統</title>
 
+<!-- 請直接用以下內容「取代你原本的 .container、.left、.center、.panel CSS」，
+目標：改成像 emperor1 那種「桌面管理介面」：
+✔ 左側固定控制欄
+✔ 中央上方佛王
+✔ 下方大型固定審判主面板
+✔ 桌面版高度完整利用
+✔ 手機仍保留響應式
+-->
+
 <style>
-body{
-  margin:0;
-  font-family:"Microsoft JhengHei";
-  background:linear-gradient(to bottom,#fff,#f7f1dc,#e9f2ff);
-  color:#333;
-}
 
-/* 上方標題 */
-header{
-  text-align:center;
-  padding:16px;
-  font-size:20px;
-  font-weight:bold;
-  background:#ffffffcc;
-  border-bottom:2px solid #e0c36a;
-}
-
-/* 主畫面 */
+/* ===== 主畫面（桌面式）===== */
 .container{
   display:flex;
-  height:100vh;
+  height:calc(100vh - 72px); /* 扣掉header高度 */
 }
 
-/* 左側操作 */
+/* ===== 左側控制台 ===== */
 .left{
   width:260px;
-  background:#ffffffdd;
-  backdrop-filter: blur(6px);
+  min-width:260px;
+  background:#ffffffee;
+  backdrop-filter: blur(8px);
   border-right:1px solid #ddd;
   padding:12px;
+  overflow-y:auto;
 }
 
-button{
-  width:100%;
-  padding:10px;
-  margin:6px 0;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  background:#f5f5f5;
-}
-button:hover{
-  background:#fff3cd;
-}
-
-/* 中央審判區 */
+/* ===== 中央主區 ===== */
 .center{
   flex:1;
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:flex-start; /* 改這裡 */
-  padding-top:30px;
-  overflow-y:auto;
+  justify-content:flex-start;
+  padding:20px;
+  overflow:hidden;
 }
 
-/* 佛王NPC */
+/* ===== 佛王NPC固定上方 ===== */
 .npc{
   width:140px;
   height:140px;
+  min-height:140px;
   border-radius:50%;
   background:radial-gradient(circle,#fff,#ffe9b3,#e0c36a);
   display:flex;
@@ -72,50 +55,88 @@ button:hover{
   justify-content:center;
   font-weight:bold;
   box-shadow:0 0 20px rgba(255,215,0,0.4);
-  margin-bottom:20px;
+  margin-bottom:18px;
   animation:glow 2s infinite;
 }
 
-@keyframes glow{
-  0%{transform:scale(1);}
-  50%{transform:scale(1.05);}
-  100%{transform:scale(1);}
-}
-
-/* 審判結果 */
+/* ===== 下方大型審判面板（像 emperor1 主奏摺區）===== */
 .panel{
   background:white;
-  padding:16px;
-  border-radius:12px;
-  width:360px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  width:min(900px,95%);
+  flex:1;
+  min-height:420px;
+  border-radius:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.12);
+  padding:24px;
   text-align:center;
+  overflow-y:auto;
+  border-top:4px solid #e0c36a;
 }
 
-/* 六道顯示 */
-.result{
-  font-size:18px;
+/* ===== 業力報告標題 ===== */
+.panel div:first-child{
+  font-size:22px;
   font-weight:bold;
-  margin-top:10px;
+  margin-bottom:18px;
   color:#8a6d1d;
 }
 
-/* NPC對話框 */
-.dialog{
-  margin-top:10px;
-  font-size:14px;
-  color:#555;
+/* ===== 狀態區 ===== */
+#status{
+  font-size:20px;
+  line-height:2;
+  padding:18px;
+  background:#f9fafc;
+  border-radius:12px;
+  margin-bottom:20px;
+  border:1px solid #eee;
 }
 
-/* ===== 響應式設計 ===== */
+/* ===== 結果 ===== */
+.result{
+  font-size:26px;
+  font-weight:bold;
+  margin-top:16px;
+  color:#8a6d1d;
+}
+
+/* ===== NPC對話 ===== */
+.dialog{
+  margin-top:20px;
+  font-size:18px;
+  line-height:1.8;
+  color:#555;
+  background:#fff8dc;
+  padding:16px;
+  border-radius:12px;
+}
+
+/* ===== 按鈕 ===== */
+button{
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:#f5f5f5;
+  font-size:16px;
+}
+button:hover{
+  background:#fff3cd;
+}
+
+/* ===== 響應式（手機）===== */
 @media (max-width: 768px){
 
   .container{
     flex-direction:column;
+    height:auto;
   }
 
   .left{
     width:100%;
+    min-width:100%;
     display:flex;
     flex-wrap:wrap;
     justify-content:space-between;
@@ -133,14 +154,32 @@ button:hover{
   }
 
   .center{
-    padding-top:10px;
+    padding:12px;
+    overflow:visible;
+  }
+
+  .panel{
+    width:100%;
+    min-height:auto;
+    flex:none;
+    padding:16px;
+  }
+
+  #status{
+    font-size:16px;
+  }
+
+  .result{
+    font-size:22px;
+  }
+
+  .dialog{
+    font-size:16px;
   }
 }
 
-
-
-
 </style>
+
 </head>
 
 <body>
