@@ -94,12 +94,38 @@ button {
   cursor:pointer; 
   font-size:12px; 
 }
+
+/* 請加在 style 區塊內 */
+.nav-link{
+  margin-top:6px;
+}
+.nav-link a{
+  display:inline-block;
+  text-decoration:none;
+  background:linear-gradient(to bottom,#ffe082,#ffb300);
+  color:#5a3e1b;
+  padding:6px 12px;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:bold;
+  box-shadow:0 2px 6px rgba(0,0,0,0.15);
+  transition:all .2s ease;
+}
+.nav-link a:hover{
+  transform:translateY(-2px);
+  background:linear-gradient(to bottom,#ffd54f,#ffa000);
+}
+
 </style>
 </head>
 <body>
 
 <header>
   <div id="time">第 1 年・春</div>
+  <!-- 請直接加在 <header> 裡面，建議放在 <div id="time">...</div> 下方 -->
+<div class="nav-link">
+  <a href="emperor1.html">👑 皇帝批摺</a>
+</div>
   <div class="stat">
     <span id="gold">💰 43000</span>
     <span id="people">😊 100</span>
