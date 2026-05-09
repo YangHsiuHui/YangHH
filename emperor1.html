@@ -107,6 +107,27 @@
       display:none;z-index:9999;
     }
     .hint{font-size:0.9rem;color:#777;margin-top:8px;}
+    
+    
+    /* 請加在 style 裡 */
+.nav-links{
+  margin-top:8px;
+}
+.nav-links a{
+  display:inline-block;
+  text-decoration:none;
+  background:linear-gradient(180deg,#ffe8a3,#ffd36b);
+  color:#5a3b00;
+  padding:8px 14px;
+  border-radius:8px;
+  font-weight:700;
+  box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  transition:all .2s ease;
+}
+.nav-links a:hover{
+  transform:translateY(-2px);
+  background:linear-gradient(180deg,#ffd36b,#ffbf47);
+}
   </style>
 </head>
 <body>
@@ -116,6 +137,10 @@
       <div>
         <h1>皇帝批摺<span class="yahoo">萬歲!</span></h1>
         <div class="subtitle">審閱奏摺，選擇：允（approve） / 駁（reject） / 留中（hold）。嘗試保持國家平衡。</div>
+        <!-- 請直接加在 header 區塊 subtitle 下方最方便 -->
+<div class="nav-links">
+  <a href="01.html">📜 皇帝・極盛治世</a>
+</div>
       </div>
     </header>
 
