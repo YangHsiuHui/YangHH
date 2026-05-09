@@ -126,27 +126,125 @@ button:hover{
   background:#fff3cd;
 }
 
-/* ===== 響應式（手機）===== */
-@media (max-width: 768px){
+/* ===== 手機 / 平板 響應式優化（請直接取代你原本 @media max-width:768px 區塊）=====
+目標：
+✔ 橫向手機（landscape）完整可視
+✔ 直向手機佛王卡片不過長
+✔ 中央卡片更像 emperor1 精簡版
+✔ 左側按鈕更整齊
+*/
 
+@media (max-width: 992px){
+
+  /* 整體改直式排列 */
   .container{
     flex-direction:column;
     height:auto;
+    min-height:100vh;
   }
 
+  /* 左側控制欄改上方工具列 */
   .left{
     width:100%;
     min-width:100%;
     display:flex;
     flex-wrap:wrap;
     justify-content:space-between;
+    align-items:center;
     border-right:none;
     border-bottom:1px solid #ddd;
+    padding:10px;
+    gap:8px;
+  }
+
+  /* 返回首頁全寬 */
+  .left a{
+    width:100%;
+    margin-bottom:4px;
+  }
+
+  /* 按鈕手機版 */
+  .left button{
+    width:48%;
+    flex:1 1 48%;
+    min-height:44px;
+    font-size:14px;
+    margin:0;
+  }
+
+  /* 中央 */
+  .center{
+    padding:12px 10px 20px;
+    overflow:visible;
+  }
+
+  /* 佛王縮小 */
+  .npc{
+    width:110px;
+    height:110px;
+    min-height:110px;
+    margin-bottom:12px;
+    font-size:16px;
+  }
+
+  /* 主卡片縮短 */
+  .panel{
+    width:100%;
+    max-width:680px;
+    min-height:auto;      /* 不強制超長 */
+    flex:none;
+    padding:16px 14px;
+    border-radius:14px;
+  }
+
+  /* 標題 */
+  .panel div:first-child{
+    font-size:20px;
+    margin-bottom:12px;
+  }
+
+  /* 狀態區縮短 */
+  #status{
+    font-size:16px;
+    line-height:1.8;
+    padding:12px;
+    margin-bottom:14px;
+  }
+
+  /* 結果 */
+  .result{
+    font-size:22px;
+    margin-top:10px;
+  }
+
+  /* 對話框 */
+  .dialog{
+    font-size:15px;
+    line-height:1.7;
+    padding:12px;
+    margin-top:14px;
+  }
+}
+
+
+/* ===== 橫向手機專用（高度不足時避免卡片太高）===== */
+@media (max-width: 992px) and (orientation: landscape){
+
+  header{
+    padding:10px;
+    font-size:16px;
+  }
+
+  .left{
+    padding:8px;
+    gap:6px;
   }
 
   .left button{
-    width:48%;
-    font-size:14px;
+    width:19%;
+    flex:1 1 19%;
+    font-size:13px;
+    padding:8px;
   }
 
   .left a{
@@ -154,27 +252,35 @@ button:hover{
   }
 
   .center{
-    padding:12px;
-    overflow:visible;
+    padding:8px;
+  }
+
+  .npc{
+    width:85px;
+    height:85px;
+    min-height:85px;
+    margin-bottom:8px;
+    font-size:14px;
   }
 
   .panel{
-    width:100%;
-    min-height:auto;
-    flex:none;
-    padding:16px;
+    max-width:95%;
+    padding:12px;
   }
 
   #status{
-    font-size:16px;
+    font-size:14px;
+    line-height:1.6;
+    padding:10px;
   }
 
   .result{
-    font-size:22px;
+    font-size:18px;
   }
 
   .dialog{
-    font-size:16px;
+    font-size:13px;
+    padding:10px;
   }
 }
 
