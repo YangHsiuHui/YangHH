@@ -350,84 +350,422 @@ function loadMemo(){
   });
 }
 
-/* ===== 以下保留原功能 ===== */
+/* ===== 六部任務 ===== */
+
 const deptTasks={
-"吏部":[{task:"整頓冗官",g:0,p:2,a:0,f:1,desc:"整頓冗官，提升官僚效率"}],
-"戶部":[{task:"清查賦稅",g:2000,p:0,a:0,f:0,desc:"清查賦稅，增加財政收入"},{task:"招募胡商",g:1000,p:0,a:5,f:0,desc:"招募胡商，增加軍力"}],
-"禮部":[{task:"修宗廟",g:0,p:1,a:0,f:3,desc:"修繕宗廟，提升民心與聲望"}],
-"兵部":[{task:"邊防演練",g:0,p:0,a:3,f:0,desc:"邊防演練，提高軍力"}],
-"刑部":[{task:"整頓法紀",g:0,p:2,a:0,f:0,desc:"整頓法紀，提升民心"}],
-"工部":[{task:"修築水利",g:0,p:1,a:0,f:0,desc:"修築水利，改善民生"}]
+
+"吏部":[
+
+  {task:"整頓冗官",g:0,p:2,a:0,f:1,desc:"整頓冗官，提升官僚效率"},
+
+  {task:"選賢任能",g:500,p:1,a:0,f:2,desc:"廣納賢才，提升朝廷聲望"}
+
+],
+
+"戶部":[
+
+  {task:"清查賦稅",g:2000,p:0,a:0,f:0,desc:"清查賦稅，增加財政收入"},
+
+  {task:"招募胡商",g:1000,p:0,a:5,f:0,desc:"招募胡商，增加軍力"}
+
+],
+
+"禮部":[
+
+  {task:"修宗廟",g:0,p:1,a:0,f:3,desc:"修繕宗廟，提升民心與聲望"},
+
+  {task:"推行教化",g:0,p:3,a:0,f:1,desc:"推行禮教，提升百姓安定"}
+
+],
+
+"兵部":[
+
+  {task:"邊防演練",g:0,p:0,a:3,f:0,desc:"邊防演練，提高軍力"},
+
+  {task:"募兵強軍",g:-500,p:0,a:5,f:1,desc:"招募新兵，強化國防"}
+
+],
+
+"刑部":[
+
+  {task:"整頓法紀",g:0,p:2,a:0,f:0,desc:"整頓法紀，提升民心"},
+
+  {task:"嚴查貪腐",g:1500,p:1,a:0,f:2,desc:"查辦貪官，充實國庫"}
+
+],
+
+"工部":[
+
+  {task:"修築水利",g:0,p:1,a:0,f:0,desc:"修築水利，改善民生"},
+
+  {task:"興建官道",g:1000,p:2,a:0,f:1,desc:"興建道路，促進商業"}
+
+]
+
 };
 
-let activeTasks=[],current={},taskHistory=[];
+/* ===== 任務資料 ===== */
+
+let activeTasks=[];
+
+let current={};
+
+let taskHistory=[];
+
+/* ===== 開啟六部任務 ===== */
 
 function openTask(dept,name){
+
   current={dept,name};
-  taskTitle.innerText=`${dept}尚書 ${name}`;
+
+  document.getElementById("taskTitle").innerText=`${dept}尚書 ${name}`;
+
+  const taskBtns=document.getElementById("taskBtns");
+
   taskBtns.innerHTML="";
-  deptTasks[dept].forEach(t=>{
-    const b=document.createElement("button");
-    b.className="btn-green";
-    b.innerText=t.task;
-    b.onclick=()=>assignTask(t);
-    taskBtns.appendChild(b);
+
+  deptTasks[dept].forEach(task=>{
+
+    const btn=document.createElement("button");
+
+    btn.className="btn-green";
+
+    btn.innerText=task.task;
+
+    btn.onclick=()=>assignTask(task);
+
+    taskBtns.appendChild(btn);
+
   });
+
   showPanel("taskPanel");
+
 }
 
-function closeTask(){showPanel("six");}
+/* ===== 返回六部 ===== */
 
-function assignTask(t){
-  activeTasks.push({...t,dept:current.dept,officer:current.name,remain:2});
+function closeTask(){
+
+  showPanel("six");
+
+}
+
+/* ===== 指派任務 ===== */
+
+function assignTask(task){
+
+  activeTasks.push({
+
+    dept:current.dept,
+
+    officer:current.name,
+
+    task:task.task,
+
+    desc:task.desc,
+
+    g:task.g,
+
+    p:task.p,
+
+    a:task.a,
+
+    f:task.f,
+
+    remain:2
+
+  });
+
   updateTaskList();
+
   closeTask();
+
 }
+
+/* ===== 更新任務列表 ===== */
 
 function updateTaskList(){
-  tasks.innerHTML=activeTasks.length?activeTasks.map(t=>`【${t.dept}】${t.officer}－${t.task}（剩 ${t.remain} 季）`).join("<br>"):"目前無任務";
-  taskHistory.innerHTML=taskHistory.length?taskHistory.map(h=>`【${h.dept}】${h.officer}－${h.task}`).join("<br>"):"目前無歷史紀錄";
+
+  const tasksDiv=document.getElementById("tasks");
+
+  const historyDiv=document.getElementById("taskHistory");
+
+  /* 進行中任務 */
+
+  if(activeTasks.length===0){
+
+    tasksDiv.innerHTML="目前無任務";
+
+  }else{
+
+    tasksDiv.innerHTML=activeTasks.map(t=>
+
+      `【${t.dept}】${t.officer}－${t.task}（剩 ${t.remain} 季）`
+
+    ).join("<br>");
+
+  }
+
+  /* 歷史紀錄 */
+
+  renderTaskHistory();
+
+  /* 分類按鈕 */
+
+  generateFilterButtons();
+
 }
+
+/* ===== 顯示歷史 ===== */
+
+function renderTaskHistory(filterDept=null){
+
+  const historyDiv=document.getElementById("taskHistory");
+
+  let records=filterDept
+
+    ? taskHistory.filter(t=>t.dept===filterDept)
+
+    : taskHistory;
+
+  if(records.length===0){
+
+    historyDiv.innerHTML="目前無歷史紀錄";
+
+    return;
+
+  }
+
+  historyDiv.innerHTML=records.map(h=>
+
+    `【${h.dept}】${h.officer}－${h.task}<br>
+
+     ${h.desc}<br>
+
+     💰${h.g>=0?'+':''}${h.g}　
+
+     😊${h.p>=0?'+':''}${h.p}　
+
+     ⚔️${h.a>=0?'+':''}${h.a}　
+
+     ⭐${h.f>=0?'+':''}${h.f}<br>
+
+     完成：第 ${h.year} 年・${seasons[h.si]}`
+
+  ).join("<hr>");
+
+}
+
+/* ===== 分類按鈕 ===== */
+
+function generateFilterButtons(){
+
+  const filterDiv=document.getElementById("filterBtns");
+
+  filterDiv.innerHTML="";
+
+  if(taskHistory.length===0) return;
+
+  /* 全部 */
+
+  const allBtn=document.createElement("span");
+
+  allBtn.className="filter-btn";
+
+  allBtn.innerText="全部";
+
+  allBtn.onclick=()=>renderTaskHistory();
+
+  filterDiv.appendChild(allBtn);
+
+  /* 各部門 */
+
+  const depts=[...new Set(taskHistory.map(t=>t.dept))];
+
+  depts.forEach(dept=>{
+
+    const btn=document.createElement("span");
+
+    btn.className="filter-btn";
+
+    btn.innerText=dept;
+
+    btn.onclick=()=>renderTaskHistory(dept);
+
+    filterDiv.appendChild(btn);
+
+  });
+
+}
+
+/* ===== 推進季度 ===== */
 
 function nextSeason(){
+
   si++;
-  if(si>=4){si=0;year++;}
-  activeTasks.forEach(t=>t.remain--);
-  activeTasks=activeTasks.filter(t=>{
-    if(t.remain<=0){
-      gold+=t.g;people+=t.p;army+=t.a;fame+=t.f;
-      taskHistory.push({...t,year,si});
-      return false;
-    }
-    return true;
+
+  if(si>=4){
+
+    si=0;
+
+    year++;
+
+  }
+
+  let completed=[];
+
+  /* 任務倒數 */
+
+  activeTasks.forEach(task=>{
+
+    task.remain--;
+
   });
-  if(Math.random()<0.25){heirs++;}
+
+  /* 完成任務 */
+
+  activeTasks=activeTasks.filter(task=>{
+
+    if(task.remain<=0){
+
+      gold+=task.g||0;
+
+      people+=task.p||0;
+
+      army+=task.a||0;
+
+      fame+=task.f||0;
+
+      taskHistory.push({
+
+        ...task,
+
+        year:year,
+
+        si:si
+
+      });
+
+      completed.push(`【${task.dept}】${task.task}`);
+
+      return false;
+
+    }
+
+    return true;
+
+  });
+
+  /* 子嗣 */
+
+  if(Math.random()<0.25){
+
+    heirs++;
+
+  }
+
   updateStats();
+
   updateTime();
+
   updateHeirs();
+
   updateSuccession();
+
   updateTaskList();
+
+  if(completed.length>0){
+
+    alert("任務完成：\n"+completed.join("\n"));
+
+  }
+
 }
+
+/* ===== AI ===== */
 
 function aiProposal(){
-  alert("AI 宰相提案：開源節流、以商養國、以民固本。");
+
+  alert("AI 宰相提案：開源節流、均衡六部、先富國再強兵。");
+
 }
+
+/* ===== 存檔 ===== */
 
 function saveGame(){
-  localStorage.setItem("emperorSave",JSON.stringify({year,si,gold,people,army,fame,heirs,activeTasks,taskHistory}));
+
+  localStorage.setItem("emperorSave",JSON.stringify({
+
+    year,si,gold,people,army,fame,heirs,
+
+    activeTasks,
+
+    taskHistory
+
+  }));
+
+  alert("已成功存檔！");
+
 }
+
+/* ===== 讀檔 ===== */
 
 function loadGame(){
+
   const data=JSON.parse(localStorage.getItem("emperorSave"));
+
   if(data){
-    ({year,si,gold,people,army,fame,heirs,activeTasks,taskHistory}=data);
-    updateStats();updateTime();updateHeirs();updateSuccession();updateTaskList();
+
+    year=data.year;
+
+    si=data.si;
+
+    gold=data.gold;
+
+    people=data.people;
+
+    army=data.army;
+
+    fame=data.fame;
+
+    heirs=data.heirs;
+
+    activeTasks=data.activeTasks||[];
+
+    taskHistory=data.taskHistory||[];
+
+    updateStats();
+
+    updateTime();
+
+    updateHeirs();
+
+    updateSuccession();
+
+    updateTaskList();
+
+    alert("讀檔成功！");
+
+  }else{
+
+    alert("無存檔資料！");
+
   }
+
 }
 
+/* ===== 重置 ===== */
+
 function resetGame(){
-  localStorage.removeItem("emperorSave");
-  location.reload();
+
+  if(confirm("確定重置遊戲？")){
+
+    localStorage.removeItem("emperorSave");
+
+    location.reload();
+
+  }
+
 }
 
 function showPanel(id){
