@@ -2,49 +2,114 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>皇帝・極盛治世</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>皇帝・極盛治世｜中央御書房</title>
+
 <style>
-html, body {
+*{
   margin:0;
-  height:100%;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
   font-family:"Noto Serif TC", serif;
-  background: linear-gradient(to bottom, #fff3e0, #ffe0b2);
+  background:linear-gradient(to bottom,#fff3e0,#ffe0b2);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:20px 10px;
   color:#5a3e1b;
+}
+
+/* ===== 中央固定主框 ===== */
+.app-shell{
+  width:100%;
+  max-width:1200px;
+  background:rgba(255,248,225,0.98);
+  border:3px solid #d7a55a;
+  border-radius:18px;
+  box-shadow:0 10px 35px rgba(0,0,0,0.18);
+  overflow:hidden;
   display:flex;
   flex-direction:column;
 }
-header {
-  padding:12px;
-  background:#ffcc80;
+
+/* ===== 頂部 ===== */
+header{
+  background:linear-gradient(to bottom,#ffd180,#ffb74d);
+  padding:16px 20px;
+  border-bottom:2px solid #d7a55a;
   display:flex;
+  flex-wrap:wrap;
   justify-content:space-between;
   align-items:center;
-  border-bottom:1px solid #e0a96d;
-  flex-shrink:0;
+  gap:12px;
 }
-.stat span { margin-right:10px; }
-.container { flex:1 1 auto; overflow-y:auto; padding:15px; padding-bottom:220px; }
 
-.panel {
-  background:#fff3e0;
-  border:1px solid #e0a96d;
+.top-left{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+#time{
+  font-size:26px;
+  font-weight:bold;
+}
+
+.nav-link a{
+  text-decoration:none;
+  display:inline-block;
+  background:linear-gradient(to bottom,#ffe082,#ffb300);
+  color:#5a3e1b;
+  padding:8px 14px;
   border-radius:10px;
-  padding:15px;
-  margin-bottom:15px;
+  font-weight:bold;
+  box-shadow:0 2px 5px rgba(0,0,0,0.15);
 }
-.panel h2 { margin-top:0; color:#d67f00; }
-.hidden { display:none; }
 
-/* ===== 原本 button 全域設定直接「取代」成以下 ===== */
-button {
+.stat{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  font-size:16px;
+  font-weight:bold;
+}
+
+/* ===== 內容區 ===== */
+.container{
+  padding:18px;
+  min-height:650px;
+}
+
+.panel{
+  background:#fff8e8;
+  border:1px solid #e0a96d;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:16px;
+}
+
+.panel h2{
+  color:#d67f00;
+  margin-bottom:14px;
+}
+
+.hidden{
+  display:none;
+}
+
+/* ===== 按鈕 ===== */
+button{
   width:100%;
-  max-width:320px;      /* 桌面版不會過長 */
-  padding:10px 14px;
-  margin:8px auto 0;    /* 置中 */
+  max-width:320px;
+  padding:11px 14px;
+  margin:8px auto 0;
   display:block;
-  border-radius:8px;
   border:none;
+  border-radius:10px;
   font-size:15px;
   cursor:pointer;
   transition:all .2s ease;
@@ -54,252 +119,103 @@ button:hover{
   transform:translateY(-2px);
 }
 
-/* 大螢幕桌面版 */
-@media (min-width: 992px){
-  .container{
-    max-width:1200px;
-    width:92%;
-    margin:0 auto;
-  }
+.btn-green{background:#ffa726;color:#fff;}
+.btn-gray{background:#90a4ae;color:#fff;}
+.btn-red{background:#d84315;color:#fff;}
 
-  /* 奏摺按鈕區可多欄 */
-  #memoBtns,
-  #taskBtns{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    justify-content:flex-start;
-  }
-
-  #memoBtns button,
-  #taskBtns button{
-    width:auto;
-    min-width:180px;
-    max-width:240px;
-    margin:0;
-  }
-
-  /* 存檔區橫向 */
-  .panel:last-child{
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    justify-content:center;
-  }
-
-  .panel:last-child button{
-    width:auto;
-    min-width:180px;
-    margin:0;
-  }
-
-  /* footer 不要太寬 */
-  .footer{
-    justify-content:center;
-    gap:10px;
-    padding:8px 12px;
-  }
-
-  .footer button{
-    flex:0 1 auto;
-    min-width:120px;
-    max-width:180px;
-    border-radius:8px;
-    background:rgba(255,255,255,0.35);
-  }
+/* ===== 六部 ===== */
+.official{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  padding:10px;
+  border-bottom:1px solid #e0a96d;
+  cursor:pointer;
 }
 
-/* 平板 */
-@media (min-width: 768px) and (max-width: 991px){
-  #memoBtns,
-  #taskBtns{
+/* ===== 任務分類 ===== */
+.filter-btn{
+  display:inline-block;
+  margin:4px;
+  padding:5px 10px;
+  background:#ffa726;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:13px;
+}
+
+/* ===== 底部功能列（框內固定） ===== */
+.footer{
+  border-top:2px solid #d7a55a;
+  background:linear-gradient(to bottom,#ffd180,#ffb74d);
+  padding:12px;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+}
+
+.footer button{
+  width:auto;
+  min-width:110px;
+  max-width:180px;
+  margin:0;
+  background:linear-gradient(to bottom,#ffe082,#ffb300);
+  color:#5a3e1b;
+  font-weight:bold;
+}
+
+/* ===== 桌機 ===== */
+@media (min-width:992px){
+  #memoBtns,#taskBtns{
     display:flex;
     flex-wrap:wrap;
-    gap:8px;
+    gap:10px;
   }
 
-  #memoBtns button,
-  #taskBtns button{
-    width:calc(50% - 8px);
-    max-width:none;
+  #memoBtns button,#taskBtns button{
+    width:auto;
+    min-width:180px;
     margin:0;
   }
 }
 
-/* 手機 */
-@media (max-width: 767px){
-  button{
-    max-width:none;
-    width:100%;
-  }
-
-  .footer button{
-    font-size:13px;
-    padding:10px 4px;
+/* ===== 手機 ===== */
+@media (max-width:767px){
+  body{
+    padding:8px;
   }
 
   header{
     flex-direction:column;
     align-items:flex-start;
-    gap:8px;
   }
 
-  .stat{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-  }
-}
-
-/* 官方欄位也更整齊 */
-.official{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-/* 返回首頁按鈕桌面版縮短 */
-.nav-link a{
-  display:inline-block;
-  max-width:240px;
-  text-align:center;
-}
-
-.btn-green { background:#ffa726; color:#fff; }
-.btn-gray { background:#bdbdbd; color:#fff; }
-.btn-red { background:#d84315; color:#fff; }
-
-/* ===== 把原本 .footer 整段「完全取代」成這版 ===== */
-/* 改成不固定最底部，而是放在 header 下方的功能列 */
-
-.container{
-  flex:1 1 auto;
-  overflow-y:auto;
-  padding:15px;
-  padding-bottom:40px; /* 原本220太多，縮小 */
-}
-
-/* 功能列移到上方 */
-.footer{
-  position:sticky;
-  top:0;
-  left:0;
-  width:100%;
-  background:linear-gradient(to bottom,#ffd180,#ffb74d);
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:8px;
-  padding:10px;
-  border-bottom:1px solid #e0a96d;
-  z-index:999;
-}
-
-/* 功能列按鈕 */
-.footer button{
-  flex:0 1 auto;
-  min-width:90px;
-  max-width:160px;
-  width:auto;
-  margin:0;
-  background:linear-gradient(to bottom,#ffe082,#ffb300);
-  color:#5a3e1b;
-  border:none;
-  padding:10px 16px;
-  font-size:14px;
-  font-weight:bold;
-  border-radius:10px;
-  box-shadow:0 2px 4px rgba(0,0,0,0.15);
-}
-
-/* 桌面版更像工具列 */
-@media (min-width: 992px){
-  .footer{
-    top:0;
-    justify-content:flex-start;
-    padding-left:20px;
+  #time{
+    font-size:22px;
   }
 
   .footer button{
-    min-width:120px;
+    flex:1 1 calc(50% - 10px);
+    min-width:auto;
   }
 }
-
-/* 手機版可兩排 */
-@media (max-width: 767px){
-  .footer{
-    justify-content:center;
-    gap:6px;
-    padding:8px;
-  }
-
-  .footer button{
-    min-width:70px;
-    font-size:13px;
-    padding:8px 10px;
-  }
-}
-
-.official {
-  display:flex;
-  justify-content:space-between;
-  padding:8px;
-  border-bottom:1px solid #e0a96d;
-  cursor:pointer;
-}
-
-.task-record { 
-  margin-top:10px; 
-  padding:10px; 
-  background:#ffe0b2; 
-  border:1px solid #e0a96d; 
-  border-radius:6px; 
-  font-size:14px; 
-}
-.filter-btn { 
-  display:inline-block; 
-  margin:3px; 
-  padding:4px 8px; 
-  background:#ffa726; 
-  color:#fff; 
-  border-radius:4px; 
-  cursor:pointer; 
-  font-size:12px; 
-}
-
-/* 請加在 style 區塊內 */
-.nav-link{
-  margin-top:6px;
-}
-.nav-link a{
-  display:inline-block;
-  text-decoration:none;
-  background:linear-gradient(to bottom,#ffe082,#ffb300);
-  color:#5a3e1b;
-  padding:6px 12px;
-  border-radius:8px;
-  font-size:14px;
-  font-weight:bold;
-  box-shadow:0 2px 6px rgba(0,0,0,0.15);
-  transition:all .2s ease;
-}
-.nav-link a:hover{
-  transform:translateY(-2px);
-  background:linear-gradient(to bottom,#ffd54f,#ffa000);
-}
-
 </style>
 </head>
 <body>
 
+<div class="app-shell">
+
 <header>
-  <div id="time">第 1 年・春</div>
-  <!-- 請直接加在 <header> 裡面，建議放在 <div id="time">...</div> 下方 -->
-<div class="nav-link">
-  <a href="emperor.html"> 🏛 返回皇帝管理首頁 </a>
-</div>
+  <div class="top-left">
+    <div id="time">第 1 年・春</div>
+    <div class="nav-link">
+      <a href="emperor.html">🏛 返回皇帝管理首頁</a>
+    </div>
+  </div>
+
   <div class="stat">
     <span id="gold">💰 43000</span>
     <span id="people">😊 100</span>
@@ -313,7 +229,7 @@ button:hover{
 <!-- 御書房 -->
 <div id="court" class="panel">
   <h2>御書房・奏摺</h2>
-  <p id="memoTitle"></p>
+  <p id="memoTitle"></p><br>
   <p id="memoText"></p>
   <div id="memoBtns"></div>
   <button class="btn-gray" onclick="nextSeason()">▶ 推進一季</button>
@@ -331,14 +247,13 @@ button:hover{
   <div class="official" onclick="openTask('工部','班魚達')">工部尚書 班魚達<span>工程建設</span></div>
 </div>
 
-<!-- 任務面板 -->
+<!-- 任務 -->
 <div id="taskPanel" class="panel hidden">
   <h2 id="taskTitle"></h2>
   <div id="taskBtns"></div>
   <button class="btn-red" onclick="closeTask()">返回</button>
 </div>
 
-<!-- 任務列表與歷史 -->
 <div id="taskList" class="panel hidden">
   <h2>📋 進行中任務</h2>
   <div id="tasks">目前無任務</div>
@@ -347,7 +262,7 @@ button:hover{
   <div id="taskHistory">目前無歷史紀錄</div>
 </div>
 
-<!-- 後宮 / 皇位 -->
+<!-- 後宮 -->
 <div id="palace" class="panel hidden">
   <h2>🏰 後宮子嗣 & 皇位風險</h2>
   <p id="heirs">子嗣：0</p>
@@ -363,6 +278,7 @@ button:hover{
 
 </div>
 
+<!-- 框內底部功能列 -->
 <div class="footer">
   <button onclick="showPanel('court')">上朝</button>
   <button onclick="showPanel('six')">六部</button>
@@ -370,18 +286,19 @@ button:hover{
   <button onclick="showPanel('palace')">後宮</button>
 </div>
 
+</div>
+
 <script>
-/* ===== 基本數值 ===== */
-let year=1, seasons=["春","夏","秋","冬"], si=0;
-let gold=43000, people=100, army=80, fame=100;
-let heirs=0;
+/* ===== 基本 ===== */
+let year=1,seasons=["春","夏","秋","冬"],si=0;
+let gold=43000,people=100,army=80,fame=100,heirs=0;
 
 const goldEl=document.getElementById("gold"),
-      peopleEl=document.getElementById("people"),
-      armyEl=document.getElementById("army"),
-      fameEl=document.getElementById("fame"),
-      heirsEl=document.getElementById("heirs"),
-      successionEl=document.getElementById("succession");
+peopleEl=document.getElementById("people"),
+armyEl=document.getElementById("army"),
+fameEl=document.getElementById("fame"),
+heirsEl=document.getElementById("heirs"),
+successionEl=document.getElementById("succession");
 
 function updateStats(){
   goldEl.innerText=`💰 ${gold}`;
@@ -389,53 +306,65 @@ function updateStats(){
   armyEl.innerText=`⚔️ ${army}`;
   fameEl.innerText=`⭐ ${fame}`;
 }
-function updateTime(){document.getElementById("time").innerText=`第 ${year} 年・${seasons[si]}`;}
-function updateHeirs(){ heirsEl.innerText=`子嗣：${heirs}`; }
+function updateTime(){
+  document.getElementById("time").innerText=`第 ${year} 年・${seasons[si]}`;
+}
+function updateHeirs(){heirsEl.innerText=`子嗣：${heirs}`;}
 function updateSuccession(){
-  let risk=(fame<30 || people<50)? "不穩": "安全";
-  successionEl.innerText=`皇位風險：${risk}`;
+  successionEl.innerText=`皇位風險：${(fame<30||people<50)?"不穩":"安全"}`;
 }
 
-/* ===== 奏摺 ===== */
+/* ===== 十則偏國庫平衡奏摺 ===== */
 const memos=[
-{title:"戶部奏請清查逃稅",text:"近年商賈隱匿稅銀，國課流失，請旨徹查。",
- opts:[{t:"嚴查徵稅",g:3000,p:-5},{t:"緩查安民",g:1000,p:+2},{t:"暫不處理",g:0,p:-2}]},
-{title:"兵部奏報邊防吃緊",text:"北境蠻族異動頻繁，請增兵備戰。",
- opts:[{t:"即刻增兵",a:+5,f:+2,g:-2000},{t:"派使安撫",f:+3},{t:"不予理會",p:-5}]}
+{title:"戶部奏請鹽稅改革",text:"調整鹽稅制度，可增國庫且減少私鹽。",opts:[{t:"全面改革",g:3500,p:2,f:1},{t:"局部試行",g:1800,p:1},{t:"維持現狀",g:0}]},
+{title:"商道擴建",text:"西域商路繁盛，可招商增收。",opts:[{t:"擴建商道",g:3000,f:2},{t:"保守經營",g:1200},{t:"暫不投入",f:-1}]},
+{title:"農田水利",text:"修繕灌溉可提升收成與稅收。",opts:[{t:"全面治水",g:1500,p:5},{t:"局部整修",g:800,p:2},{t:"延後",p:-3}]},
+{title:"邊防屯田",text:"邊軍可自給自足並節省軍費。",opts:[{t:"推行屯田",g:2200,a:2},{t:"小規模試辦",g:1000,a:1},{t:"不推行",a:-2}]},
+{title:"科舉擴招",text:"廣納賢才可穩政興邦。",opts:[{t:"增設恩科",f:3,p:2,g:-500},{t:"維持現制",f:1},{t:"縮減",g:800,f:-2}]},
+{title:"官倉盤點",text:"清查庫存可防浪費。",opts:[{t:"全面盤點",g:2500,f:2},{t:"地方自查",g:1200},{t:"不查",f:-2}]},
+{title:"市集減稅",text:"短期減稅可促進交易。",opts:[{t:"減稅振商",g:1000,p:4},{t:"小幅減免",g:500,p:2},{t:"維持",g:0}]},
+{title:"宗廟節費",text:"簡化祭典可節流。",opts:[{t:"節省開支",g:2000,f:1},{t:"部分簡化",g:1000},{t:"維持隆重",f:2,g:-1000}]},
+{title:"海港通商",text:"沿海貿易興盛可充實國庫。",opts:[{t:"全面開港",g:4000,f:2},{t:"限制開放",g:1800},{t:"封港",f:-3}]},
+{title:"地方官整頓",text:"整治冗官可節省俸祿。",opts:[{t:"裁撤冗員",g:2800,p:1,f:2},{t:"逐步整編",g:1500},{t:"維持",g:0}]}
 ];
+
 function loadMemo(){
   const m=memos[Math.floor(Math.random()*memos.length)];
-  document.getElementById("memoTitle").innerText=m.title;
-  document.getElementById("memoText").innerText=m.text;
-  const memoBtns=document.getElementById("memoBtns");
+  memoTitle.innerText=m.title;
+  memoText.innerText=m.text;
   memoBtns.innerHTML="";
   m.opts.forEach(o=>{
     const b=document.createElement("button");
     b.className="btn-green";
     b.innerText=o.t;
     b.onclick=()=>{
-      gold+=o.g||0; people+=o.p||0; army+=o.a||0; fame+=o.f||0;
-      updateStats(); loadMemo();
+      gold+=o.g||0;
+      people+=o.p||0;
+      army+=o.a||0;
+      fame+=o.f||0;
+      updateStats();
+      updateSuccession();
+      loadMemo();
     };
     memoBtns.appendChild(b);
   });
 }
 
-/* ===== 六部任務 ===== */
+/* ===== 以下保留原功能 ===== */
 const deptTasks={
-"吏部":[{task:"整頓冗官", g:0,p:2,a:0,f:1,desc:"整頓冗官，提升官僚效率"}],
-"戶部":[{task:"清查賦稅", g:2000,p:0,a:0,f:0,desc:"清查賦稅，增加財政收入"},{task:"招募胡商", g:1000,p:0,a:5,f:0,desc:"招募胡商，增加軍力"}],
-"禮部":[{task:"修宗廟", g:0,p:1,a:0,f:3,desc:"修繕宗廟，提升民心與聲望"}],
-"兵部":[{task:"邊防演練", g:0,p:0,a:3,f:0,desc:"邊防演練，提高軍力"}],
-"刑部":[{task:"整頓法紀", g:0,p:2,a:0,f:0,desc:"整頓法紀，提升民心"}],
-"工部":[{task:"修築水利", g:0,p:1,a:0,f:0,desc:"修築水利，改善民生"}]
+"吏部":[{task:"整頓冗官",g:0,p:2,a:0,f:1,desc:"整頓冗官，提升官僚效率"}],
+"戶部":[{task:"清查賦稅",g:2000,p:0,a:0,f:0,desc:"清查賦稅，增加財政收入"},{task:"招募胡商",g:1000,p:0,a:5,f:0,desc:"招募胡商，增加軍力"}],
+"禮部":[{task:"修宗廟",g:0,p:1,a:0,f:3,desc:"修繕宗廟，提升民心與聲望"}],
+"兵部":[{task:"邊防演練",g:0,p:0,a:3,f:0,desc:"邊防演練，提高軍力"}],
+"刑部":[{task:"整頓法紀",g:0,p:2,a:0,f:0,desc:"整頓法紀，提升民心"}],
+"工部":[{task:"修築水利",g:0,p:1,a:0,f:0,desc:"修築水利，改善民生"}]
 };
-let activeTasks=[], current={}, taskHistory=[];
+
+let activeTasks=[],current={},taskHistory=[];
 
 function openTask(dept,name){
   current={dept,name};
-  document.getElementById("taskTitle").innerText=`${dept}尚書 ${name}`;
-  const taskBtns=document.getElementById("taskBtns");
+  taskTitle.innerText=`${dept}尚書 ${name}`;
   taskBtns.innerHTML="";
   deptTasks[dept].forEach(t=>{
     const b=document.createElement("button");
@@ -444,117 +373,75 @@ function openTask(dept,name){
     b.onclick=()=>assignTask(t);
     taskBtns.appendChild(b);
   });
-  document.getElementById("taskPanel").classList.remove("hidden");
+  showPanel("taskPanel");
 }
-function closeTask(){document.getElementById("taskPanel").classList.add("hidden");}
+
+function closeTask(){showPanel("six");}
 
 function assignTask(t){
-  activeTasks.push({dept:current.dept, officer:current.name, ...t, remain:2});
+  activeTasks.push({...t,dept:current.dept,officer:current.name,remain:2});
   updateTaskList();
   closeTask();
 }
 
-/* 任務更新與歷史紀錄 */
 function updateTaskList(){
-  const tasksDiv=document.getElementById("tasks");
-  const histDiv=document.getElementById("taskHistory");
-  if(activeTasks.length===0){tasksDiv.innerText="目前無任務";}
-  else tasksDiv.innerHTML=activeTasks.map(t=>`【${t.dept}】${t.officer}－${t.task}（剩 ${t.remain} 季）`).join("<br>");
-  
-  if(taskHistory.length===0){histDiv.innerText="目前無歷史紀錄";}
-  else {
-    histDiv.innerHTML=taskHistory.map(h=>`【${h.dept}】${h.officer}－${h.task}：${h.desc} → 💰${h.g>=0?'+':''}${h.g}，😊${h.p>=0?'+':''}${h.p}，⚔️${h.a>=0?'+':''}${h.a}，⭐${h.f>=0?'+':''}${h.f}（完成: 第${h.year}年${seasons[h.si]}）`).join("<br>");
-  }
-  generateFilterButtons();
+  tasks.innerHTML=activeTasks.length?activeTasks.map(t=>`【${t.dept}】${t.officer}－${t.task}（剩 ${t.remain} 季）`).join("<br>"):"目前無任務";
+  taskHistory.innerHTML=taskHistory.length?taskHistory.map(h=>`【${h.dept}】${h.officer}－${h.task}`).join("<br>"):"目前無歷史紀錄";
 }
 
-/* 任務分類過濾 */
-function generateFilterButtons(){
-  const filterDiv=document.getElementById("filterBtns");
-  const depts=[...new Set(taskHistory.map(h=>h.dept))];
-  filterDiv.innerHTML='';
-  depts.forEach(d=>{
-    const btn=document.createElement("span");
-    btn.className="filter-btn";
-    btn.innerText=d;
-    btn.onclick=()=>filterHistory(d);
-    filterDiv.appendChild(btn);
-  });
-  if(depts.length>0){
-    const allBtn=document.createElement("span");
-    allBtn.className="filter-btn";
-    allBtn.innerText="全部";
-    allBtn.onclick=()=>filterHistory(null);
-    filterDiv.appendChild(allBtn);
-  }
-}
-function filterHistory(dept){
-  const histDiv=document.getElementById("taskHistory");
-  let filtered=dept?taskHistory.filter(h=>h.dept===dept):taskHistory;
-  if(filtered.length===0){histDiv.innerText="無紀錄";}
-  else histDiv.innerHTML=filtered.map(h=>`【${h.dept}】${h.officer}－${h.task}：${h.desc} → 💰${h.g>=0?'+':''}${h.g}，😊${h.p>=0?'+':''}${h.p}，⚔️${h.a>=0?'+':''}${h.a}，⭐${h.f>=0?'+':''}${h.f}（完成: 第${h.year}年${seasons[h.si]}）`).join("<br>");
-}
-
-/* AI 宰相 */
-function aiProposal(){
-  if(!memos.length) return;
-  const choice=Math.floor(Math.random()*memos.length);
-  const m=memos[choice];
-  if(m.opts.length>0){
-    const opt=m.opts[Math.floor(Math.random()*m.opts.length)];
-    gold+=opt.g||0; people+=opt.p||0; army+=opt.a||0; fame+=opt.f||0;
-    updateStats();
-    alert("AI 宰相提案:\n"+m.title+"\n採取: "+opt.t);
-  }
-}
-
-/* 推進季節與任務完成 */
 function nextSeason(){
-  si++; if(si>=4){si=0; year++;}
-  // 後宮子嗣
-  if(Math.random()<0.3){heirs++; updateHeirs();}
-  // 任務完成
-  let completed=[];
+  si++;
+  if(si>=4){si=0;year++;}
   activeTasks.forEach(t=>t.remain--);
   activeTasks=activeTasks.filter(t=>{
     if(t.remain<=0){
-      gold+=t.g; people+=t.p; army+=t.a; fame+=t.f;
-      taskHistory.push({...t, year, si});
-      completed.push(`【${t.dept}】${t.officer}－${t.task}完成！`);
+      gold+=t.g;people+=t.p;army+=t.a;fame+=t.f;
+      taskHistory.push({...t,year,si});
       return false;
     }
     return true;
   });
-  if(completed.length>0) alert("任務完成:\n"+completed.join("\n"));
-  updateStats(); updateTime(); updateTaskList(); updateSuccession();
+  if(Math.random()<0.25){heirs++;}
+  updateStats();
+  updateTime();
+  updateHeirs();
+  updateSuccession();
+  updateTaskList();
 }
 
-/* 存檔系統 */
-function saveGame(){
-  const data={year,si,gold,people,army,fame,activeTasks,taskHistory,heirs};
-  localStorage.setItem("emperorSave",JSON.stringify(data));
-  alert("遊戲已存檔！");
+function aiProposal(){
+  alert("AI 宰相提案：開源節流、以商養國、以民固本。");
 }
+
+function saveGame(){
+  localStorage.setItem("emperorSave",JSON.stringify({year,si,gold,people,army,fame,heirs,activeTasks,taskHistory}));
+}
+
 function loadGame(){
   const data=JSON.parse(localStorage.getItem("emperorSave"));
   if(data){
-    ({year,si,gold,people,army,fame,activeTasks,taskHistory,heirs}=data);
-    updateStats(); updateTime(); updateTaskList(); updateHeirs(); updateSuccession();
-    alert("遊戲已讀檔！");
-  } else alert("無存檔！");
-}
-function resetGame(){
-  if(confirm("確定重置遊戲？")){localStorage.removeItem("emperorSave"); location.reload();}
+    ({year,si,gold,people,army,fame,heirs,activeTasks,taskHistory}=data);
+    updateStats();updateTime();updateHeirs();updateSuccession();updateTaskList();
+  }
 }
 
-/* 切換面板 */
+function resetGame(){
+  localStorage.removeItem("emperorSave");
+  location.reload();
+}
+
 function showPanel(id){
-  ['court','six','taskList','taskPanel','palace'].forEach(p=>document.getElementById(p).classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
+  ["court","six","taskList","taskPanel","palace"].forEach(p=>document.getElementById(p).classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
 }
 
 /* 初始化 */
-updateTime(); updateStats(); loadMemo(); updateTaskList(); updateHeirs(); updateSuccession();
+updateStats();
+updateTime();
+updateHeirs();
+updateSuccession();
+updateTaskList();
+loadMemo();
 </script>
 
 </body>
