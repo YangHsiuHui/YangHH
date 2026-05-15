@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>公司經營遊戲 招聘版</title>
+<title>公司經營遊戲｜京級美金版</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -83,12 +83,24 @@ button:active{
     background:#ffe0b2;
     border-radius:12px;
 }
+.money{
+    color:#d84315;
+    font-weight:bold;
+}
+.speed{
+    color:#2e7d32;
+    font-weight:bold;
+}
 </style>
 </head>
+
 <body>
 
 <header>
-🏢 公司經營遊戲 ｜ 💰資金：<span id="money"></span> ｜ 👥員工：<span id="empCount"></span> ｜ 🏆公司Lv：<span id="companyLv"></span>
+🏢 公司經營遊戲｜
+💵 總資產：<span id="money"></span>｜
+👥 員工：<span id="empCount"></span>｜
+🏆 公司Lv：<span id="companyLv"></span>
 </header>
 
 <div class="container">
@@ -105,7 +117,7 @@ button:active{
 
     <div class="recruit-box">
         <b>📝 招聘中心</b><br>
-        招聘成本：1000萬<br>
+        招聘成本：1000萬美金<br>
         <button onclick="recruitEmployee()">招聘新員工</button>
     </div>
 
@@ -121,29 +133,72 @@ button:active{
 </div>
 
 <script>
-// =====================
-// 🔥 全域狀態
-// =====================
-let money = 1e16; // 💰 一開始直接「京級」
 
+// =====================
+// 💰 全球公司資金（美金京級）
+// =====================
+let money = 1e16;
+
+// =====================
+// ⚡ 渲染鎖
+// =====================
 let renderLock = false;
 
 // =====================
-// 💰 京級統一格式（核心修正）
+// 💵 美金京級格式化
 // =====================
 function formatMoney(n){
-    if(n >= 1e16) return (n / 1e16).toFixed(2) + "京";
-    if(n >= 1e12) return (n / 1e12).toFixed(2) + "兆";
-    if(n >= 1e8)  return (n / 1e8).toFixed(2)  + "億";
-    if(n >= 1e4)  return (n / 1e4).toFixed(2)  + "萬";
-    return Math.floor(n);
+
+    if(n >= 1e20){
+        return "US$ " + (n/1e20).toFixed(2) + " 垓";
+    }
+
+    if(n >= 1e16){
+        return "US$ " + (n/1e16).toFixed(2) + " 京";
+    }
+
+    if(n >= 1e12){
+        return "US$ " + (n/1e12).toFixed(2) + " 兆";
+    }
+
+    if(n >= 1e8){
+        return "US$ " + (n/1e8).toFixed(2) + " 億";
+    }
+
+    if(n >= 1e4){
+        return "US$ " + (n/1e4).toFixed(2) + " 萬";
+    }
+
+    return "US$ " + Math.floor(n);
 }
 
 // =====================
-// 🚀 防卡頓渲染
+// ⚡ 京級產業轉速
+// =====================
+function formatSpeed(n){
+
+    if(n >= 1e16){
+        return (n/1e16).toFixed(4) + " 京美金 / 秒";
+    }
+
+    if(n >= 1e12){
+        return (n/1e12).toFixed(4) + " 兆美金 / 秒";
+    }
+
+    if(n >= 1e8){
+        return (n/1e8).toFixed(2) + " 億美金 / 秒";
+    }
+
+    return formatMoney(n) + " / 秒";
+}
+
+// =====================
+// 🚀 防卡渲染
 // =====================
 function fastRender(){
+
     if(renderLock) return;
+
     renderLock = true;
 
     requestAnimationFrame(()=>{
@@ -153,23 +208,28 @@ function fastRender(){
 }
 
 // =====================
-// 👥 員工（35人不重複三字名）
+// 👥 姓名系統
 // =====================
 const last = ["王","李","張","林","陳","黃","楊","吳","劉","蔡","鄭","許","郭","謝"];
 const mid  = ["志","雅","俊","美","冠","柏","家","承","亞","欣","佩","哲","思","子","佳"];
 const end  = ["真","婷","宏","玲","傑","翰","雯","華","安","琪","君","庭","翔","明","強"];
 
+window.usedNames = new Set();
+
 function makeName(){
+
     let name="";
+
     do{
         name =
         last[Math.floor(Math.random()*last.length)] +
         mid[Math.floor(Math.random()*mid.length)] +
         end[Math.floor(Math.random()*end.length)];
-    }while(window.usedNames?.has(name));
+    }
+    while(window.usedNames.has(name));
 
-    window.usedNames = window.usedNames || new Set();
     window.usedNames.add(name);
+
     return name;
 }
 
@@ -177,6 +237,9 @@ function trait(){
     return ["⚡效率","🧠商業","🛠技術"][Math.floor(Math.random()*3)];
 }
 
+// =====================
+// 👥 員工
+// =====================
 let employees = Array.from({length:35},(_,i)=>({
     id:i,
     name:makeName(),
@@ -188,83 +251,157 @@ let employees = Array.from({length:35},(_,i)=>({
     industry:null
 }));
 
-
-let namePool = new Set();
-
-function generateUniqueName(){
-    const last = ["王","李","張","林","陳","黃","楊","吳","劉","蔡","鄭","許","郭","謝"];
-    const mid  = ["志","雅","俊","美","冠","柏","家","承","宇","欣","佩","哲","思","子","佳"];
-    const end  = ["豪","婷","宏","玲","傑","翰","雯","華","安","琪","君","庭","翔","明","強"];
-
-    let n;
-    do{
-        n =
-        last[Math.floor(Math.random()*last.length)] +
-        mid[Math.floor(Math.random()*mid.length)] +
-        end[Math.floor(Math.random()*end.length)];
-    }while(namePool.has(n));
-
-    namePool.add(n);
-    return n;
-}
-
 // =====================
-// 🏭 產業
+// 🏭 產業（全面京級）
 // =====================
 let industries = {
-    "奶茶店":{lv:1,cap:5,emp:[]},
-    "大賣場":{lv:1,cap:5,emp:[]},
-    "電影院":{lv:1,cap:5,emp:[]},
-    "美容館":{lv:1,cap:5,emp:[]},
-    "飯店":{lv:1,cap:5,emp:[]},
-    "醫院":{lv:1,cap:5,emp:[]},
-    "網吧":{lv:1,cap:5,emp:[]}
+
+    "奶茶店":{
+        lv:1,
+        cap:5,
+        emp:[],
+        base:3e15
+    },
+
+    "大賣場":{
+        lv:1,
+        cap:5,
+        emp:[],
+        base:5e15
+    },
+
+    "電影院":{
+        lv:1,
+        cap:5,
+        emp:[],
+        base:8e15
+    },
+
+    "美容館":{
+        lv:1,
+        cap:5,
+        emp:[],
+        base:6e15
+    },
+
+    "飯店":{
+        lv:1,
+        cap:5,
+        emp:[],
+        base:1e16
+    },
+
+    "醫院":{
+        lv:1,
+        cap:5,
+        emp:[],
+        base:2e16
+    },
+
+    "網吧":{
+        lv:1,
+        cap:5,
+        emp:[],
+        base:7e15
+    }
 };
 
 // =====================
-// 🚀 專案（解鎖產業）
+// 🚀 專案
 // =====================
 let projects = [
-    {name:"🚲腳踏車AI",cost:1e10,prog:0,unlock:"物流中心"},
-    {name:"💱數位貨幣",cost:5e11,prog:0,unlock:"銀行"},
-    {name:"🏠房地產AI",cost:2e12,prog:0,unlock:"建設公司"},
-    {name:"🚗無人車AI",cost:5e13,prog:0,unlock:"科技園區"}
+
+    {
+        name:"🚲腳踏車AI",
+        cost:5e16,
+        prog:0,
+        unlock:"物流中心"
+    },
+
+    {
+        name:"💱數位貨幣",
+        cost:2e17,
+        prog:0,
+        unlock:"銀行"
+    },
+
+    {
+        name:"🏠房地產AI",
+        cost:5e17,
+        prog:0,
+        unlock:"建設公司"
+    },
+
+    {
+        name:"🚗無人車AI",
+        cost:2e18,
+        prog:0,
+        unlock:"科技園區"
+    }
 ];
 
 // =====================
-// 🧠 公司等級（京制）
+// 🏆 公司等級
 // =====================
 function companyLv(){
-    return Math.max(1, Math.floor(Math.log10(money) / 2));
+
+    return Math.max(
+        1,
+        Math.floor(Math.log10(money)/2)
+    );
 }
 
 // =====================
 // 🖥️ 主渲染
 // =====================
 function renderAll(){
+
     document.getElementById("money").innerText = formatMoney(money);
+
     document.getElementById("empCount").innerText = employees.length;
+
     document.getElementById("companyLv").innerText = companyLv();
 
     renderIndustry();
+
     renderEmployee();
+
     renderProject();
 }
 
 // =====================
-// 🏭 產業
+// 🏭 產業顯示
 // =====================
 function renderIndustry(){
+
     let html="";
 
     for(let k in industries){
+
         let ind = industries[k];
+
+        let income =
+            ind.emp.length *
+            ind.lv *
+            ind.base;
 
         html += `
         <div class="card">
-            <b>${k} Lv.${ind.lv}</b> (${ind.emp.length}/${ind.cap})<br>
-            收入：${formatMoney(ind.emp.length * ind.lv * 1e8)} /秒<br>
-            <button onclick="upgradeInd('${k}')">升級產業</button>
+
+            <b>${k} Lv.${ind.lv}</b>
+            (${ind.emp.length}/${ind.cap})<br><br>
+
+            💹 產業轉速：<span class="speed">
+            ${formatSpeed(income)}
+            </span><br><br>
+
+            💵 單位產值：
+            ${formatMoney(ind.base)}<br><br>
+
+            <button onclick="upgradeInd('${k}')">
+            升級產業
+            </button>
+
         </div>`;
     }
 
@@ -272,19 +409,35 @@ function renderIndustry(){
 }
 
 // =====================
-// 👥 員工
+// 👥 員工顯示
 // =====================
 function renderEmployee(){
+
     let html="";
 
-    [...employees].sort((a,b)=>b.kp-a.kp).forEach(e=>{
+    [...employees]
+    .sort((a,b)=>b.kp-a.kp)
+    .forEach(e=>{
+
         html += `
         <div class="card">
-            <b>${e.name}</b> Lv.${e.lv} ${e.trait}<br>
-            能量:${e.energy}｜KPI:${e.kp}<br>
-            <span class="small">${e.industry || "待命"}</span><br>
-            <button onclick="train(${e.id})">訓練</button>
-            <button onclick="aiAssign(${e.id})">AI分配</button>
+
+            <b>${e.name}</b>
+            Lv.${e.lv}
+            ${e.trait}<br><br>
+
+            ⚡ 能量：${e.energy}<br>
+            📈 KPI：${e.kp}<br>
+            🏢 部門：${e.industry || "待命"}<br><br>
+
+            <button onclick="train(${e.id})">
+            訓練
+            </button>
+
+            <button onclick="aiAssign(${e.id})">
+            AI分配
+            </button>
+
         </div>`;
     });
 
@@ -292,19 +445,32 @@ function renderEmployee(){
 }
 
 // =====================
-// 🚀 專案
+// 🚀 專案顯示
 // =====================
 function renderProject(){
+
     let html="";
 
     projects.forEach((p,i)=>{
+
         html += `
         <div class="card">
-            <b>${p.name}</b><br>
-            成本：${formatMoney(p.cost)}<br>
-            進度：${p.prog}%<br>
-            解鎖：${p.unlock}<br>
-            <button onclick="work(${i})">研發</button>
+
+            <b>${p.name}</b><br><br>
+
+            💰 研發成本：
+            ${formatMoney(p.cost)}<br><br>
+
+            📊 進度：
+            ${p.prog}%<br><br>
+
+            🔓 解鎖：
+            ${p.unlock}<br><br>
+
+            <button onclick="work(${i})">
+            研發
+            </button>
+
         </div>`;
     });
 
@@ -312,45 +478,51 @@ function renderProject(){
 }
 
 // =====================
-// 📝 招聘系統（修正補丁）
+// 📝 招聘
 // =====================
 function recruitEmployee(){
-    const cost = 1e7; // 1000萬
+
+    const cost = 1e7;
 
     if(money < cost){
-        alert("資金不足（需要 1000萬）");
+
+        alert("資金不足");
         return;
     }
 
     money -= cost;
 
-    let newEmp = {
-        id: employees.length,
-        name: generateUniqueName(), // 如果你沒有這個函式我也可以幫你補
-        lv: 1,
-        exp: 0,
-        energy: 100,
-        kp: 0,
-        trait: trait(),
-        industry: null
-    };
+    employees.push({
 
-    employees.push(newEmp);
+        id:employees.length,
+        name:makeName(),
+        lv:1,
+        exp:0,
+        energy:100,
+        kp:0,
+        trait:trait(),
+        industry:null
+    });
 
     fastRender();
 }
-
 
 // =====================
 // 🤖 AI分配
 // =====================
 function aiAssign(id){
+
     let e = employees[id];
 
-    let best=null;
+    let best = null;
 
     for(let k in industries){
-        if(industries[k].emp.length < industries[k].cap){
+
+        if(
+            industries[k].emp.length
+            <
+            industries[k].cap
+        ){
             best = k;
             break;
         }
@@ -359,10 +531,15 @@ function aiAssign(id){
     if(!best) return;
 
     for(let k in industries){
-        industries[k].emp = industries[k].emp.filter(x=>x.id!==id);
+
+        industries[k].emp =
+        industries[k].emp.filter(
+            x=>x.id!==id
+        );
     }
 
     industries[best].emp.push(e);
+
     e.industry = best;
 
     fastRender();
@@ -372,15 +549,21 @@ function aiAssign(id){
 // 🏋️ 訓練
 // =====================
 function train(id){
+
     let e = employees[id];
+
     if(e.energy < 10) return;
 
     e.energy -= 10;
+
     e.exp += 25;
+
     e.kp += 5;
 
     if(e.exp >= 100){
+
         e.lv++;
+
         e.exp = 0;
     }
 
@@ -388,41 +571,70 @@ function train(id){
 }
 
 // =====================
-// 🏭 升級產業（京級成本）
+// 🏭 升級產業
 // =====================
 function upgradeInd(name){
-    let ind = industries[name];
-    let cost = ind.lv * 5e10; // 🔥改成京級邏輯
 
-    if(money < cost) return;
+    let ind = industries[name];
+
+    let cost =
+        ind.lv * 2e16;
+
+    if(money < cost){
+
+        alert("資金不足");
+        return;
+    }
 
     money -= cost;
+
     ind.lv++;
+
     ind.cap++;
+
+    ind.base *= 1.6;
 
     fastRender();
 }
 
 // =====================
-// 🚀 專案（解鎖產業）
+// 🚀 專案
 // =====================
 function work(i){
+
     let p = projects[i];
 
-    if(money < p.cost) return;
+    if(money < p.cost){
+
+        alert("資金不足");
+        return;
+    }
 
     money -= p.cost;
+
     p.prog += 20;
 
     if(p.prog >= 100){
+
         if(!industries[p.unlock]){
-            industries[p.unlock] = {lv:1,cap:5,emp:[]};
+
+            industries[p.unlock] = {
+
+                lv:1,
+                cap:5,
+                emp:[],
+                base:3e16
+            };
+
             alert("🔥解鎖產業：" + p.unlock);
         }
     }
 
     employees.forEach(e=>{
-        e.energy = Math.min(100, e.energy+5);
+
+        e.energy =
+        Math.min(100,e.energy+5);
+
         e.kp++;
     });
 
@@ -430,24 +642,32 @@ function work(i){
 }
 
 // =====================
-// 💰 自動收入（京級放置）
+// 💵 全球企業收入
 // =====================
 setInterval(()=>{
+
     let income = 0;
 
     for(let k in industries){
+
         let ind = industries[k];
 
-        income += ind.emp.length * ind.lv * 1e8;
+        income +=
+            ind.emp.length *
+            ind.lv *
+            ind.base;
     }
 
     money += income;
 
     fastRender();
+
 },500);
 
 // =====================
 renderAll();
+// =====================
+
 </script>
 </body>
 </html>
