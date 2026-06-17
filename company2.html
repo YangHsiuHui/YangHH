@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>公司經營遊戲｜京級美金版</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{box-sizing:border-box;}
+body{
+    margin:0;
+    font-family:"Microsoft JhengHei",sans-serif;
+    background:linear-gradient(135deg,#fff3e0,#ffe0b2);
+    color:#333;
+}
+header{
+    background:linear-gradient(90deg,#ff9800,#ffb74d);
+    color:white;
+    text-align:center;
+    padding:14px;
+    font-size:20px;
+    font-weight:bold;
+    position:sticky;
+    top:0;
+    z-index:10;
+}
+.container{display:flex;gap:10px;padding:10px;}
+.panel{
+    flex:1;
+    background:#fff8e1;
+    border-radius:14px;
+    padding:10px;
+    height:88vh;
+    overflow-y:auto;
+    box-shadow:0 4px 12px rgba(0,0,0,0.12);
+}
+h3{
+    color:#e65100;
+    margin-top:0;
+    position:sticky;
+    top:0;
+    background:#fff8e1;
+    padding:6px 0;
+}
+.card{
+    background:#fff3e0;
+    border:1px solid #ffd180;
+    padding:10px;
+    margin-bottom:8px;
+    border-radius:12px;
+}
+button{
+    background:#ff9800;
+    border:none;
+    color:white;
+    padding:6px 10px;
+    margin:3px;
+    border-radius:8px;
+    cursor:pointer;
+}
+button:hover{background:#f57c00;}
+.small{font-size:12px;color:#666;}
+.recruit-box{margin-bottom:12px;padding:10px;background:#ffe0b2;border-radius:12px;}
+.money{color:#d84315;font-weight:bold;}
+.speed{color:#2e7d32;font-weight:bold;}
+</style>
+</head>
+
+<body>
+
+<header>
+🏢 公司經營遊戲｜
+💵 總資產：<span id="money"></span>｜
+👥 工作人員：<span id="empCount"></span>｜
+🏆 公司Lv：<span id="companyLv"></span>
+</header>
+
+<div class="container">
+
+<div class="panel">
+    <h3>🏭 產業大樓</h3>
+    <div id="industries"></div>
+</div>
+
+<div class="panel">
+    <h3>👥 員工招聘 / 管理</h3>
+
+    <div class="recruit-box">
+        <b>📝 招聘中心</b><br>
+        招聘成本：1000萬美金<br>
+        <button onclick="recruitEmployee()">招聘新員工</button>
+    </div>
+
+    <div id="employees"></div>
+</div>
+
+<div class="panel">
+    <h3>🚀 科技專案</h3>
+    <div id="projects"></div>
+</div>
+
+</div>
+
+<script>
+
+let money = BigInt("9".repeat(120)); // ✅ 120個9
+
+let renderLock = false;
+
+function formatMoney(n){
+    n = BigInt(n);
+
+    const trillion = 10n**12n;
+    const quadrillion = 10n**16n;
+    const quintillion = 10n**20n;
+
+    if(n >= quintillion) return "US$ " + Number(n/quintillion) + " 垓";
+    if(n >= quadrillion) return "US$ " + Number(n/quadrillion) + " 京";
+    if(n >= trillion) return "US$ " + Number(n/trillion) + " 兆";
+    if(n >= 10n**8n) return "US$ " + Number(n/(10n**8n)) + " 億";
+    if(n >= 10n**4n) return "US$ " + Number(n/(10n**4n)) + " 萬";
+
+    return "US$ " + n.toString();
+}
+
+function formatSpeed(n){
+    return formatMoney(n) + " / 秒";
+}
+
+function fastRender(){
+    if(renderLock) return;
+    renderLock = true;
+    requestAnimationFrame(()=>{
+        renderLock = false;
+        renderAll();
+    });
+}
+
+const last=["王","李","張","林","陳","黃","楊","吳","劉","蔡","鄭","許","郭","謝"];
+const mid=["志","雅","俊","美","冠","柏","家","承","亞","欣","佩","哲","思","子","佳"];
+const end=["真","婷","宏","玲","傑","翰","雯","華","安","琪","君","庭","翔","明","強"];
+
+window.usedNames=new Set();
+
+function makeName(){
+    let name;
+    do{
+        name=
+        last[Math.floor(Math.random()*last.length)] +
+        mid[Math.floor(Math.random()*mid.length)] +
+        end[Math.floor(Math.random()*end.length)];
+    }while(window.usedNames.has(name));
+
+    window.usedNames.add(name);
+    return name;
+}
+
+function trait(){
+    return ["⚡效率","🧠商業","🛠技術"][Math.floor(Math.random()*3)];
+}
+
+let employees=Array.from({length:35},(_,i)=>({
+    id:i,
+    name:makeName(),
+    lv:1,
+    exp:0,
+    energy:100,
+    kp:0,
+    trait:trait(),
+    industry:null
+}));
+
+let industries={
+    "奶茶店":{lv:1,cap:5,emp:[],base:3e15},
+    "大賣場":{lv:1,cap:5,emp:[],base:5e15},
+    "電影院":{lv:1,cap:5,emp:[],base:8e15},
+    "美容館":{lv:1,cap:5,emp:[],base:6e15},
+    "飯店":{lv:1,cap:5,emp:[],base:1e16},
+    "醫院":{lv:1,cap:5,emp:[],base:2e16},
+    "網吧":{lv:1,cap:5,emp:[],base:7e15}
+};
+
+let projects=[
+    {name:"🚲腳踏車AI",cost:5e16,prog:0,unlock:"物流中心"},
+    {name:"💱數位貨幣",cost:2e17,prog:0,unlock:"銀行"},
+    {name:"🏠房地產AI",cost:5e17,prog:0,unlock:"建設公司"},
+    {name:"🚗無人車AI",cost:2e18,prog:0,unlock:"科技園區"}
+];
+
+function companyLv(){
+    return Math.max(1, Math.floor(Number(money.toString().length)/2));
+}
+
+function renderAll(){
+    document.getElementById("money").innerText = formatMoney(money);
+    document.getElementById("empCount").innerText = employees.length;
+    document.getElementById("companyLv").innerText = companyLv();
+    renderIndustry();
+    renderEmployee();
+    renderProject();
+}
+
+function renderIndustry(){
+    let html="";
+    for(let k in industries){
+        let ind=industries[k];
+        let income=ind.emp.length*ind.lv*ind.base;
+
+        html+=`
+        <div class="card">
+        <b>${k} Lv.${ind.lv}</b> (${ind.emp.length}/${ind.cap})<br><br>
+        💹 產業轉速：<span class="speed">${formatSpeed(income)}</span><br><br>
+        💵 單位產值：${formatMoney(ind.base)}<br><br>
+        <button onclick="upgradeInd('${k}')">升級產業</button>
+        </div>`;
+    }
+    document.getElementById("industries").innerHTML=html;
+}
+
+function renderEmployee(){
+    let html="";
+    [...employees].sort((a,b)=>b.kp-a.kp).forEach(e=>{
+        html+=`
+        <div class="card">
+        <b>${e.name}</b> Lv.${e.lv} ${e.trait}<br><br>
+        ⚡ 能量：${e.energy}<br>
+        📈 KPI：${e.kp}<br>
+        🏢 部門：${e.industry||"待命"}<br><br>
+        <button onclick="train(${e.id})">訓練</button>
+        <button onclick="aiAssign(${e.id})">AI分配</button>
+        </div>`;
+    });
+    document.getElementById("employees").innerHTML=html;
+}
+
+function renderProject(){
+    let html="";
+    projects.forEach((p,i)=>{
+        html+=`
+        <div class="card">
+        <b>${p.name}</b><br><br>
+        💰 成本：${formatMoney(p.cost)}<br><br>
+        📊 進度：${p.prog}%<br><br>
+        🔓 解鎖：${p.unlock}<br><br>
+        <button onclick="work(${i})">研發</button>
+        </div>`;
+    });
+    document.getElementById("projects").innerHTML=html;
+}
+
+function recruitEmployee(){
+    const cost=1e7;
+    if(money<cost) return alert("資金不足");
+
+    money-=BigInt(cost);
+
+    employees.push({
+        id:employees.length,
+        name:makeName(),
+        lv:1,exp:0,energy:100,kp:0,trait:trait(),industry:null
+    });
+
+    fastRender();
+}
+
+function aiAssign(id){
+    let e=employees[id];
+    let best=null;
+
+    for(let k in industries){
+        if(industries[k].emp.length<industries[k].cap){
+            best=k;break;
+        }
+    }
+    if(!best)return;
+
+    for(let k in industries){
+        industries[k].emp=industries[k].emp.filter(x=>x.id!==id);
+    }
+
+    industries[best].emp.push(e);
+    e.industry=best;
+    fastRender();
+}
+
+function train(id){
+    let e=employees[id];
+    if(e.energy<10)return;
+
+    e.energy-=10;
+    e.exp+=25;
+    e.kp+=5;
+
+    if(e.exp>=100){e.lv++;e.exp=0;}
+    fastRender();
+}
+
+function upgradeInd(name){
+    let ind=industries[name];
+    let cost=ind.lv*2e16;
+
+    if(money<BigInt(cost))return alert("資金不足");
+
+    money-=BigInt(cost);
+    ind.lv++;ind.cap++;ind.base*=1.6;
+
+    fastRender();
+}
+
+function work(i){
+    let p=projects[i];
+    if(money<BigInt(p.cost))return alert("資金不足");
+
+    money-=BigInt(p.cost);
+    p.prog+=20;
+
+    if(p.prog>=100 && !industries[p.unlock]){
+        industries[p.unlock]={lv:1,cap:5,emp:[],base:3e16};
+        alert("🔥解鎖產業：" + p.unlock);
+    }
+
+    employees.forEach(e=>{
+        e.energy=Math.min(100,e.energy+5);
+        e.kp++;
+    });
+
+    fastRender();
+}
+
+setInterval(()=>{
+    let income=0;
+
+    for(let k in industries){
+        let ind=industries[k];
+        income+=ind.emp.length*ind.lv*ind.base;
+    }
+
+    money+=BigInt(Math.floor(income));
+
+    fastRender();
+},500);
+
+renderAll();
+
+</script>
+</body>
+</html>
