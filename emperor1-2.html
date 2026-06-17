@@ -48,7 +48,6 @@ h1{margin:0;font-size:1.25rem;}
   word-break:break-word;
 }
 
-/* buttons */
 .controls{display:flex;gap:8px;margin-top:12px;}
 button{
   flex:1;padding:10px 12px;border-radius:8px;border:none;
@@ -74,11 +73,7 @@ button{
   display:none;z-index:9999;
 }
 
-
-/* 請加在 style 裡 */
-.nav-links{
-  margin-top:8px;
-}
+.nav-links{margin-top:8px;}
 .nav-links a{
   display:inline-block;
   text-decoration:none;
@@ -94,7 +89,6 @@ button{
   transform:translateY(-2px);
   background:linear-gradient(180deg,#ffd36b,#ffbf47);
 }
-
 </style>
 </head>
 
@@ -108,8 +102,6 @@ button{
 <div class="nav-links">
   <a href="emperor.html">🏛 返回皇帝管理首頁</a>
 </div>
-
-
 </header>
 
 <div class="panels">
@@ -133,7 +125,7 @@ button{
 
 <div class="stat">
 國庫：<span id="tVal"></span>
-<div style="font-size:0.85rem;color:#666;" id="tLevel"></div>
+<div style="font-size:0.85rem;color:#666;" id="tLevel">單位：京美金</div>
 </div>
 
 <div class="stat">回合 <span id="turn"></span></div>
@@ -141,18 +133,13 @@ button{
 </div>
 </div>
 
-</div>
-
 <div class="big-toast" id="toast"></div>
 
 <script>
 
-/* =========================
-   國庫：120個9（京美金）
-========================= */
+/* 120個9 國庫 */
 let treasuryInit = BigInt("9".repeat(120));
 
-/* 基礎狀態 */
 let state = {
   stability: 60,
   people: 60,
@@ -161,32 +148,31 @@ let state = {
   maxTurns: 20
 };
 
-/* 國庫顯示壓縮 + 等級 */
+/* =========================
+   國庫「四位數壓縮顯示」
+   例：123456789 → 1.234e8（簡化版）
+========================= */
 function formatTreasury(val){
   let s = val.toString();
-  if(s.length < 5) return s + " 京美金";
+  let len = s.length;
 
-  const levels = [
-    {name:"府庫", digit:4},
-    {name:"州庫", digit:8},
-    {name:"國庫", digit:12},
-    {name:"天庫", digit:20},
-    {name:"混沌神庫", digit:999}
-  ];
-
-  for(let i=levels.length-1;i>=0;i--){
-    if(s.length > levels[i].digit){
-      return `${s.slice(0,3)}...${levels[i].name}（京美金）`;
-    }
+  if(len <= 4){
+    return s + " 京美金";
   }
-  return s + " 京美金";
+
+  // 取前4位
+  let head = s.slice(0,4);
+  let rest = len - 4;
+
+  return `${head}×10^${rest} 京美金`;
 }
 
+/* 等級（保留簡化） */
 function getLevel(val){
   let len = val.toString().length;
-  if(len < 20) return "府庫";
-  if(len < 40) return "州庫";
-  if(len < 80) return "國庫";
+  if(len < 40) return "府庫";
+  if(len < 80) return "州庫";
+  if(len < 120) return "國庫";
   return "天庫";
 }
 
@@ -211,8 +197,7 @@ function updateStats(){
   turnEl.textContent = state.turn;
 }
 
-/* 奏摺（完全保留，不改內容） */
-
+/* 奏摺（原封不動） */
 
 const memorials = [
       {title:"河道決堤，百姓無家", body:"今臣聞境內河道氾濫，村舍被淹，百姓流離失所。奏請敕令撥銀修堤，並徵調民夫勘查災情。", effects:{
@@ -488,26 +473,21 @@ function render(){
   memorialEl.innerHTML = `【${current.title}】\n\n${current.body}`;
 }
 
-/* BigInt運算 */
 function applyEffect(type){
   let e = current.effects[type];
-
   state.people += e.people || 0;
   state.stability += e.stability || 0;
   state.treasury += BigInt(e.treasury || 0);
 }
 
-/* log */
 function log(text){
   let d = document.createElement("div");
   d.textContent = `回合${state.turn}：${text}`;
   logEl.prepend(d);
 }
 
-/* 行動 */
 function act(type){
   applyEffect(type);
-
   log(`選擇${type}`);
 
   state.turn++;
@@ -522,7 +502,6 @@ function act(type){
   updateStats();
 }
 
-/* init */
 render();
 updateStats();
 
