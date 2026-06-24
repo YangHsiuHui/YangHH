@@ -3,6 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<meta
+http-equiv="Content-Security-Policy"
+content="frame-ancestors 'none'"
+>
+
 <title>皇帝批摺</title>
 
 <style>
@@ -70,7 +76,11 @@ button{
 .big-toast{
   position:fixed;left:50%;top:18%;transform:translateX(-50%);
   background:rgba(0,0,0,0.8);color:#fff;padding:12px 18px;border-radius:10px;
-  display:none;z-index:9999;
+  display:none;
+}
+
+.big-toast{
+pointer-events:none;
 }
 
 .nav-links{margin-top:8px;}
@@ -100,7 +110,9 @@ button{
 <div class="subtitle">允 / 駁 / 留中，維持國政平衡</div>
 </div>
 <div class="nav-links">
-  <a href="emperor.html">🏛 返回皇帝管理首頁</a>
+  <a
+href="./emperor.html"
+rel="noopener"> 🏛 返回皇帝管理首頁</a>
 </div>
 </header>
 
@@ -187,6 +199,22 @@ const tLevel = document.getElementById('tLevel');
 
 const turnEl = document.getElementById('turn');
 
+const btnAllow=
+document.getElementById(
+"btnAllow"
+);
+
+const btnReject=
+document.getElementById(
+"btnReject"
+);
+
+const btnHold=
+document.getElementById(
+"btnHold"
+);
+
+/*
 function updateStats(){
   sVal.textContent = state.stability;
   pVal.textContent = state.people;
@@ -196,6 +224,51 @@ function updateStats(){
 
   turnEl.textContent = state.turn;
 }
+*/
+
+function updateStats(){
+
+sVal.textContent=
+state.stability;
+
+pVal.textContent=
+state.people;
+
+sBar.style.width=
+Math.max(
+0,
+Math.min(
+100,
+state.stability
+)
+)+"%";
+
+pBar.style.width=
+Math.max(
+0,
+Math.min(
+100,
+state.people
+)
+)+"%";
+
+tVal.textContent=
+formatTreasury(
+state.treasury
+);
+
+tLevel.textContent=
+"等級："+
+getLevel(
+state.treasury
+);
+
+turnEl.textContent=
+state.turn;
+
+}
+
+
 
 /* 奏摺（原封不動） */
 
@@ -463,14 +536,35 @@ const memorials = [
 
 
 /* 隨機 */
+/*
 function getRandom(){
   return JSON.parse(JSON.stringify(memorials[Math.floor(Math.random()*memorials.length)]));
 }
+*/
+
+function getRandom(){
+
+return structuredClone(
+memorials[
+Math.floor(
+Math.random()
+*
+memorials.length
+)
+]
+
+);
+
+}
+
 
 let current = getRandom();
 
 function render(){
-  memorialEl.innerHTML = `【${current.title}】\n\n${current.body}`;
+  memorialEl.textContent =
+`【${current.title}】
+
+${current.body}`;
 }
 
 function applyEffect(type){
@@ -481,9 +575,34 @@ function applyEffect(type){
 }
 
 function log(text){
-  let d = document.createElement("div");
-  d.textContent = `回合${state.turn}：${text}`;
-  logEl.prepend(d);
+
+let d=
+document.createElement("div");
+
+d.textContent=
+`回合${state.turn}:${text}`;
+
+logEl.prepend(d);
+
+while(
+logEl.children.length>50
+){
+logEl.lastChild.remove();
+}
+
+}
+
+function endGame(){
+
+[
+btnAllow,
+btnReject,
+btnHold
+
+].forEach(
+b=>b.disabled=true
+);
+
 }
 
 function act(type){
@@ -492,10 +611,25 @@ function act(type){
 
   state.turn++;
 
-  if(state.turn > state.maxTurns){
+  /*
+if(state.turn > state.maxTurns){
     alert("結束");
     return;
   }
+*/
+
+if(
+state.turn>
+state.maxTurns
+){
+
+endGame();
+
+alert("遊戲結束");
+
+return;
+
+}
 
   current = getRandom();
   render();
