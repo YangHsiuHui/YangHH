@@ -6,7 +6,7 @@
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
-    <title>世界帝國：總統模擬器 2026</title>
+    <title>世界帝國：總統模擬器</title>
     <style>
         :root {
             --bg-main: #f4f6f9;
@@ -19,6 +19,7 @@
             --accent-gold: #d97706;
             --border-color: #e5e7eb;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --sidebar-width: 260px;
         }
 
         * {
@@ -33,12 +34,28 @@
             color: var(--text-primary);
             display: flex;
             height: 100vh;
-            overflow: hidden; /* 固定視窗尺寸，防止外層滾動 */
+            overflow: hidden;
+        }
+
+        /* 遮罩 (手機版側邊欄開啟時背景) */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
         }
 
         /* Sidebar Navigation */
         .sidebar {
-            width: 260px;
+            width: var(--sidebar-width);
             background-color: var(--bg-card);
             border-right: 1px solid var(--border-color);
             display: flex;
@@ -46,6 +63,8 @@
             padding: 1.25rem 1rem;
             flex-shrink: 0;
             height: 100vh;
+            transition: transform 0.3s ease;
+            z-index: 50;
         }
 
         .brand {
@@ -55,10 +74,19 @@
             margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: space-between;
         }
 
-        /* 固定方框連結容器 (頂部/固定位置) */
+        .close-sidebar-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        /* 固定方框連結容器 */
         .fixed-link-box {
             background-color: #fefce8;
             border: 1px solid #fef08a;
@@ -96,7 +124,7 @@
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-            overflow-y: auto; /* 若選單過長允許內部微滾動 */
+            overflow-y: auto;
         }
 
         .nav-btn {
@@ -124,19 +152,39 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            overflow: hidden; /* 主運作視窗固定 */
+            overflow: hidden;
+            width: 100%;
         }
 
         /* Top Header */
         .header {
             background-color: var(--bg-card);
             border-bottom: 1px solid var(--border-color);
-            padding: 1rem 2rem;
+            padding: 1rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: var(--shadow);
             flex-shrink: 0;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .hamburger-btn {
+            display: none;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
         }
 
         .president-info h2 {
@@ -151,8 +199,9 @@
 
         .status-bar {
             display: flex;
-            gap: 1.5rem;
+            gap: 1.25rem;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .stat-box {
@@ -190,6 +239,7 @@
             font-size: 0.85rem;
             font-weight: 500;
             transition: opacity 0.2s;
+            white-space: nowrap;
         }
 
         .btn:hover {
@@ -202,11 +252,11 @@
             color: var(--text-primary);
         }
 
-        /* View Content Area (獨立滾動視窗) */
+        /* View Content Area */
         .content {
             flex: 1;
-            padding: 2rem;
-            overflow-y: auto; /* 內容過長時僅中央卡片區域可滾動 */
+            padding: 1.5rem;
+            overflow-y: auto;
         }
 
         .panel {
@@ -220,15 +270,15 @@
         /* Dashboard Grid */
         .grid-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
             margin-bottom: 2rem;
         }
 
         .card {
             background-color: var(--bg-card);
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 1.25rem;
             box-shadow: var(--shadow);
             border: 1px solid var(--border-color);
         }
@@ -240,8 +290,9 @@
         }
 
         .card-value {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
+            word-break: break-all;
         }
 
         /* Interactive Action List */
@@ -259,6 +310,13 @@
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 8px;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .action-info {
+            flex: 1;
+            min-width: 200px;
         }
 
         .action-info h4 {
@@ -271,7 +329,7 @@
             color: var(--text-secondary);
         }
 
-        /* Country Select Modal Overlay */
+        /* Modal Overlay */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -284,19 +342,21 @@
             justify-content: center;
             align-items: center;
             z-index: 100;
+            padding: 1rem;
         }
 
         .modal {
             background: var(--bg-card);
-            padding: 2.5rem;
+            padding: 2rem;
             border-radius: 16px;
-            width: 450px;
+            width: 100%;
+            max-width: 450px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         .modal h2 {
             margin-bottom: 1rem;
-            font-size: 1.5rem;
+            font-size: 1.35rem;
             text-align: center;
         }
 
@@ -330,10 +390,76 @@
             font-size: 0.85rem;
             height: 180px;
             overflow-y: auto;
+            line-height: 1.5;
+        }
+
+        /* RWD 響應式媒體查詢 (Responsive Breakpoints) */
+        @media (max-width: 768px) {
+            body {
+                overflow: auto; /* 手機版頁面可正常捲動 */
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                transform: translateX(-100%);
+                box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .close-sidebar-btn {
+                display: block;
+            }
+
+            .hamburger-btn {
+                display: block;
+            }
+
+            .main-container {
+                height: auto;
+                min-height: 100vh;
+                overflow: visible;
+            }
+
+            .header {
+                padding: 0.75rem 1rem;
+            }
+
+            .status-bar {
+                width: 100%;
+                justify-content: space-between;
+                gap: 0.5rem;
+                margin-top: 0.5rem;
+            }
+
+            .stat-box {
+                text-align: left;
+            }
+
+            .content {
+                padding: 1rem;
+                overflow-y: visible;
+            }
+
+            .action-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .action-item .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
+
+    <!-- 側邊欄遮罩 (手機版點擊可收合) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Country Selection Modal (Starts Game) -->
     <div class="modal-overlay" id="startModal">
@@ -359,15 +485,16 @@
     </div>
 
     <!-- Main Application UI -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="brand">
-            🏛️ 總統指揮中心
+            <span>🏛️ 總統指揮中心</span>
+            <button class="close-sidebar-btn" id="closeSidebarBtn">&times;</button>
         </div>
 
-        <!-- 固定方框連結區域 (顯眼且固定的頂部區塊) -->
+        <!-- 固定方框連結區域 -->
         <div class="fixed-link-box">
             <div class="nav-links">
-                <a href=".emperor.html" rel="noopener noreferrer">🏛 返回皇帝管理首頁</a>
+                <a href="https://yanghsiuhui.github.io/YangHH/emperor.html" rel="noopener noreferrer">🏛 返回皇帝管理首頁</a>
             </div>
         </div>
 
@@ -383,9 +510,12 @@
     <div class="main-container">
         <!-- Top Navigation Header -->
         <header class="header">
-            <div class="president-info">
-                <h2 id="displayCountry">國家名稱</h2>
-                <p>總統：<span id="displayPresident">姓名</span></p>
+            <div class="header-left">
+                <button class="hamburger-btn" id="hamburgerBtn">☰</button>
+                <div class="president-info">
+                    <h2 id="displayCountry">國家名稱</h2>
+                    <p>總統：<span id="displayPresident">姓名</span></p>
+                </div>
             </div>
             <div class="status-bar">
                 <div class="stat-box">
@@ -397,9 +527,9 @@
                     <div class="value" id="incomeDisplay">+$0</div>
                 </div>
                 <div class="time-controls">
-                    <span id="dateDisplay" style="font-weight: 600; font-size: 0.9rem; padding: 0 0.5rem;">2026-07-22</span>
+                    <span id="dateDisplay" style="font-weight: 600; font-size: 0.85rem; padding: 0 0.25rem;">2026-07-22</span>
                     <button class="btn btn-outline" id="pauseBtn">暫停</button>
-                    <button class="btn btn-outline" id="speedBtn">1x 速度</button>
+                    <button class="btn btn-outline" id="speedBtn">1x</button>
                 </div>
             </div>
         </header>
@@ -545,7 +675,6 @@
             if (len <= 15) return (Number(bigIntNum / 1000000000n) / 1000).toFixed(2) + " T";
             if (len <= 18) return (Number(bigIntNum / 1000000000000n) / 1000).toFixed(2) + " Qa";
 
-            // 對於極大的數字 (例如 120 位數)，顯示指數簡寫模式以維持介面美觀
             const exponent = len - 1;
             const leadingDigits = str.substring(0, 4);
             const formattedLeading = (parseInt(leadingDigits, 10) / 1000).toFixed(2);
@@ -556,11 +685,9 @@
         const state = {
             president: '亞歷山大',
             country: '美利堅合眾國',
-            // 國庫初始值：120 個 9 (BigInt)
             treasury: BigInt("9".repeat(120)),
-            // 每日基礎財政收入：10^110 美金
             dailyIncome: BigInt("1".repeat(110)),
-            date: new Date(2026, 6, 22), // 2026年7月22日
+            date: new Date(2026, 6, 22),
             satisfaction: 85,
             techLevel: 10,
             defenseLevel: 8,
@@ -587,7 +714,11 @@
             satisfactionVal: document.getElementById('satisfactionVal'),
             techVal: document.getElementById('techVal'),
             defenseVal: document.getElementById('defenseVal'),
-            cultureVal: document.getElementById('cultureVal')
+            cultureVal: document.getElementById('cultureVal'),
+            sidebar: document.getElementById('sidebar'),
+            hamburgerBtn: document.getElementById('hamburgerBtn'),
+            closeSidebarBtn: document.getElementById('closeSidebarBtn'),
+            sidebarOverlay: document.getElementById('sidebarOverlay')
         };
 
         // 日誌紀錄功能
@@ -614,10 +745,7 @@
         function tick() {
             if (state.isPaused) return;
 
-            // 時間加一天
             state.date.setDate(state.date.getDate() + 1);
-
-            // 結算每日財政收入
             state.treasury += state.dailyIncome;
 
             updateUI();
@@ -628,8 +756,24 @@
             state.timer = setInterval(tick, 1000 / state.gameSpeed);
         }
 
+        // 切換側邊欄 (手機版)
+        function toggleSidebar(show) {
+            if (show) {
+                elements.sidebar.classList.add('active');
+                elements.sidebarOverlay.classList.add('active');
+            } else {
+                elements.sidebar.classList.remove('active');
+                elements.sidebarOverlay.classList.remove('active');
+            }
+        }
+
         // 事件監聽與綁定
         function initEvents() {
+            // RWD 側邊欄按鈕
+            elements.hamburgerBtn.addEventListener('click', () => toggleSidebar(true));
+            elements.closeSidebarBtn.addEventListener('click', () => toggleSidebar(false));
+            elements.sidebarOverlay.addEventListener('click', () => toggleSidebar(false));
+
             // 分頁切換
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -639,6 +783,9 @@
                     e.target.classList.add('active');
                     const targetPanel = e.target.getAttribute('data-target');
                     document.getElementById(targetPanel).classList.add('active');
+
+                    // 手機版切換分頁後自動關閉選單
+                    toggleSidebar(false);
                 });
             });
 
@@ -669,7 +816,7 @@
                 else if (state.gameSpeed === 2) state.gameSpeed = 5;
                 else state.gameSpeed = 1;
 
-                elements.speedBtn.textContent = state.gameSpeed + 'x 速度';
+                elements.speedBtn.textContent = state.gameSpeed + 'x';
                 setupTimer();
             });
 
@@ -683,7 +830,7 @@
 
             document.getElementById('actBond').addEventListener('click', () => {
                 state.treasury += state.dailyIncome * 30n;
-                addLog('發行了國庫發行超級債券，獲取了30天的儲備資金。');
+                addLog('發行了國庫超級債券，獲取了30天的儲備資金。');
                 updateUI();
             });
 
