@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+    <title>世界帝國：總統模擬器 2026</title>
+    <style>
+        :root {
+            --bg-main: #f4f6f9;
+            --bg-card: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --accent-blue: #2563eb;
+            --accent-green: #059669;
+            --accent-red: #dc2626;
+            --accent-gold: #d97706;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 1rem;
+        }
+
+        .brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1; /* 讓導覽列撐開空間，把底部連結推下去 */
+        }
+
+        .nav-btn {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: none;
+            background: transparent;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background-color: #eff6ff;
+            color: var(--accent-blue);
+        }
+        
+        /* 底部返回連結樣式 */
+        .nav-links {
+            margin-top: auto; /* 推至側邊欄最底 */
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .nav-links a {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--accent-gold);
+            background-color: #fdf6e3; /* 輕微的背景色突顯 */
+            transition: all 0.2s;
+            border: 1px solid #fcecae;
+        }
+
+        .nav-links a:hover {
+            background-color: #fef0c7;
+            color: #b45309;
+        }
+
+        /* Main Content */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        .header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        .president-info h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .president-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .stat-box {
+            text-align: right;
+        }
+
+        .stat-box .label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .stat-box .value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .time-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f3f4f6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        .btn {
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        /* View Content Area */
+        .content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .panel {
+            display: none;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        /* Dashboard Grid */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Interactive Action List */
+        .action-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .action-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .action-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .action-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Country Select Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: 16px;
+            width: 450px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal h2 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background-color: #f9fafb;
+        }
+
+        /* Log console */
+        .log-box {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            height: 150px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Country Selection Modal (Starts Game) -->
+    <div class="modal-overlay" id="startModal">
+        <div class="modal">
+            <h2>選擇您的國家開局</h2>
+            <form id="startForm">
+                <div class="form-group">
+                    <label for="presidentName">總統姓名</label>
+                    <input type="text" id="presidentName" class="form-control" value="亞歷山大" required maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label for="countrySelect">選擇執政國家</label>
+                    <select id="countrySelect" class="form-control">
+                        <option value="美利堅合眾國">美利堅合眾國 (高科技/國防強國)</option>
+                        <option value="中華聯邦">中華聯邦 (龐大農業/工業生產)</option>
+                        <option value="歐洲聯盟">歐洲聯盟 (高文化/先進教育)</option>
+                        <option value="亞特蘭蒂斯帝國">亞特蘭蒂斯帝國 (均衡發展)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" style="width: 100%; padding: 0.75rem;">宣誓就職 (2026.07.22)</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application UI -->
+    <div class="sidebar">
+        <div class="brand">
+            🏛️ 總統指揮中心
+        </div>
+        <ul class="nav-list">
+            <li><button class="nav-btn active" data-target="dashboard">國家總覽</button></li>
+            <li><button class="nav-btn" data-target="finance">財政與經濟</button></li>
+            <li><button class="nav-btn" data-target="industry">士農工商管理</button></li>
+            <li><button class="nav-btn" data-target="defense">國防與科技</button></li>
+            <li><button class="nav-btn" data-target="culture">文化與教育</button></li>
+        </ul>
+        
+        <!-- 返回皇帝管理首頁連結 -->
+        <div class="nav-links">
+            <a href="./emperor.html" rel="noopener noreferrer">🏛 返回皇帝管理首頁</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Top Navigation Header -->
+        <header class="header">
+            <div class="president-info">
+                <h2 id="displayCountry">國家名稱</h2>
+                <p>總統：<span id="displayPresident">姓名</span></p>
+            </div>
+            <div class="status-bar">
+                <div class="stat-box">
+                    <div class="label">國家總國庫 (USD)</div>
+                    <div class="value" id="treasuryDisplay">$0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">每日淨收入</div>
+                    <div class="value" id="incomeDisplay">+$0</div>
+                </div>
+                <div class="time-controls">
+                    <span id="dateDisplay" style="font-weight: 600; font-size: 0.9rem; padding: 0 0.5rem;">2026-07-22</span>
+                    <button class="btn btn-outline" id="pauseBtn">暫停</button>
+                    <button class="btn btn-outline" id="speedBtn">1x 速度</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Panels -->
+        <main class="content">
+            <!-- 1. Dashboard Panel -->
+            <section id="dashboard" class="panel active">
+                <h3 style="margin-bottom: 1rem;">國家關鍵指標</h3>
+                <div class="grid-cards">
+                    <div class="card">
+                        <div class="card-title">人民滿意度</div>
+                        <div class="card-value" id="satisfactionVal">85%</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">科技發展指數</div>
+                        <div class="card-value" id="techVal">Level 10</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">國防威懾等級</div>
+                        <div class="card-value" id="defenseVal">Level 8</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">綜合文化影響力</div>
+                        <div class="card-value" id="cultureVal">880 / 1000</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 1rem;">國家簡報 console</h3>
+                <div class="log-box" id="logConsole">
+                    [2026-07-22] 總統成功就職，政權轉移完成。國庫已注入開局資金。<br>
+                </div>
+            </section>
+
+            <!-- 2. Finance Panel -->
+            <section id="finance" class="panel">
+                <h3 style="margin-bottom: 1rem;">財政政策管理</h3>
+                <div class="action-list">
+                    <div class="action-item">
+                        <div class="action-info">
+                            <h4>調升全國商業稅率</h4>
+                            <p>增加每日 5% 財政收入，但可能降低 2% 人民滿意度。</p>
+                        </div>
+                        <button class="btn" id="actTax">執行政策</button>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-info">
+                            <h4>發行國家超級債券</h4>
+                            <p>立即籌措大量流動資金。</p>
+                        </div>
+                        <button class="btn" id="actBond">發行債券</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Industry Panel -->
+            <section id="industry" class="panel">
+                <h3 style="margin-bottom: 1rem;">士農工商產業升級</h3>
+                <div class="action-list">
+                    <div class="action-item">
+                        <div class="action-info">
+                            <h4>[農] 推動精密智慧農業技術</h4>
+                            <p>提高糧食產量，穩定國內物價與基礎滿意度。</p>
+                        </div>
+                        <button class="btn" id="actAgri">推動升級</button>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-info">
+                            <h4>[工] 全自動化AI微晶圓工廠</h4>
+                            <p>大幅提升每日工業稅收產出。</p>
+                        </div>
+                        <button class="btn" id="actInd">建設工廠</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Defense Panel -->
+            <section id="defense" class="panel">
+                <h3 style="margin-bottom: 1rem;">國防與科技戰略</h3>
+                <div class="action-list">
+                    <div class="action-item">
+                        <div class="action-info">
+                            <h4>研發軌道防禦系統</h4>
+                            <p>提升國防防禦指數。</p>
+                        </div>
+                        <button class="btn" id="actDefense">開始研發</button>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-info">
+                            <h4>量子運算科研計畫</h4>
+                            <p>大幅提高國家科技發展等級。</p>
+                        </div>
+                        <button class="btn" id="actTech">投入經費</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Culture Panel -->
+            <section id="culture" class="panel">
+                <h3 style="margin-bottom: 1rem;">文化與教育體系</h3>
+                <div class="action-list">
+                    <div class="action-item">
+                        <div class="action-info">
+                            <h4>推動高科技高等教育改革</h4>
+                            <p>長期提升科技成長速度與國民素質。</p>
+                        </div>
+                        <button class="btn" id="actEdu">推動改革</button>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-info">
+                            <h4>舉辦世界博覽會與文化節</h4>
+                            <p>快速擴張國家全球文化影響力。</p>
+                        </div>
+                        <button class="btn" id="actCulture">舉辦盛會</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        'use strict';
+
+        /**
+         * 安全性轉義工具，防範 XSS
+         */
+        function sanitizeHTML(str) {
+            const temp = document.createElement('div');
+            temp.textContent = str;
+            return temp.innerHTML;
+        }
+
+        /**
+         * 數字簡寫與 BigInt 處理 (解決 120 個 9 的大數問題)
+         */
+        function formatBigNumber(bigIntNum) {
+            const str = bigIntNum.toString();
+            const len = str.length;
+
+            if (len <= 6) return str;
+            if (len <= 9) return (Number(bigIntNum / 1000n) / 1000).toFixed(2) + " M";
+            if (len <= 12) return (Number(bigIntNum / 1000000n) / 1000).toFixed(2) + " B";
+            if (len <= 15) return (Number(bigIntNum / 1000000000n) / 1000).toFixed(2) + " T";
+            if (len <= 18) return (Number(bigIntNum / 1000000000000n) / 1000).toFixed(2) + " Qa"; // Quadrillion
+
+            // 對於極大的數字 (例如 120 位數)，顯示指數簡寫模式以維持介面美觀
+            const exponent = len - 1;
+            const leadingDigits = str.substring(0, 4);
+            const formattedLeading = (parseInt(leadingDigits, 10) / 1000).toFixed(2);
+            return `${formattedLeading} × 10^${exponent}`;
+        }
+
+        // 國家初始化資料結構
+        const state = {
+            president: '亞歷山大',
+            country: '美利堅合眾國',
+            // 國庫初始值：120 個 9 (BigInt)
+            treasury: BigInt("9".repeat(120)),
+            // 每日基礎財政收入：10^110 美金
+            dailyIncome: BigInt("1".repeat(110)),
+            date: new Date(2026, 6, 22), // 2026年7月22日 (月份由 0 開始)
+            satisfaction: 85,
+            techLevel: 10,
+            defenseLevel: 8,
+            cultureLevel: 880,
+            isPaused: false,
+            gameSpeed: 1, // 1秒 = 1天
+            timer: null
+        };
+
+        // DOM 元素 DOM Elements
+        const elements = {
+            startModal: document.getElementById('startModal'),
+            startForm: document.getElementById('startForm'),
+            presidentNameInput: document.getElementById('presidentName'),
+            countrySelect: document.getElementById('countrySelect'),
+            displayCountry: document.getElementById('displayCountry'),
+            displayPresident: document.getElementById('displayPresident'),
+            treasuryDisplay: document.getElementById('treasuryDisplay'),
+            incomeDisplay: document.getElementById('incomeDisplay'),
+            dateDisplay: document.getElementById('dateDisplay'),
+            pauseBtn: document.getElementById('pauseBtn'),
+            speedBtn: document.getElementById('speedBtn'),
+            logConsole: document.getElementById('logConsole'),
+            satisfactionVal: document.getElementById('satisfactionVal'),
+            techVal: document.getElementById('techVal'),
+            defenseVal: document.getElementById('defenseVal'),
+            cultureVal: document.getElementById('cultureVal')
+        };
+
+        // 日誌紀錄功能
+        function addLog(msg) {
+            const dateStr = state.date.toISOString().split('T')[0];
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = sanitizeHTML(`[${dateStr}] ${msg}`);
+            elements.logConsole.appendChild(logEntry);
+            elements.logConsole.scrollTop = elements.logConsole.scrollHeight;
+        }
+
+        // 渲染 UI 視圖
+        function updateUI() {
+            elements.treasuryDisplay.textContent = '$' + formatBigNumber(state.treasury);
+            elements.incomeDisplay.textContent = '+$' + formatBigNumber(state.dailyIncome);
+            elements.dateDisplay.textContent = state.date.toISOString().split('T')[0];
+            elements.satisfactionVal.textContent = state.satisfaction + '%';
+            elements.techVal.textContent = 'Level ' + state.techLevel;
+            elements.defenseVal.textContent = 'Level ' + state.defenseLevel;
+            elements.cultureVal.textContent = state.cultureLevel + ' / 1000';
+        }
+
+        // 時間推進引擎
+        function tick() {
+            if (state.isPaused) return;
+
+            // 時間加一天
+            state.date.setDate(state.date.getDate() + 1);
+
+            // 結算每日財政收入
+            state.treasury += state.dailyIncome;
+
+            updateUI();
+        }
+
+        function setupTimer() {
+            if (state.timer) clearInterval(state.timer);
+            state.timer = setInterval(tick, 1000 / state.gameSpeed);
+        }
+
+        // 事件監聽與綁定 (遵守無內聯事件規範)
+        function initEvents() {
+            // 分頁切換
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+
+                    e.target.classList.add('active');
+                    const targetPanel = e.target.getAttribute('data-target');
+                    document.getElementById(targetPanel).classList.add('active');
+                });
+            });
+
+            // 表單提交事件 (選擇國家開局)
+            elements.startForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                state.president = elements.presidentNameInput.value.trim() || '亞歷山大';
+                state.country = elements.countrySelect.value;
+
+                elements.displayPresident.textContent = state.president;
+                elements.displayCountry.textContent = state.country;
+
+                elements.startModal.style.display = 'none';
+                addLog(`國家【${state.country}】政權成立，執政者：${state.president}`);
+                updateUI();
+                setupTimer();
+            });
+
+            // 時間控制項
+            elements.pauseBtn.addEventListener('click', () => {
+                state.isPaused = !state.isPaused;
+                elements.pauseBtn.textContent = state.isPaused ? '繼續' : '暫停';
+                addLog(state.isPaused ? '國家政務運作已暫停' : '時間恢復運作');
+            });
+
+            elements.speedBtn.addEventListener('click', () => {
+                if (state.gameSpeed === 1) state.gameSpeed = 2;
+                else if (state.gameSpeed === 2) state.gameSpeed = 5;
+                else state.gameSpeed = 1;
+
+                elements.speedBtn.textContent = state.gameSpeed + 'x 速度';
+                setupTimer();
+            });
+
+            // 內閣政策按鈕綁定
+            document.getElementById('actTax').addEventListener('click', () => {
+                state.dailyIncome = state.dailyIncome * 105n / 100n;
+                state.satisfaction = Math.max(0, state.satisfaction - 2);
+                addLog('商業稅率已調升 5%，人民滿意度小幅下降。');
+                updateUI();
+            });
+
+            document.getElementById('actBond').addEventListener('click', () => {
+                state.treasury += state.dailyIncome * 30n;
+                addLog('發行了國庫發行超級債券，獲取了30天的儲備資金。');
+                updateUI();
+            });
+
+            document.getElementById('actAgri').addEventListener('click', () => {
+                state.satisfaction = Math.min(100, state.satisfaction + 3);
+                addLog('推動智慧農業發展，全國糧食儲備充裕，滿意度上升。');
+                updateUI();
+            });
+
+            document.getElementById('actInd').addEventListener('click', () => {
+                state.dailyIncome += BigInt("10").pow ? BigInt("10")**100n : BigInt("1000000000000000000000000000000");
+                addLog('微晶圓超級工廠落成，大幅提高產業生產力。');
+                updateUI();
+            });
+
+            document.getElementById('actDefense').addEventListener('click', () => {
+                state.defenseLevel += 1;
+                addLog('國防軌道防禦系統進展順利，威懾等級提升。');
+                updateUI();
+            });
+
+            document.getElementById('actTech').addEventListener('click', () => {
+                state.techLevel += 1;
+                addLog('量子運算研究取得突破，科技發展指數提升。');
+                updateUI();
+            });
+
+            document.getElementById('actEdu').addEventListener('click', () => {
+                state.techLevel += 1;
+                state.satisfaction = Math.min(100, state.satisfaction + 1);
+                addLog('高等教育改革方案啟動，培養大量前沿科技人才。');
+                updateUI();
+            });
+
+            document.getElementById('actCulture').addEventListener('click', () => {
+                state.cultureLevel = Math.min(1000, state.cultureLevel + 25);
+                addLog('世界博覽會舉辦成功，大幅提昇國際文化影響力。');
+                updateUI();
+            });
+        }
+
+        // 初始化遊戲
+        window.addEventListener('DOMContentLoaded', () => {
+            initEvents();
+        });
+    </script>
+</body>
+</html>
