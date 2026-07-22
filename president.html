@@ -33,7 +33,7 @@
             color: var(--text-primary);
             display: flex;
             height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* 固定視窗尺寸，防止外層滾動 */
         }
 
         /* Sidebar Navigation */
@@ -43,17 +43,52 @@
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            padding: 1.5rem 1rem;
+            padding: 1.25rem 1rem;
+            flex-shrink: 0;
+            height: 100vh;
         }
 
         .brand {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--accent-blue);
-            margin-bottom: 2rem;
+            margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        /* 固定方框連結容器 (頂部/固定位置) */
+        .fixed-link-box {
+            background-color: #fefce8;
+            border: 1px solid #fef08a;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .fixed-link-box a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.6rem;
+            text-align: center;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #b45309;
+            background-color: #ffffff;
+            border: 1px solid #fde047;
+            transition: all 0.2s ease;
+        }
+
+        .fixed-link-box a:hover {
+            background-color: #fef3c7;
+            color: #78350f;
+            border-color: #f59e0b;
         }
 
         .nav-list {
@@ -61,7 +96,7 @@
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-            flex: 1; /* 讓導覽列撐開空間，把底部連結推下去 */
+            overflow-y: auto; /* 若選單過長允許內部微滾動 */
         }
 
         .nav-btn {
@@ -82,40 +117,14 @@
             background-color: #eff6ff;
             color: var(--accent-blue);
         }
-        
-        /* 底部返回連結樣式 */
-        .nav-links {
-            margin-top: auto; /* 推至側邊欄最底 */
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
-        }
 
-        .nav-links a {
-            display: block;
-            width: 100%;
-            padding: 0.75rem 1rem;
-            text-align: center;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--accent-gold);
-            background-color: #fdf6e3; /* 輕微的背景色突顯 */
-            transition: all 0.2s;
-            border: 1px solid #fcecae;
-        }
-
-        .nav-links a:hover {
-            background-color: #fef0c7;
-            color: #b45309;
-        }
-
-        /* Main Content */
+        /* Main Content Container */
         .main-container {
             flex: 1;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            height: 100vh;
+            overflow: hidden; /* 主運作視窗固定 */
         }
 
         /* Top Header */
@@ -127,6 +136,7 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: var(--shadow);
+            flex-shrink: 0;
         }
 
         .president-info h2 {
@@ -192,11 +202,11 @@
             color: var(--text-primary);
         }
 
-        /* View Content Area */
+        /* View Content Area (獨立滾動視窗) */
         .content {
             flex: 1;
             padding: 2rem;
-            overflow-y: auto;
+            overflow-y: auto; /* 內容過長時僅中央卡片區域可滾動 */
         }
 
         .panel {
@@ -210,7 +220,7 @@
         /* Dashboard Grid */
         .grid-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -318,7 +328,7 @@
             border-radius: 8px;
             font-family: monospace;
             font-size: 0.85rem;
-            height: 150px;
+            height: 180px;
             overflow-y: auto;
         }
     </style>
@@ -353,6 +363,14 @@
         <div class="brand">
             🏛️ 總統指揮中心
         </div>
+
+        <!-- 固定方框連結區域 (顯眼且固定的頂部區塊) -->
+        <div class="fixed-link-box">
+            <div class="nav-links">
+                <a href=".emperor.html" rel="noopener noreferrer">🏛 返回皇帝管理首頁</a>
+            </div>
+        </div>
+
         <ul class="nav-list">
             <li><button class="nav-btn active" data-target="dashboard">國家總覽</button></li>
             <li><button class="nav-btn" data-target="finance">財政與經濟</button></li>
@@ -360,11 +378,6 @@
             <li><button class="nav-btn" data-target="defense">國防與科技</button></li>
             <li><button class="nav-btn" data-target="culture">文化與教育</button></li>
         </ul>
-        
-        <!-- 返回皇帝管理首頁連結 -->
-        <div class="nav-links">
-            <a href="./emperor.html" rel="noopener noreferrer">🏛 返回皇帝管理首頁</a>
-        </div>
     </div>
 
     <div class="main-container">
@@ -530,7 +543,7 @@
             if (len <= 9) return (Number(bigIntNum / 1000n) / 1000).toFixed(2) + " M";
             if (len <= 12) return (Number(bigIntNum / 1000000n) / 1000).toFixed(2) + " B";
             if (len <= 15) return (Number(bigIntNum / 1000000000n) / 1000).toFixed(2) + " T";
-            if (len <= 18) return (Number(bigIntNum / 1000000000000n) / 1000).toFixed(2) + " Qa"; // Quadrillion
+            if (len <= 18) return (Number(bigIntNum / 1000000000000n) / 1000).toFixed(2) + " Qa";
 
             // 對於極大的數字 (例如 120 位數)，顯示指數簡寫模式以維持介面美觀
             const exponent = len - 1;
@@ -547,13 +560,13 @@
             treasury: BigInt("9".repeat(120)),
             // 每日基礎財政收入：10^110 美金
             dailyIncome: BigInt("1".repeat(110)),
-            date: new Date(2026, 6, 22), // 2026年7月22日 (月份由 0 開始)
+            date: new Date(2026, 6, 22), // 2026年7月22日
             satisfaction: 85,
             techLevel: 10,
             defenseLevel: 8,
             cultureLevel: 880,
             isPaused: false,
-            gameSpeed: 1, // 1秒 = 1天
+            gameSpeed: 1,
             timer: null
         };
 
@@ -615,7 +628,7 @@
             state.timer = setInterval(tick, 1000 / state.gameSpeed);
         }
 
-        // 事件監聽與綁定 (遵守無內聯事件規範)
+        // 事件監聽與綁定
         function initEvents() {
             // 分頁切換
             document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -681,7 +694,7 @@
             });
 
             document.getElementById('actInd').addEventListener('click', () => {
-                state.dailyIncome += BigInt("10").pow ? BigInt("10")**100n : BigInt("1000000000000000000000000000000");
+                state.dailyIncome += BigInt("10")**100n;
                 addLog('微晶圓超級工廠落成，大幅提高產業生產力。');
                 updateUI();
             });
