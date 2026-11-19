@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>公司經營遊戲｜京級美金版</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="referrer" content="no-referrer">
+
+<style>
+*{box-sizing:border-box;}
+html, body{
+    margin:0;
+    padding:0;
+    height:100%;
+    font-family:"Microsoft JhengHei",sans-serif;
+    background:linear-gradient(135deg,#fff3e0,#ffe0b2);
+    color:#333;
+    overflow:hidden;
+}
+body{
+    display:flex;
+    flex-direction:column;
+}
+header{
+    flex-shrink:0;
+    background:linear-gradient(90deg,#ff9800,#ffb74d);
+    color:white;
+    text-align:center;
+    padding:8px 8px;
+    font-size:14px;
+    font-weight:bold;
+    z-index:10;
+}
+.header-stats{
+    line-height:1.4;
+}
+.header-actions{
+    margin-top:6px;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+    gap:4px;
+    font-size:11px;
+    font-weight:normal;
+}
+.save-status{
+    background:rgba(255,255,255,0.25);
+    padding:3px 7px;
+    border-radius:6px;
+}
+.container{
+    flex:1;
+    min-height:0;
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:6px;
+    padding:6px;
+}
+.panel{
+    min-width:0;
+    min-height:0;
+    width:100%;
+    height:100%;
+    background:#fff8e1;
+    border-radius:10px;
+    padding:6px;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    box-shadow:0 2px 8px rgba(0,0,0,0.12);
+}
+h3{
+    color:#e65100;
+    margin:0 0 6px 0;
+    font-size:13px;
+    position:sticky;
+    top:0;
+    background:#fff8e1;
+    padding:4px 0;
+    z-index:2;
+    border-bottom:1px solid #ffe0b2;
+}
+.card{
+    background:#fff3e0;
+    border:1px solid #ffd180;
+    padding:6px;
+    margin-bottom:6px;
+    border-radius:8px;
+    font-size:11px;
+}
+.card-line{
+    margin-bottom:4px;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+}
+.card-title{
+    font-weight:bold;
+    margin-bottom:4px;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+}
+.btn-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+    margin-top:6px;
+}
+button{
+    flex-shrink:0;
+    white-space:nowrap;
+    background-color:#ff9800;
+    border:1px solid #e65100;
+    color:#ffffff;
+    opacity:1;
+    padding:5px 7px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:11px;
+    line-height:1.2;
+}
+button:hover{background-color:#f57c00;}
+button:disabled{
+    background-color:#ccc;
+    border-color:#aaa;
+    color:#666;
+    cursor:not-allowed;
+}
+.rd-btn{
+    display:block;
+    width:100%;
+    background-color:#e65100 !important;
+    border:1px solid #bf360c !important;
+    color:#ffffff !important;
+    opacity:1 !important;
+    font-weight:bold;
+    text-align:center;
+    padding:6px 4px;
+    border-radius:6px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.rd-btn:hover{
+    background-color:#bf360c !important;
+}
+.batch-btn{
+    background-color:#ef6c00;
+    font-weight:bold;
+    width:100%;
+    margin-top:4px;
+}
+.batch-btn:hover{
+    background-color:#e65100;
+}
+.save-btn{
+    background-color:#2e7d32;
+    border-color:#1b5e20;
+    font-weight:bold;
+}
+.save-btn:hover{
+    background-color:#1b5e20;
+}
+.io-btn{
+    background-color:#5d4037;
+    border-color:#3e2723;
+    font-weight:bold;
+}
+.io-btn:hover{
+    background-color:#3e2723;
+}
+.reset-btn{
+    background-color:#c62828;
+    border-color:#8e0000;
+    font-weight:bold;
+}
+.reset-btn:hover{
+    background-color:#8e0000;
+}
+.toolbar-box{
+    margin-bottom:8px;
+    padding:6px;
+    background:#ffe0b2;
+    border-radius:8px;
+    font-size:11px;
+}
+.small{font-size:10px;color:#555;}
+.money{color:#d84315;font-weight:bold;}
+.speed{color:#2e7d32;font-weight:bold;}
+.edu-tag{color:#1565c0;font-weight:bold;}
+.modal-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:12px;
+}
+.modal-box{
+    background:#fff8e1;
+    color:#333;
+    width:100%;
+    max-width:520px;
+    border-radius:12px;
+    padding:14px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.3);
+}
+.modal-box h4{
+    margin:0 0 8px 0;
+    color:#e65100;
+    font-size:16px;
+}
+.modal-box textarea{
+    width:100%;
+    height:150px;
+    padding:8px;
+    border-radius:8px;
+    border:1px solid #ffb74d;
+    font-family:monospace;
+    font-size:12px;
+    resize:vertical;
+    background:#fff;
+    color:#222;
+}
+.modal-actions{
+    margin-top:10px;
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+}
+@media (min-width: 768px){
+    header{font-size:18px;padding:12px 14px;}
+    .header-actions{font-size:13px;gap:8px;}
+    .container{gap:10px;padding:10px;}
+    .panel{padding:10px;border-radius:14px;}
+    h3{font-size:16px;padding:6px 0;}
+    .card{padding:10px;font-size:14px;border-radius:12px;}
+    .toolbar-box{padding:10px;font-size:13px;border-radius:12px;}
+    button{font-size:13px;padding:6px 10px;}
+    .rd-btn{width:auto;display:inline-block;padding:6px 12px;}
+    .small{font-size:12px;}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-stats">
+        🏢 公司經營遊戲｜
+        💵 總資產：<span id="money"></span>｜
+        👥 人員：<span id="empCount"></span>｜
+        🏆 Lv：<span id="companyLv"></span>
+    </div>
+    <div class="header-actions">
+        <span class="save-status" id="saveStatus">💾 自動存檔</span>
+        <button class="save-btn" id="manualSaveBtn" type="button">手動存檔</button>
+        <button class="io-btn" id="exportSaveBtn" type="button">匯出存檔</button>
+        <button class="io-btn" id="importSaveBtn" type="button">匯入存檔</button>
+        <button class="reset-btn" id="resetGameBtn" type="button">重置遊戲</button>
+    </div>
+</header>
+
+<div class="modal-backdrop" id="saveIoModal" role="dialog" aria-modal="true" aria-labelledby="ioModalTitle">
+    <div class="modal-box">
+        <h4 id="ioModalTitle">存檔備份</h4>
+        <div class="small" id="ioModalDesc" style="margin-bottom:8px;"></div>
+        <textarea id="ioTextarea" placeholder="請在此貼上或複製存檔備份字串..."></textarea>
+        <div class="modal-actions" id="ioModalActions"></div>
+    </div>
+</div>
+
+<div class="container">
+
+<div class="panel" id="leftPanel">
+    <h3>🏭 產業大樓</h3>
+    <div class="toolbar-box">
+        <b>🏗️ 產業管理</b>
+        <button class="batch-btn" id="upgradeAllIndBtn" type="button">一鍵升級全部產業</button>
+    </div>
+    <div id="industries"></div>
+</div>
+
+<div class="panel" id="centerPanel">
+    <h3>👥 員工管理</h3>
+    <div class="toolbar-box">
+        <b>📝 招聘：1000萬</b><br>
+        <button class="batch-btn" id="recruitBtn" type="button">招聘新員工</button>
+        <button class="batch-btn" id="aiAssignAllBtn" type="button">一鍵AI分配全部</button>
+        <button class="batch-btn" id="trainAllBtn" type="button">一鍵訓練全部</button>
+    </div>
+    <div id="employees"></div>
+</div>
+
+<div class="panel" id="rightPanel">
+    <h3>🚀 科技專案</h3>
+    <div id="projects"></div>
+</div>
+
+</div>
+
+<script>
+"use strict";
+
+const SAVE_KEY = "company_game_rd_btn_v2";
+const DEFAULT_EMP_COUNT = 40;
+const RECRUIT_COST = 10000000n;
+const BASE_UPGRADE_COST = 20000000000000000n;
+
+const SURNAMES = ["王","李","張","林","陳","黃","楊","吳","劉","蔡","鄭","許","郭","謝"];
+const MIDNAMES = ["志","雅","俊","美","冠","柏","家","琇","承","亞","欣","佩","哲","思","子","佳"];
+const ENDNAMES = ["真","婷","宏","玲","傑","翰","雯","惠","華","安","琪","君","庭","翔","明","強"];
+const TRAITS = ["⚡效率","🧠商業","🛠技術"];
+
+const INDUSTRY_ICONS = {
+    "學校教育":       "🎓",
+    "奶茶店":         "🧋",
+    "大賣場":         "🛒",
+    "電影院":         "🎬",
+    "美容館":         "💆",
+    "飯店":           "🏨",
+    "醫院":           "🏥",
+    "網吧":           "💻",
+    "智慧手機專賣店": "📱",
+    "物流中心":       "🚚",
+    "銀行":           "🏦",
+    "建設公司":       "🏗️",
+    "科技園區":       "🌆"
+};
+
+let money = 0n;
+let nextEmpId = 0;
+let renderLock = false;
+let employees = [];
+let industries = {};
+let projects = [];
+let lastEduSummary = "無在職";
+const usedNames = new Set();
+
+function createEl(tag, className, text){
+    const el = document.createElement(tag);
+    if(className) el.className = className;
+    if(typeof text === "string") el.textContent = text;
+    return el;
+}
+
+function appendLine(parent, text, className){
+    const div = createEl("div", className || "card-line", text);
+    parent.appendChild(div);
+    return div;
+}
+
+function createInitialIndustries(){
+    return {
+        "學校教育": {lv:1, cap:5, emp:[], base:1.5e16},
+        "奶茶店":   {lv:1, cap:5, emp:[], base:3e15},
+        "大賣場":   {lv:1, cap:5, emp:[], base:5e15},
+        "電影院":   {lv:1, cap:5, emp:[], base:8e15},
+        "美容館":   {lv:1, cap:5, emp:[], base:6e15},
+        "飯店":     {lv:1, cap:5, emp:[], base:1e16},
+        "醫院":     {lv:1, cap:5, emp:[], base:2e16},
+        "網吧":     {lv:1, cap:5, emp:[], base:7e15}
+    };
+}
+
+function createInitialProjects(){
+    return [
+        {name:"📱智慧手機", cost:1e16, prog:0, unlock:"智慧手機專賣店"},
+        {name:"🚲腳踏車AI", cost:5e16, prog:0, unlock:"物流中心"},
+        {name:"💱數位貨幣", cost:2e17, prog:0, unlock:"銀行"},
+        {name:"🏠房地產AI", cost:5e17, prog:0, unlock:"建設公司"},
+        {name:"🚗無人車AI", cost:2e18, prog:0, unlock:"科技園區"}
+    ];
+}
+
+function makeName(){
+    let name = "";
+    let guard = 0;
+    do{
+        name =
+            SURNAMES[Math.floor(Math.random() * SURNAMES.length)] +
+            MIDNAMES[Math.floor(Math.random() * MIDNAMES.length)] +
+            ENDNAMES[Math.floor(Math.random() * ENDNAMES.length)];
+        guard++;
+    }while(usedNames.has(name) && guard < 2000);
+
+    if(usedNames.has(name)){
+        name = `${name}_${nextEmpId + 1}`;
+    }
+
+    usedNames.add(name);
+    return name;
+}
+
+function randomTrait(){
+    return TRAITS[Math.floor(Math.random() * TRAITS.length)];
+}
+
+function createEmployeeObj(){
+    return {
+        id: nextEmpId++,
+        name: makeName(),
+        lv: 1,
+        exp: 0,
+        energy: 100,
+        kp: 0,
+        trait: randomTrait(),
+        industry: null
+    };
+}
+
+function initNewGameState(){
+    money = BigInt("9".repeat(120));
+    nextEmpId = 0;
+    usedNames.clear();
+    industries = createInitialIndustries();
+    projects = createInitialProjects();
+    employees = Array.from({length: DEFAULT_EMP_COUNT}, () => createEmployeeObj());
+    lastEduSummary = "無在職";
+}
+
+function formatTimeLabel(date = new Date()){
+    return date.toTimeString().slice(0, 8);
+}
+
+function updateSaveStatus(text){
+    const el = document.getElementById("saveStatus");
+    if(el) el.textContent = text;
+}
+
+function toBigIntAmount(n){
+    if(typeof n === "bigint") return n;
+    if(typeof n === "number"){
+        if(!Number.isFinite(n) || n <= 0) return 0n;
+        return BigInt(Math.floor(n));
+    }
+    return BigInt(String(n));
+}
+
+function formatMoney(n){
+    const val = BigInt(n);
+    const trillion = 10n ** 12n;
+    const quadrillion = 10n ** 16n;
+    const quintillion = 10n ** 20n;
+
+    if(val >= quintillion) return `US$ ${Number(val / quintillion)} 垓`;
+    if(val >= quadrillion) return `US$ ${Number(val / quadrillion)} 京`;
+    if(val >= trillion) return `US$ ${Number(val / trillion)} 兆`;
+    if(val >= 10n ** 8n) return `US$ ${Number(val / (10n ** 8n))} 億`;
+    if(val >= 10n ** 4n) return `US$ ${Number(val / (10n ** 4n))} 萬`;
+
+    return `US$ ${val.toString()}`;
+}
+
+function formatSpeed(n){
+    return `${formatMoney(n)}/秒`;
+}
+
+function fastRender(){
+    if(renderLock) return;
+    renderLock = true;
+    requestAnimationFrame(() => {
+        renderLock = false;
+        renderAll();
+    });
+}
+
+function companyLv(){
+    return Math.max(1, Math.floor(money.toString().length / 2));
+}
+
+function getIndustryIncome(ind){
+    return toBigIntAmount(ind.emp.length) * toBigIntAmount(ind.lv) * toBigIntAmount(ind.base);
+}
+
+function getUpgradeCost(ind){
+    return toBigIntAmount(ind.lv) * BASE_UPGRADE_COST;
+}
+
+function buildSavePayload(){
+    const serializedIndustries = {};
+    for(const k of Object.keys(industries)){
+        const ind = industries[k];
+        serializedIndustries[k] = {
+            lv: ind.lv,
+            cap: ind.cap,
+            base: ind.base,
+            empIds: ind.emp.map((e) => e.id)
+        };
+    }
+
+    return {
+        version: 1,
+        savedAt: new Date().toISOString(),
+        money: money.toString(),
+        nextEmpId,
+        usedNames: Array.from(usedNames),
+        employees,
+        industries: serializedIndustries,
+        projects,
+        lastEduSummary
+    };
+}
+
+function applySaveData(data){
+    if(!data || typeof data !== "object") return false;
+    if(!Array.isArray(data.employees) || !data.industries || typeof data.industries !== "object"){
+        return false;
+    }
+
+    const rawMoney = String(data.money ?? ("9".repeat(120))).trim();
+    if(!/^-?\d+$/.test(rawMoney)) return false;
+    const parsedMoney = BigInt(rawMoney);
+
+    money = parsedMoney;
+    usedNames.clear();
+
+    employees = data.employees.map((e, idx) => {
+        const empName = typeof e.name === "string" && e.name.trim() ? e.name.trim() : `員工_${idx + 1}`;
+        usedNames.add(empName);
+        return {
+            id: typeof e.id === "number" && Number.isFinite(e.id) ? e.id : idx,
+            name: empName,
+            lv: Math.max(1, Number(e.lv) || 1),
+            exp: Math.max(0, Number(e.exp) || 0),
+            energy: typeof e.energy === "number" && Number.isFinite(e.energy) ? e.energy : 100,
+            kp: Math.max(0, Number(e.kp) || 0),
+            trait: typeof e.trait === "string" ? e.trait : randomTrait(),
+            industry: null
+        };
+    });
+
+    if(Array.isArray(data.usedNames)){
+        data.usedNames.forEach((n) => {
+            if(typeof n === "string" && n.trim()) usedNames.add(n.trim());
+        });
+    }
+
+    const maxId = employees.reduce((m, e) => Math.max(m, e.id), -1);
+    nextEmpId = typeof data.nextEmpId === "number" && Number.isFinite(data.nextEmpId)
+        ? Math.max(data.nextEmpId, maxId + 1)
+        : maxId + 1;
+
+    const empMap = new Map(employees.map((e) => [e.id, e]));
+    const restoredIndustries = {};
+
+    for(const k of Object.keys(data.industries)){
+        if(k === "__proto__" || k === "constructor" || k === "prototype") continue;
+        const savedInd = data.industries[k];
+        if(!savedInd || typeof savedInd !== "object") continue;
+
+        const empList = [];
+        if(Array.isArray(savedInd.empIds)){
+            savedInd.empIds.forEach((eid) => {
+                const empObj = empMap.get(eid);
+                if(empObj && !empList.some((x) => x.id === eid)){
+                    empObj.industry = k;
+                    empList.push(empObj);
+                }
+            });
+        }
+
+        restoredIndustries[k] = {
+            lv: Math.max(1, Number(savedInd.lv) || 1),
+            cap: Math.max(1, Number(savedInd.cap) || 5),
+            emp: empList,
+            base: Number(savedInd.base) > 0 ? Number(savedInd.base) : 3e15
+        };
+    }
+
+    const defaults = createInitialIndustries();
+    for(const k of Object.keys(defaults)){
+        if(!restoredIndustries[k]){
+            restoredIndustries[k] = defaults[k];
+        }
+    }
+    industries = restoredIndustries;
+
+    projects = Array.isArray(data.projects) && data.projects.length > 0
+        ? data.projects.map((p) => ({
+            name: typeof p.name === "string" ? p.name : "科技專案",
+            cost: Number(p.cost) > 0 ? Number(p.cost) : 1e16,
+            prog: Math.min(100, Math.max(0, Number(p.prog) || 0)),
+            unlock: typeof p.unlock === "string" ? p.unlock : ""
+        }))
+        : createInitialProjects();
+
+    if(typeof data.lastEduSummary === "string"){
+        lastEduSummary = data.lastEduSummary;
+    }
+
+    return true;
+}
+
+function encodeBackupString(payload){
+    const jsonStr = JSON.stringify(payload);
+    const bytes = new TextEncoder().encode(jsonStr);
+    let bin = "";
+    for(let i = 0; i < bytes.length; i++){
+        bin += String.fromCharCode(bytes[i]);
+    }
+    return btoa(bin);
+}
+
+function decodeBackupString(input){
+    const trimmed = String(input || "").trim();
+    if(!trimmed || trimmed.length > 2000000){
+        throw new Error("無效長度");
+    }
+
+    if(trimmed.startsWith("{")){
+        return JSON.parse(trimmed);
+    }
+
+    const bin = atob(trimmed);
+    const bytes = new Uint8Array(bin.length);
+    for(let i = 0; i < bin.length; i++){
+        bytes[i] = bin.charCodeAt(i);
+    }
+    const jsonStr = new TextDecoder().decode(bytes);
+    return JSON.parse(jsonStr);
+}
+
+function closeIoModal(){
+    const modal = document.getElementById("saveIoModal");
+    if(modal) modal.style.display = "none";
+}
+
+function openExportModal(){
+    saveGame(false);
+    const payload = buildSavePayload();
+    const encoded = encodeBackupString(payload);
+
+    document.getElementById("ioModalTitle").textContent = "📤 匯出遊戲存檔";
+    document.getElementById("ioModalDesc").textContent = "請複製下方備份字串妥善保存；之後可使用「匯入存檔」還原進度。";
+    const ta = document.getElementById("ioTextarea");
+    ta.readOnly = true;
+    ta.value = encoded;
+
+    const actions = document.getElementById("ioModalActions");
+    actions.replaceChildren();
+
+    const copyBtn = createEl("button", "save-btn", "一鍵複製");
+    copyBtn.type = "button";
+    copyBtn.addEventListener("click", () => {
+        ta.select();
+        if(navigator.clipboard && navigator.clipboard.writeText){
+            navigator.clipboard.writeText(ta.value).then(() => {
+                alert("✅ 已複製存檔備份字串到剪貼簿！");
+            }).catch(() => {
+                alert("✅ 已全選備份字串，請按 Ctrl+C / Cmd+C 複製。");
+            });
+        }else{
+            alert("✅ 已全選備份字串，請按 Ctrl+C / Cmd+C 複製。");
+        }
+    });
+
+    const closeBtn = createEl("button", "", "關閉");
+    closeBtn.type = "button";
+    closeBtn.addEventListener("click", closeIoModal);
+
+    actions.appendChild(copyBtn);
+    actions.appendChild(closeBtn);
+
+    document.getElementById("saveIoModal").style.display = "flex";
+    ta.focus();
+    ta.select();
+}
+
+function openImportModal(){
+    document.getElementById("ioModalTitle").textContent = "📥 匯入遊戲存檔";
+    document.getElementById("ioModalDesc").textContent = "請將先前匯出的存檔字串貼入下方，確認後將覆蓋目前進度並自動存檔。";
+    const ta = document.getElementById("ioTextarea");
+    ta.readOnly = false;
+    ta.value = "";
+
+    const actions = document.getElementById("ioModalActions");
+    actions.replaceChildren();
+
+    const confirmBtn = createEl("button", "save-btn", "確認匯入");
+    confirmBtn.type = "button";
+    confirmBtn.addEventListener("click", confirmImportBackup);
+
+    const cancelBtn = createEl("button", "", "取消");
+    cancelBtn.type = "button";
+    cancelBtn.addEventListener("click", closeIoModal);
+
+    actions.appendChild(confirmBtn);
+    actions.appendChild(cancelBtn);
+
+    document.getElementById("saveIoModal").style.display = "flex";
+    ta.focus();
+}
+
+function confirmImportBackup(){
+    const rawText = document.getElementById("ioTextarea").value;
+    try{
+        const data = decodeBackupString(rawText);
+        if(!applySaveData(data)){
+            return alert("⚠️ 存檔格式不完整，無法匯入！");
+        }
+        saveGame(false);
+        updateSaveStatus(`📥 已匯入：${formatTimeLabel()}`);
+        closeIoModal();
+        fastRender();
+        alert("✅ 存檔匯入成功！");
+    }catch(err){
+        console.error("匯入存檔失敗：", err);
+        alert("⚠️ 存檔字串無效或已損毀，請確認是否完整複製。");
+    }
+}
+
+function saveGame(showAlert = false){
+    try{
+        const payload = buildSavePayload();
+        localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+        updateSaveStatus(`💾 已存：${formatTimeLabel()}`);
+        if(showAlert) alert("✅ 遊戲進度已手動存檔！");
+    }catch(err){
+        console.error("存檔失敗：", err);
+        updateSaveStatus("⚠️ 存檔失敗");
+        if(showAlert) alert("⚠️ 存檔失敗，可能是瀏覽器儲存空間不足。");
+    }
+}
+
+function loadGame(){
+    try{
+        const raw = localStorage.getItem(SAVE_KEY);
+        if(!raw) return false;
+
+        const data = JSON.parse(raw);
+        if(!applySaveData(data)) return false;
+
+        if(data.savedAt){
+            updateSaveStatus(`💾 已讀：${formatTimeLabel(new Date(data.savedAt))}`);
+        }
+        return true;
+    }catch(err){
+        console.error("讀取存檔失敗：", err);
+        return false;
+    }
+}
+
+function resetGame(){
+    if(!confirm("確定要重置遊戲嗎？目前的存檔與進度將會清除，並恢復預設 40 名工作人員。")) return;
+    localStorage.removeItem(SAVE_KEY);
+    initNewGameState();
+    saveGame(false);
+    updateSaveStatus(`🔄 已重置：${formatTimeLabel()}`);
+    fastRender();
+}
+
+function renderIndustry(){
+    const container = document.getElementById("industries");
+    container.replaceChildren();
+
+    for(const k of Object.keys(industries)){
+        const ind = industries[k];
+        const income = getIndustryIncome(ind);
+        const upCost = getUpgradeCost(ind);
+        const icon = INDUSTRY_ICONS[k] || "🏬";
+
+        const card = createEl("div", "card");
+        createEl("div", "card-title", `${icon} ${k} Lv.${ind.lv} (${ind.emp.length}/${ind.cap})`);
+        appendLine(card, `💹 轉速：${formatSpeed(income)}`, "card-line speed");
+        appendLine(card, `💵 產值：${formatMoney(toBigIntAmount(ind.base))}`);
+        appendLine(card, `🔧 升級：${formatMoney(upCost)}`, "card-line money");
+
+        if(k === "學校教育"){
+            const gainPerTick = ind.emp.length * 10 + ind.lv * 5;
+            appendLine(
+                card,
+                `🎓 每5秒培育+${gainPerTick}EXP（${lastEduSummary}）`,
+                "card-line small edu-tag"
+            );
+        }
+
+        const btnRow = createEl("div", "btn-row");
+        const upBtn = createEl("button", "", "升級產業");
+        upBtn.type = "button";
+        upBtn.addEventListener("click", () => upgradeInd(k));
+        btnRow.appendChild(upBtn);
+        card.appendChild(btnRow);
+
+        container.appendChild(card);
+    }
+}
+
+function renderEmployee(){
+    const container = document.getElementById("employees");
+    container.replaceChildren();
+
+    [...employees].sort((a, b) => b.kp - a.kp).forEach((e) => {
+        const card = createEl("div", "card");
+        createEl("div", "card-title", `${e.name} Lv.${e.lv} ${e.trait}`);
+        appendLine(card, `⚡ 能量：${e.energy}｜✨ EXP：${e.exp}/100`);
+        appendLine(card, `📈 KPI：${e.kp}`);
+        appendLine(card, `🏢 部門：${e.industry || "待命"}`);
+
+        const btnRow = createEl("div", "btn-row");
+        const trainBtn = createEl("button", "", "訓練");
+        trainBtn.type = "button";
+        trainBtn.addEventListener("click", () => train(e.id));
+
+        const assignBtn = createEl("button", "", "AI分配");
+        assignBtn.type = "button";
+        assignBtn.addEventListener("click", () => aiAssign(e.id));
+
+        btnRow.appendChild(trainBtn);
+        btnRow.appendChild(assignBtn);
+        card.appendChild(btnRow);
+        container.appendChild(card);
+    });
+}
+
+function renderProject(){
+    const container = document.getElementById("projects");
+    container.replaceChildren();
+
+    projects.forEach((p, i) => {
+        const unlocked = Boolean(industries[p.unlock]);
+        const card = createEl("div", "card");
+        createEl("div", "card-title", p.name);
+        appendLine(card, `💰 成本：${formatMoney(toBigIntAmount(p.cost))}`, "card-line money");
+        appendLine(card, `📊 進度：${p.prog}%`);
+        appendLine(card, `🔓 解鎖：${p.unlock}${unlocked ? " ✅" : ""}`);
+
+        const btnRow = createEl("div", "btn-row");
+        const workBtn = createEl("button", "rd-btn", p.prog >= 100 && unlocked ? "繼續研發" : "研發");
+        workBtn.type = "button";
+        workBtn.addEventListener("click", () => work(i));
+        btnRow.appendChild(workBtn);
+        card.appendChild(btnRow);
+
+        container.appendChild(card);
+    });
+}
+
+function renderAll(){
+    document.getElementById("money").textContent = formatMoney(money);
+    document.getElementById("empCount").textContent = String(employees.length);
+    document.getElementById("companyLv").textContent = String(companyLv());
+    renderIndustry();
+    renderEmployee();
+    renderProject();
+}
+
+function recruitEmployee(){
+    if(money < RECRUIT_COST) return alert("資金不足");
+    money -= RECRUIT_COST;
+    employees.push(createEmployeeObj());
+    fastRender();
+}
+
+function findAvailableIndustry(){
+    for(const k of Object.keys(industries)){
+        if(industries[k].emp.length < industries[k].cap){
+            return k;
+        }
+    }
+    return null;
+}
+
+function aiAssign(id){
+    const e = employees.find((x) => x.id === id);
+    if(!e) return;
+
+    const best = findAvailableIndustry();
+    if(!best) return alert("目前所有產業人數皆已滿編！");
+
+    for(const k of Object.keys(industries)){
+        industries[k].emp = industries[k].emp.filter((x) => x.id !== id);
+    }
+
+    industries[best].emp.push(e);
+    e.industry = best;
+    fastRender();
+}
+
+function aiAssignAll(){
+    let assignedCount = 0;
+
+    for(const e of employees){
+        if(e.industry && industries[e.industry]){
+            continue;
+        }
+
+        const best = findAvailableIndustry();
+        if(!best) break;
+
+        for(const k of Object.keys(industries)){
+            industries[k].emp = industries[k].emp.filter((x) => x.id !== e.id);
+        }
+
+        industries[best].emp.push(e);
+        e.industry = best;
+        assignedCount++;
+    }
+
+    if(assignedCount === 0){
+        alert("沒有可分配的新空缺（可能所有員工皆已分配或產業已滿編）。");
+    }
+
+    fastRender();
+}
+
+function addExpToEmployee(e, expGain, kpGain = 0){
+    e.exp += expGain;
+    e.kp += kpGain;
+    let leveled = 0;
+
+    while(e.exp >= 100){
+        e.lv++;
+        e.exp -= 100;
+        leveled++;
+    }
+    return leveled;
+}
+
+function applyTrainGain(e){
+    addExpToEmployee(e, 25, 5);
+}
+
+function train(id){
+    const e = employees.find((x) => x.id === id);
+    if(!e) return;
+    applyTrainGain(e);
+    fastRender();
+}
+
+function trainAll(){
+    if(employees.length === 0) return alert("目前沒有員工可訓練！");
+    for(const e of employees){
+        applyTrainGain(e);
+    }
+    fastRender();
+}
+
+function runSchoolEducationTick(){
+    const edu = industries["學校教育"];
+    if(!edu || edu.emp.length === 0){
+        lastEduSummary = "無在職";
+        return;
+    }
+
+    const staffGain = edu.emp.length * 15 + edu.lv * 8;
+    const allStaffGain = edu.emp.length * 8 + edu.lv * 4;
+    let levelUpCount = 0;
+
+    edu.emp.forEach((staff) => {
+        const empObj = employees.find((x) => x.id === staff.id);
+        if(empObj){
+            levelUpCount += addExpToEmployee(empObj, staffGain, 2);
+        }
+    });
+
+    employees.forEach((emp) => {
+        levelUpCount += addExpToEmployee(emp, allStaffGain, 1);
+    });
+
+    lastEduSummary = `${formatTimeLabel()} 培育${employees.length}人${levelUpCount > 0 ? ` 升${levelUpCount}級` : ""}`;
+    fastRender();
+}
+
+function applySingleIndustryUpgrade(ind){
+    const cost = getUpgradeCost(ind);
+    if(money < cost) return false;
+
+    money -= cost;
+    ind.lv++;
+    ind.cap++;
+    ind.base = ind.base * 1.6;
+    return true;
+}
+
+function upgradeInd(name){
+    const ind = industries[name];
+    if(!ind) return;
+
+    if(!applySingleIndustryUpgrade(ind)){
+        return alert("資金不足");
+    }
+
+    fastRender();
+}
+
+function upgradeAllInd(){
+    let upgradedCount = 0;
+
+    for(const k of Object.keys(industries)){
+        if(applySingleIndustryUpgrade(industries[k])){
+            upgradedCount++;
+        }
+    }
+
+    if(upgradedCount === 0){
+        return alert("目前資金不足以升級任何產業！");
+    }
+
+    fastRender();
+}
+
+function work(i){
+    const p = projects[i];
+    if(!p) return;
+
+    const cost = toBigIntAmount(p.cost);
+    if(money < cost) return alert("資金不足");
+
+    money -= cost;
+    p.prog = Math.min(100, p.prog + 20);
+
+    if(p.prog >= 100 && p.unlock && !industries[p.unlock]){
+        industries[p.unlock] = {lv:1, cap:5, emp:[], base:3e16};
+        alert(`🔥解鎖產業：${p.unlock}`);
+    }
+
+    employees.forEach((e) => {
+        e.energy = Math.min(100, e.energy + 5);
+        e.kp++;
+    });
+
+    fastRender();
+}
+
+function bindStaticEvents(){
+    document.getElementById("manualSaveBtn").addEventListener("click", () => saveGame(true));
+    document.getElementById("exportSaveBtn").addEventListener("click", openExportModal);
+    document.getElementById("importSaveBtn").addEventListener("click", openImportModal);
+    document.getElementById("resetGameBtn").addEventListener("click", resetGame);
+    document.getElementById("upgradeAllIndBtn").addEventListener("click", upgradeAllInd);
+    document.getElementById("recruitBtn").addEventListener("click", recruitEmployee);
+    document.getElementById("aiAssignAllBtn").addEventListener("click", aiAssignAll);
+    document.getElementById("trainAllBtn").addEventListener("click", trainAll);
+}
+
+setInterval(() => {
+    let totalIncome = 0n;
+    for(const k of Object.keys(industries)){
+        totalIncome += getIndustryIncome(industries[k]);
+    }
+    money += totalIncome;
+    fastRender();
+}, 500);
+
+setInterval(() => {
+    runSchoolEducationTick();
+}, 5000);
+
+setInterval(() => {
+    saveGame(false);
+}, 10000);
+
+bindStaticEvents();
+if(!loadGame()){
+    initNewGameState();
+}
+renderAll();
+</script>
+</body>
+</html>
