@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>公司經營遊戲｜京級美金版</title>
+<title>公司經營模擬</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="no-referrer">
@@ -90,13 +90,21 @@ h3{
     border-radius:8px;
     font-size:11px;
 }
-.card-line{
-    margin-bottom:4px;
+.card-title{
+    display:block;
+    background:#ffe0b2;
+    color:#bf360c;
+    font-weight:bold;
+    font-size:11px;
     line-height:1.35;
+    padding:4px 5px;
+    border-radius:6px;
+    margin-bottom:5px;
+    min-height:18px;
     overflow-wrap:anywhere;
 }
-.card-title{
-    font-weight:bold;
+.card-line{
+    display:block;
     margin-bottom:4px;
     line-height:1.35;
     overflow-wrap:anywhere;
@@ -110,7 +118,7 @@ h3{
 button{
     flex-shrink:0;
     white-space:nowrap;
-    background-color:#ff9800;
+    background:#ff9800;
     border:1px solid #e65100;
     color:#ffffff;
     opacity:1;
@@ -120,9 +128,9 @@ button{
     font-size:11px;
     line-height:1.2;
 }
-button:hover{background-color:#f57c00;}
+button:hover{background:#f57c00;}
 button:disabled{
-    background-color:#ccc;
+    background:#ccc;
     border-color:#aaa;
     color:#666;
     cursor:not-allowed;
@@ -130,51 +138,50 @@ button:disabled{
 .rd-btn{
     display:block;
     width:100%;
-    background-color:#e65100 !important;
-    border:1px solid #bf360c !important;
-    color:#ffffff !important;
-    opacity:1 !important;
+    background:#5d4037;
+    border:1px solid #3e2723;
+    color:#ffffff;
+    opacity:1;
     font-weight:bold;
     text-align:center;
     padding:6px 4px;
     border-radius:6px;
-    box-shadow:0 1px 3px rgba(0,0,0,0.2);
 }
 .rd-btn:hover{
-    background-color:#bf360c !important;
+    background:#3e2723;
 }
 .batch-btn{
-    background-color:#ef6c00;
+    background:#ef6c00;
     font-weight:bold;
     width:100%;
     margin-top:4px;
 }
 .batch-btn:hover{
-    background-color:#e65100;
+    background:#e65100;
 }
 .save-btn{
-    background-color:#2e7d32;
+    background:#2e7d32;
     border-color:#1b5e20;
     font-weight:bold;
 }
 .save-btn:hover{
-    background-color:#1b5e20;
+    background:#1b5e20;
 }
 .io-btn{
-    background-color:#5d4037;
+    background:#5d4037;
     border-color:#3e2723;
     font-weight:bold;
 }
 .io-btn:hover{
-    background-color:#3e2723;
+    background:#3e2723;
 }
 .reset-btn{
-    background-color:#c62828;
+    background:#c62828;
     border-color:#8e0000;
     font-weight:bold;
 }
 .reset-btn:hover{
-    background-color:#8e0000;
+    background:#8e0000;
 }
 .toolbar-box{
     margin-bottom:8px;
@@ -236,6 +243,7 @@ button:disabled{
     .panel{padding:10px;border-radius:14px;}
     h3{font-size:16px;padding:6px 0;}
     .card{padding:10px;font-size:14px;border-radius:12px;}
+    .card-title{font-size:14px;padding:6px 8px;}
     .toolbar-box{padding:10px;font-size:13px;border-radius:12px;}
     button{font-size:13px;padding:6px 10px;}
     .rd-btn{width:auto;display:inline-block;padding:6px 12px;}
@@ -303,7 +311,7 @@ button:disabled{
 <script>
 "use strict";
 
-const SAVE_KEY = "company_game_rd_btn_v2";
+const SAVE_KEY = "company_game_labels_fixed_v4";
 const DEFAULT_EMP_COUNT = 40;
 const RECRUIT_COST = 10000000n;
 const BASE_UPGRADE_COST = 20000000000000000n;
@@ -312,22 +320,6 @@ const SURNAMES = ["王","李","張","林","陳","黃","楊","吳","劉","蔡","�
 const MIDNAMES = ["志","雅","俊","美","冠","柏","家","琇","承","亞","欣","佩","哲","思","子","佳"];
 const ENDNAMES = ["真","婷","宏","玲","傑","翰","雯","惠","華","安","琪","君","庭","翔","明","強"];
 const TRAITS = ["⚡效率","🧠商業","🛠技術"];
-
-const INDUSTRY_ICONS = {
-    "學校教育":       "🎓",
-    "奶茶店":         "🧋",
-    "大賣場":         "🛒",
-    "電影院":         "🎬",
-    "美容館":         "💆",
-    "飯店":           "🏨",
-    "醫院":           "🏥",
-    "網吧":           "💻",
-    "智慧手機專賣店": "📱",
-    "物流中心":       "🚚",
-    "銀行":           "🏦",
-    "建設公司":       "🏗️",
-    "科技園區":       "🌆"
-};
 
 let money = 0n;
 let nextEmpId = 0;
@@ -366,12 +358,17 @@ function createInitialIndustries(){
 
 function createInitialProjects(){
     return [
-        {name:"📱智慧手機", cost:1e16, prog:0, unlock:"智慧手機專賣店"},
-        {name:"🚲腳踏車AI", cost:5e16, prog:0, unlock:"物流中心"},
-        {name:"💱數位貨幣", cost:2e17, prog:0, unlock:"銀行"},
-        {name:"🏠房地產AI", cost:5e17, prog:0, unlock:"建設公司"},
-        {name:"🚗無人車AI", cost:2e18, prog:0, unlock:"科技園區"}
+        {name:"智慧手機", cost:1e16, prog:0, unlock:"智慧手機專賣店"},
+        {name:"腳踏車AI", cost:5e16, prog:0, unlock:"物流中心"},
+        {name:"數位貨幣", cost:2e17, prog:0, unlock:"銀行"},
+        {name:"房地產AI", cost:5e17, prog:0, unlock:"建設公司"},
+        {name:"無人車AI", cost:2e18, prog:0, unlock:"科技園區"}
     ];
+}
+
+function cleanProjectName(rawName){
+    const s = String(rawName || "").trim();
+    return s.replace(/^[^\u4e00-\u9fa5A-Za-z0-9]+/, "").trim() || "科技專案";
 }
 
 function makeName(){
@@ -517,7 +514,7 @@ function applySaveData(data){
     usedNames.clear();
 
     employees = data.employees.map((e, idx) => {
-        const empName = typeof e.name === "string" && e.name.trim() ? e.name.trim() : `員工_${idx + 1}`;
+        const empName = typeof e.name === "string" && e.name.trim() ? e.name.trim() : makeName();
         usedNames.add(empName);
         return {
             id: typeof e.id === "number" && Number.isFinite(e.id) ? e.id : idx,
@@ -526,7 +523,7 @@ function applySaveData(data){
             exp: Math.max(0, Number(e.exp) || 0),
             energy: typeof e.energy === "number" && Number.isFinite(e.energy) ? e.energy : 100,
             kp: Math.max(0, Number(e.kp) || 0),
-            trait: typeof e.trait === "string" ? e.trait : randomTrait(),
+            trait: typeof e.trait === "string" && e.trait.trim() ? e.trait : randomTrait(),
             industry: null
         };
     });
@@ -579,7 +576,7 @@ function applySaveData(data){
 
     projects = Array.isArray(data.projects) && data.projects.length > 0
         ? data.projects.map((p) => ({
-            name: typeof p.name === "string" ? p.name : "科技專案",
+            name: cleanProjectName(p.name),
             cost: Number(p.cost) > 0 ? Number(p.cost) : 1e16,
             prog: Math.min(100, Math.max(0, Number(p.prog) || 0)),
             unlock: typeof p.unlock === "string" ? p.unlock : ""
@@ -759,19 +756,22 @@ function renderIndustry(){
         const ind = industries[k];
         const income = getIndustryIncome(ind);
         const upCost = getUpgradeCost(ind);
-        const icon = INDUSTRY_ICONS[k] || "🏬";
 
         const card = createEl("div", "card");
-        createEl("div", "card-title", `${icon} ${k} Lv.${ind.lv} (${ind.emp.length}/${ind.cap})`);
-        appendLine(card, `💹 轉速：${formatSpeed(income)}`, "card-line speed");
-        appendLine(card, `💵 產值：${formatMoney(toBigIntAmount(ind.base))}`);
-        appendLine(card, `🔧 升級：${formatMoney(upCost)}`, "card-line money");
+        const titleEl = createEl("div", "card-title");
+        titleEl.textContent = `${k} Lv.${ind.lv}（用人：${ind.emp.length}/${ind.cap}）`;
+        card.appendChild(titleEl);
+
+        appendLine(card, `用人數量：${ind.emp.length} / ${ind.cap}`);
+        appendLine(card, `轉速：${formatSpeed(income)}`, "card-line speed");
+        appendLine(card, `產值：${formatMoney(toBigIntAmount(ind.base))}`);
+        appendLine(card, `升級：${formatMoney(upCost)}`, "card-line money");
 
         if(k === "學校教育"){
             const gainPerTick = ind.emp.length * 10 + ind.lv * 5;
             appendLine(
                 card,
-                `🎓 每5秒培育+${gainPerTick}EXP（${lastEduSummary}）`,
+                `每5秒培育+${gainPerTick}EXP（${lastEduSummary}）`,
                 "card-line small edu-tag"
             );
         }
@@ -792,11 +792,17 @@ function renderEmployee(){
     container.replaceChildren();
 
     [...employees].sort((a, b) => b.kp - a.kp).forEach((e) => {
+        const displayName = (e.name && String(e.name).trim()) ? String(e.name).trim() : "員工";
+        const displayTrait = (e.trait && String(e.trait).trim()) ? String(e.trait).trim() : "";
+
         const card = createEl("div", "card");
-        createEl("div", "card-title", `${e.name} Lv.${e.lv} ${e.trait}`);
-        appendLine(card, `⚡ 能量：${e.energy}｜✨ EXP：${e.exp}/100`);
-        appendLine(card, `📈 KPI：${e.kp}`);
-        appendLine(card, `🏢 部門：${e.industry || "待命"}`);
+        const titleEl = createEl("div", "card-title");
+        titleEl.textContent = `${displayName} Lv.${e.lv} ${displayTrait}`;
+        card.appendChild(titleEl);
+
+        appendLine(card, `能量：${e.energy}｜EXP：${e.exp}/100`);
+        appendLine(card, `KPI：${e.kp}`);
+        appendLine(card, `部門：${e.industry || "待命"}`);
 
         const btnRow = createEl("div", "btn-row");
         const trainBtn = createEl("button", "", "訓練");
@@ -820,11 +826,16 @@ function renderProject(){
 
     projects.forEach((p, i) => {
         const unlocked = Boolean(industries[p.unlock]);
+        const projTitleText = cleanProjectName(p.name);
+
         const card = createEl("div", "card");
-        createEl("div", "card-title", p.name);
-        appendLine(card, `💰 成本：${formatMoney(toBigIntAmount(p.cost))}`, "card-line money");
-        appendLine(card, `📊 進度：${p.prog}%`);
-        appendLine(card, `🔓 解鎖：${p.unlock}${unlocked ? " ✅" : ""}`);
+        const titleEl = createEl("div", "card-title");
+        titleEl.textContent = projTitleText;
+        card.appendChild(titleEl);
+
+        appendLine(card, `成本：${formatMoney(toBigIntAmount(p.cost))}`, "card-line money");
+        appendLine(card, `進度：${p.prog}%`);
+        appendLine(card, `解鎖：${p.unlock}${unlocked ? "（已解鎖）" : ""}`);
 
         const btnRow = createEl("div", "btn-row");
         const workBtn = createEl("button", "rd-btn", p.prog >= 100 && unlocked ? "繼續研發" : "研發");
@@ -1013,7 +1024,7 @@ function work(i){
 
     if(p.prog >= 100 && p.unlock && !industries[p.unlock]){
         industries[p.unlock] = {lv:1, cap:5, emp:[], base:3e16};
-        alert(`🔥解鎖產業：${p.unlock}`);
+        alert(`解鎖產業：${p.unlock}`);
     }
 
     employees.forEach((e) => {
