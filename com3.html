@@ -2,8 +2,10 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>公司經營遊戲｜京級美金版</title>
+<title>公司經營遊戲｜京級美金版（弱掃合規完整版）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="referrer" content="no-referrer">
 
 <style>
 *{box-sizing:border-box;}
@@ -79,12 +81,15 @@ h3{
     margin-bottom:8px;
     border-radius:12px;
 }
+.card-line{
+    margin-bottom:6px;
+}
 button{
     background:#ff9800;
     border:none;
     color:white;
     padding:6px 10px;
-    margin:3px;
+    margin:3px 3px 0 0;
     border-radius:8px;
     cursor:pointer;
     font-size:13px;
@@ -148,33 +153,18 @@ button:hover{background:#f57c00;}
 .money{color:#d84315;font-weight:bold;}
 .speed{color:#2e7d32;font-weight:bold;}
 .edu-tag{color:#1565c0;font-weight:bold;}
-.badge-high{
+.badge{
     display:inline-block;
-    background:#d32f2f;
     color:#fff;
     padding:2px 7px;
     border-radius:6px;
     font-size:12px;
     font-weight:bold;
+    margin-right:4px;
 }
-.badge-med{
-    display:inline-block;
-    background:#f57c00;
-    color:#fff;
-    padding:2px 7px;
-    border-radius:6px;
-    font-size:12px;
-    font-weight:bold;
-}
-.badge-low{
-    display:inline-block;
-    background:#388e3c;
-    color:#fff;
-    padding:2px 7px;
-    border-radius:6px;
-    font-size:12px;
-    font-weight:bold;
-}
+.badge-high{background:#d32f2f;}
+.badge-med{background:#f57c00;}
+.badge-low{background:#388e3c;}
 .score-bar{
     width:100%;
     height:10px;
@@ -253,14 +243,14 @@ button:hover{background:#f57c00;}
     </div>
     <div class="header-actions">
         <span class="save-status" id="saveStatus">💾 自動存檔已啟用</span>
-        <button class="save-btn" onclick="manualSave()">手動存檔</button>
-        <button class="io-btn" onclick="openExportModal()">匯出存檔</button>
-        <button class="io-btn" onclick="openImportModal()">匯入存檔</button>
-        <button class="reset-btn" onclick="resetGame()">重置遊戲</button>
+        <button class="save-btn" id="manualSaveBtn" type="button">手動存檔</button>
+        <button class="io-btn" id="exportSaveBtn" type="button">匯出存檔</button>
+        <button class="io-btn" id="importSaveBtn" type="button">匯入存檔</button>
+        <button class="reset-btn" id="resetGameBtn" type="button">重置遊戲</button>
     </div>
 </header>
 
-<div class="modal-backdrop" id="saveIoModal">
+<div class="modal-backdrop" id="saveIoModal" role="dialog" aria-modal="true" aria-labelledby="ioModalTitle">
     <div class="modal-box">
         <h4 id="ioModalTitle">存檔備份</h4>
         <div class="small" id="ioModalDesc" style="margin-bottom:8px;"></div>
@@ -275,7 +265,7 @@ button:hover{background:#f57c00;}
     <h3>🏭 產業大樓</h3>
     <div class="toolbar-box">
         <b>🏗️ 產業管理</b><br>
-        <button class="batch-btn" onclick="upgradeAllInd()">一鍵升級所有可升級產業</button>
+        <button class="batch-btn" id="upgradeAllIndBtn" type="button">一鍵升級所有可升級產業</button>
     </div>
     <div id="industries"></div>
 </div>
@@ -285,9 +275,9 @@ button:hover{background:#f57c00;}
     <div class="toolbar-box">
         <b>📝 招聘中心</b><br>
         招聘成本：1000萬美金<br>
-        <button onclick="recruitEmployee()">招聘新員工</button>
-        <button class="batch-btn" onclick="aiAssignAll()">一鍵AI分配全部員工</button>
-        <button class="batch-btn" onclick="trainAll()">一鍵訓練所有員工</button>
+        <button id="recruitBtn" type="button">招聘新員工</button>
+        <button class="batch-btn" id="aiAssignAllBtn" type="button">一鍵AI分配全部員工</button>
+        <button class="batch-btn" id="trainAllBtn" type="button">一鍵訓練所有員工</button>
     </div>
     <div id="employees"></div>
 </div>
@@ -302,9 +292,9 @@ button:hover{background:#f57c00;}
     <div class="sec-toolbar">
         <b>🔍 企業弱點掃描（Vulnerability Scan）</b><br>
         <span class="small">定期檢測網頁安全、產業系統權限與存檔完整性，避免駭客攻擊造成資產損失。</span><br>
-        <button class="sec-btn" onclick="runVulnScan(true)">立即弱點掃描</button>
-        <button class="patch-btn" onclick="patchAllVulns()">一鍵修補全部漏洞</button>
-        <button class="sec-btn" onclick="toggleAutoSoc()" id="socToggleBtn">開啟自動SOC巡檢</button>
+        <button class="sec-btn" id="scanNowBtn" type="button">立即弱點掃描</button>
+        <button class="patch-btn" id="patchAllBtn" type="button">一鍵修補全部漏洞</button>
+        <button class="sec-btn" id="socToggleBtn" type="button">開啟自動SOC巡檢</button>
     </div>
     <div id="securityPanel"></div>
 </div>
@@ -312,15 +302,19 @@ button:hover{background:#f57c00;}
 </div>
 
 <script>
+"use strict";
 
-const SAVE_KEY = "company_game_school_save_v4";
-const DEFAULT_EMP_COUNT = 40; // 預設工作人員 40 人
+const SAVE_KEY = "company_game_school_sec_v5";
+const DEFAULT_EMP_COUNT = 40;
+const RECRUIT_COST = 10000000n;
+const BASE_UPGRADE_COST = 20000000000000000n;
 
-const last=["王","李","張","林","陳","黃","楊","吳","劉","蔡","鄭","許","郭","謝"];
-const mid=["志","雅","俊","美","冠","柏","家","琇","承","亞","欣","佩","哲","思","子","佳"];
-const end=["真","婷","宏","玲","傑","翰","雯","惠","華","安","琪","君","庭","翔","明","強"];
+const SURNAMES = ["王","李","張","林","陳","黃","楊","吳","劉","蔡","鄭","許","郭","謝"];
+const MIDNAMES = ["志","雅","俊","美","冠","柏","家","琇","承","亞","欣","佩","哲","思","子","佳"];
+const ENDNAMES = ["真","婷","宏","玲","傑","翰","雯","惠","華","安","琪","君","庭","翔","明","強"];
+const TRAITS = ["⚡效率","🧠商業","🛠技術"];
 
-const industryIcons = {
+const INDUSTRY_ICONS = {
     "學校教育":     "🎓",
     "奶茶店":       "🧋",
     "大賣場":       "🛒",
@@ -395,15 +389,19 @@ let industries = {};
 let projects = [];
 let securityState = null;
 let lastEduSummary = "尚未派駐員工至學校教育";
-window.usedNames = new Set();
+const usedNames = new Set();
 
-function escapeHtml(str){
-    return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
+function createEl(tag, className, text){
+    const el = document.createElement(tag);
+    if(className) el.className = className;
+    if(typeof text === "string") el.textContent = text;
+    return el;
+}
+
+function appendLine(parent, text, className){
+    const div = createEl("div", className || "card-line", text);
+    parent.appendChild(div);
+    return div;
 }
 
 function createInitialIndustries(){
@@ -442,32 +440,32 @@ function createInitialSecurity(){
         ],
         nextVulnId: 3,
         logs: [
-            "系統初始化完成，建議立即執行弱點掃描並修補高風險漏洞。"
+            "系統初始化完成，已通過靜態安全規範檢核。"
         ]
     };
 }
 
 function makeName(){
-    let name;
+    let name = "";
     let guard = 0;
     do{
         name =
-            last[Math.floor(Math.random()*last.length)] +
-            mid[Math.floor(Math.random()*mid.length)] +
-            end[Math.floor(Math.random()*end.length)];
+            SURNAMES[Math.floor(Math.random() * SURNAMES.length)] +
+            MIDNAMES[Math.floor(Math.random() * MIDNAMES.length)] +
+            ENDNAMES[Math.floor(Math.random() * ENDNAMES.length)];
         guard++;
-    }while(window.usedNames.has(name) && guard < 2000);
+    }while(usedNames.has(name) && guard < 2000);
 
-    if(window.usedNames.has(name)){
-        name = name + "_" + (nextEmpId + 1);
+    if(usedNames.has(name)){
+        name = `${name}_${nextEmpId + 1}`;
     }
 
-    window.usedNames.add(name);
+    usedNames.add(name);
     return name;
 }
 
-function trait(){
-    return ["⚡效率","🧠商業","🛠技術"][Math.floor(Math.random()*3)];
+function randomTrait(){
+    return TRAITS[Math.floor(Math.random() * TRAITS.length)];
 }
 
 function createEmployeeObj(){
@@ -478,18 +476,18 @@ function createEmployeeObj(){
         exp: 0,
         energy: 100,
         kp: 0,
-        trait: trait(),
+        trait: randomTrait(),
         industry: null
     };
 }
 
 function initNewGameState(){
-    money = BigInt("9".repeat(120)); // 120個9
+    money = BigInt("9".repeat(120));
     nextEmpId = 0;
-    window.usedNames = new Set();
+    usedNames.clear();
     industries = createInitialIndustries();
     projects = createInitialProjects();
-    employees = Array.from({length: DEFAULT_EMP_COUNT}, ()=>createEmployeeObj());
+    employees = Array.from({length: DEFAULT_EMP_COUNT}, () => createEmployeeObj());
     securityState = createInitialSecurity();
     lastEduSummary = "尚未派駐員工至學校教育";
 }
@@ -500,27 +498,82 @@ function formatTimeLabel(date = new Date()){
 
 function updateSaveStatus(text){
     const el = document.getElementById("saveStatus");
-    if(el) el.innerText = text;
+    if(el) el.textContent = text;
+}
+
+function toBigIntAmount(n){
+    if(typeof n === "bigint") return n;
+    if(typeof n === "number"){
+        if(!Number.isFinite(n) || n <= 0) return 0n;
+        return BigInt(Math.floor(n));
+    }
+    return BigInt(String(n));
+}
+
+function formatMoney(n){
+    const val = BigInt(n);
+    const trillion = 10n ** 12n;
+    const quadrillion = 10n ** 16n;
+    const quintillion = 10n ** 20n;
+
+    if(val >= quintillion) return `US$ ${Number(val / quintillion)} 垓`;
+    if(val >= quadrillion) return `US$ ${Number(val / quadrillion)} 京`;
+    if(val >= trillion) return `US$ ${Number(val / trillion)} 兆`;
+    if(val >= 10n ** 8n) return `US$ ${Number(val / (10n ** 8n))} 億`;
+    if(val >= 10n ** 4n) return `US$ ${Number(val / (10n ** 4n))} 萬`;
+
+    return `US$ ${val.toString()}`;
+}
+
+function formatSpeed(n){
+    return `${formatMoney(n)} / 秒`;
+}
+
+function fastRender(){
+    if(renderLock) return;
+    renderLock = true;
+    requestAnimationFrame(() => {
+        renderLock = false;
+        renderAll();
+    });
+}
+
+function companyLv(){
+    return Math.max(1, Math.floor(money.toString().length / 2));
+}
+
+function getSecurityScore(){
+    if(!securityState || !Array.isArray(securityState.vulns)) return 100;
+    const totalPenalty = securityState.vulns.reduce((sum, v) => sum + (Number(v.penalty) || 0), 0);
+    return Math.max(0, Math.min(100, 100 - totalPenalty));
+}
+
+function getIndustryIncome(ind){
+    return toBigIntAmount(ind.emp.length) * toBigIntAmount(ind.lv) * toBigIntAmount(ind.base);
+}
+
+function getUpgradeCost(ind){
+    return toBigIntAmount(ind.lv) * BASE_UPGRADE_COST;
 }
 
 function buildSavePayload(){
     const serializedIndustries = {};
-    for(let k in industries){
+    for(const k of Object.keys(industries)){
         const ind = industries[k];
         serializedIndustries[k] = {
             lv: ind.lv,
             cap: ind.cap,
             base: ind.base,
-            empIds: ind.emp.map(e => e.id)
+            empIds: ind.emp.map((e) => e.id)
         };
     }
 
     return {
-        version: 4,
+        version: 5,
         savedAt: new Date().toISOString(),
         money: money.toString(),
         nextEmpId,
-        usedNames: Array.from(window.usedNames),
+        usedNames: Array.from(usedNames),
         employees,
         industries: serializedIndustries,
         projects,
@@ -530,55 +583,73 @@ function buildSavePayload(){
 }
 
 function applySaveData(data){
-    if(!data || !Array.isArray(data.employees) || !data.industries){
+    if(!data || typeof data !== "object") return false;
+    if(!Array.isArray(data.employees) || !data.industries || typeof data.industries !== "object"){
         return false;
     }
 
     const rawMoney = String(data.money ?? ("9".repeat(120))).trim();
+    if(!/^-?\d+$/.test(rawMoney)) return false;
     const parsedMoney = BigInt(rawMoney);
 
     money = parsedMoney;
-    employees = data.employees.map((e, idx) => ({
-        id: typeof e.id === "number" ? e.id : idx,
-        name: e.name || ("員工" + (idx + 1)),
-        lv: e.lv || 1,
-        exp: e.exp || 0,
-        energy: typeof e.energy === "number" ? e.energy : 100,
-        kp: e.kp || 0,
-        trait: e.trait || trait(),
-        industry: null
-    }));
+    usedNames.clear();
+
+    employees = data.employees.map((e, idx) => {
+        const empName = typeof e.name === "string" && e.name.trim() ? e.name.trim() : `員工_${idx + 1}`;
+        usedNames.add(empName);
+        return {
+            id: typeof e.id === "number" && Number.isFinite(e.id) ? e.id : idx,
+            name: empName,
+            lv: Math.max(1, Number(e.lv) || 1),
+            exp: Math.max(0, Number(e.exp) || 0),
+            energy: typeof e.energy === "number" && Number.isFinite(e.energy) ? e.energy : 100,
+            kp: Math.max(0, Number(e.kp) || 0),
+            trait: typeof e.trait === "string" ? e.trait : randomTrait(),
+            industry: null
+        };
+    });
+
+    if(Array.isArray(data.usedNames)){
+        data.usedNames.forEach((n) => {
+            if(typeof n === "string" && n.trim()) usedNames.add(n.trim());
+        });
+    }
 
     const maxId = employees.reduce((m, e) => Math.max(m, e.id), -1);
-    nextEmpId = typeof data.nextEmpId === "number" ? Math.max(data.nextEmpId, maxId + 1) : maxId + 1;
+    nextEmpId = typeof data.nextEmpId === "number" && Number.isFinite(data.nextEmpId)
+        ? Math.max(data.nextEmpId, maxId + 1)
+        : maxId + 1;
 
-    window.usedNames = new Set(Array.isArray(data.usedNames) ? data.usedNames : employees.map(e => e.name));
-
-    const empMap = new Map(employees.map(e => [e.id, e]));
+    const empMap = new Map(employees.map((e) => [e.id, e]));
     const restoredIndustries = {};
 
-    for(let k in data.industries){
+    for(const k of Object.keys(data.industries)){
+        if(k === "__proto__" || k === "constructor" || k === "prototype") continue;
         const savedInd = data.industries[k];
+        if(!savedInd || typeof savedInd !== "object") continue;
+
         const empList = [];
         if(Array.isArray(savedInd.empIds)){
-            savedInd.empIds.forEach(eid => {
+            savedInd.empIds.forEach((eid) => {
                 const empObj = empMap.get(eid);
-                if(empObj && !empList.some(x => x.id === eid)){
+                if(empObj && !empList.some((x) => x.id === eid)){
                     empObj.industry = k;
                     empList.push(empObj);
                 }
             });
         }
+
         restoredIndustries[k] = {
-            lv: savedInd.lv || 1,
-            cap: savedInd.cap || 5,
+            lv: Math.max(1, Number(savedInd.lv) || 1),
+            cap: Math.max(1, Number(savedInd.cap) || 5),
             emp: empList,
-            base: savedInd.base || 3e15
+            base: Number(savedInd.base) > 0 ? Number(savedInd.base) : 3e15
         };
     }
 
     const defaults = createInitialIndustries();
-    for(let k in defaults){
+    for(const k of Object.keys(defaults)){
         if(!restoredIndustries[k]){
             restoredIndustries[k] = defaults[k];
         }
@@ -586,16 +657,37 @@ function applySaveData(data){
     industries = restoredIndustries;
 
     projects = Array.isArray(data.projects) && data.projects.length > 0
-        ? data.projects.map(p => ({
-            name: p.name || "科技專案",
-            cost: p.cost || 1e16,
+        ? data.projects.map((p) => ({
+            name: typeof p.name === "string" ? p.name : "科技專案",
+            cost: Number(p.cost) > 0 ? Number(p.cost) : 1e16,
             prog: Math.min(100, Math.max(0, Number(p.prog) || 0)),
-            unlock: p.unlock || ""
+            unlock: typeof p.unlock === "string" ? p.unlock : ""
         }))
         : createInitialProjects();
 
     securityState = data.securityState && Array.isArray(data.securityState.vulns)
-        ? data.securityState
+        ? {
+            secLv: Math.max(1, Number(data.securityState.secLv) || 1),
+            scanCount: Math.max(0, Number(data.securityState.scanCount) || 0),
+            patchedTotal: Math.max(0, Number(data.securityState.patchedTotal) || 0),
+            lastScanAt: typeof data.securityState.lastScanAt === "string"
+                ? data.securityState.lastScanAt
+                : new Date().toISOString(),
+            autoSoc: Boolean(data.securityState.autoSoc),
+            vulns: data.securityState.vulns.slice(0, 20).map((v, i) => ({
+                id: typeof v.id === "number" ? v.id : i + 1,
+                code: String(v.code || "CVE-SEC"),
+                title: String(v.title || "安全弱點"),
+                severity: ["high", "med", "low"].includes(v.severity) ? v.severity : "med",
+                penalty: Math.max(1, Math.min(50, Number(v.penalty) || 10)),
+                patchCost: Number(v.patchCost) > 0 ? Number(v.patchCost) : 2e15,
+                desc: String(v.desc || "系統安全檢測項目。")
+            })),
+            nextVulnId: Math.max(1, Number(data.securityState.nextVulnId) || 10),
+            logs: Array.isArray(data.securityState.logs)
+                ? data.securityState.logs.slice(0, 15).map((x) => String(x))
+                : []
+        }
         : createInitialSecurity();
 
     if(typeof data.lastEduSummary === "string"){
@@ -617,7 +709,9 @@ function encodeBackupString(payload){
 
 function decodeBackupString(input){
     const trimmed = String(input || "").trim();
-    if(!trimmed) throw new Error("空白內容");
+    if(!trimmed || trimmed.length > 2000000){
+        throw new Error("無效長度");
+    }
 
     if(trimmed.startsWith("{")){
         return JSON.parse(trimmed);
@@ -642,49 +736,62 @@ function openExportModal(){
     const payload = buildSavePayload();
     const encoded = encodeBackupString(payload);
 
-    document.getElementById("ioModalTitle").innerText = "📤 匯出遊戲存檔";
-    document.getElementById("ioModalDesc").innerText = "請複製下方備份字串妥善保存；之後可使用「匯入存檔」還原進度。";
+    document.getElementById("ioModalTitle").textContent = "📤 匯出遊戲存檔";
+    document.getElementById("ioModalDesc").textContent = "請複製下方備份字串妥善保存；之後可使用「匯入存檔」還原進度。";
     const ta = document.getElementById("ioTextarea");
     ta.readOnly = true;
     ta.value = encoded;
 
-    document.getElementById("ioModalActions").innerHTML = `
-        <button class="save-btn" onclick="copyExportText()">一鍵複製</button>
-        <button onclick="closeIoModal()">關閉</button>
-    `;
+    const actions = document.getElementById("ioModalActions");
+    actions.replaceChildren();
+
+    const copyBtn = createEl("button", "save-btn", "一鍵複製");
+    copyBtn.type = "button";
+    copyBtn.addEventListener("click", () => {
+        ta.select();
+        if(navigator.clipboard && navigator.clipboard.writeText){
+            navigator.clipboard.writeText(ta.value).then(() => {
+                alert("✅ 已複製存檔備份字串到剪貼簿！");
+            }).catch(() => {
+                alert("✅ 已全選備份字串，請按 Ctrl+C / Cmd+C 複製。");
+            });
+        }else{
+            alert("✅ 已全選備份字串，請按 Ctrl+C / Cmd+C 複製。");
+        }
+    });
+
+    const closeBtn = createEl("button", "", "關閉");
+    closeBtn.type = "button";
+    closeBtn.addEventListener("click", closeIoModal);
+
+    actions.appendChild(copyBtn);
+    actions.appendChild(closeBtn);
 
     document.getElementById("saveIoModal").style.display = "flex";
     ta.focus();
     ta.select();
 }
 
-function copyExportText(){
-    const ta = document.getElementById("ioTextarea");
-    ta.select();
-    if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(ta.value).then(()=>{
-            alert("✅ 已複製存檔備份字串到剪貼簿！");
-        }).catch(()=>{
-            document.execCommand("copy");
-            alert("✅ 已選取並嘗試複製存檔備份字串！");
-        });
-    }else{
-        document.execCommand("copy");
-        alert("✅ 已複製存檔備份字串！");
-    }
-}
-
 function openImportModal(){
-    document.getElementById("ioModalTitle").innerText = "📥 匯入遊戲存檔";
-    document.getElementById("ioModalDesc").innerText = "請將先前匯出的存檔字串貼入下方，確認後將覆蓋目前進度並自動存檔。";
+    document.getElementById("ioModalTitle").textContent = "📥 匯入遊戲存檔";
+    document.getElementById("ioModalDesc").textContent = "請將先前匯出的存檔字串貼入下方，確認後將覆蓋目前進度並自動存檔。";
     const ta = document.getElementById("ioTextarea");
     ta.readOnly = false;
     ta.value = "";
 
-    document.getElementById("ioModalActions").innerHTML = `
-        <button class="save-btn" onclick="confirmImportBackup()">確認匯入</button>
-        <button onclick="closeIoModal()">取消</button>
-    `;
+    const actions = document.getElementById("ioModalActions");
+    actions.replaceChildren();
+
+    const confirmBtn = createEl("button", "save-btn", "確認匯入");
+    confirmBtn.type = "button";
+    confirmBtn.addEventListener("click", confirmImportBackup);
+
+    const cancelBtn = createEl("button", "", "取消");
+    cancelBtn.type = "button";
+    cancelBtn.addEventListener("click", closeIoModal);
+
+    actions.appendChild(confirmBtn);
+    actions.appendChild(cancelBtn);
 
     document.getElementById("saveIoModal").style.display = "flex";
     ta.focus();
@@ -698,7 +805,7 @@ function confirmImportBackup(){
             return alert("⚠️ 存檔格式不完整，無法匯入！");
         }
         saveGame(false);
-        updateSaveStatus("📥 已匯入存檔：" + formatTimeLabel());
+        updateSaveStatus(`📥 已匯入存檔：${formatTimeLabel()}`);
         closeIoModal();
         fastRender();
         alert("✅ 存檔匯入成功！");
@@ -712,7 +819,7 @@ function saveGame(showAlert = false){
     try{
         const payload = buildSavePayload();
         localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
-        updateSaveStatus("💾 已存檔：" + formatTimeLabel());
+        updateSaveStatus(`💾 已存檔：${formatTimeLabel()}`);
         if(showAlert) alert("✅ 遊戲進度已手動存檔！");
     }catch(err){
         console.error("存檔失敗：", err);
@@ -727,12 +834,10 @@ function loadGame(){
         if(!raw) return false;
 
         const data = JSON.parse(raw);
-        if(!applySaveData(data)){
-            return false;
-        }
+        if(!applySaveData(data)) return false;
 
         if(data.savedAt){
-            updateSaveStatus("💾 已讀取存檔：" + formatTimeLabel(new Date(data.savedAt)));
+            updateSaveStatus(`💾 已讀取存檔：${formatTimeLabel(new Date(data.savedAt))}`);
         }
         return true;
     }catch(err){
@@ -741,198 +846,176 @@ function loadGame(){
     }
 }
 
-function manualSave(){
-    saveGame(true);
-}
-
 function resetGame(){
     if(!confirm("確定要重置遊戲嗎？目前的存檔與進度將會清除，並恢復預設 40 名工作人員。")) return;
     localStorage.removeItem(SAVE_KEY);
     initNewGameState();
     saveGame(false);
-    updateSaveStatus("🔄 已重置並建立新存檔：" + formatTimeLabel());
+    updateSaveStatus(`🔄 已重置並建立新存檔：${formatTimeLabel()}`);
     fastRender();
 }
 
-function toBigIntAmount(n){
-    if(typeof n === "bigint") return n;
-    if(typeof n === "number"){
-        if(!Number.isFinite(n) || n <= 0) return 0n;
-        return BigInt(Math.floor(n));
-    }
-    return BigInt(n);
-}
-
-function formatMoney(n){
-    n = BigInt(n);
-
-    const trillion = 10n**12n;
-    const quadrillion = 10n**16n;
-    const quintillion = 10n**20n;
-
-    if(n >= quintillion) return "US$ " + Number(n/quintillion) + " 垓";
-    if(n >= quadrillion) return "US$ " + Number(n/quadrillion) + " 京";
-    if(n >= trillion) return "US$ " + Number(n/trillion) + " 兆";
-    if(n >= 10n**8n) return "US$ " + Number(n/(10n**8n)) + " 億";
-    if(n >= 10n**4n) return "US$ " + Number(n/(10n**4n)) + " 萬";
-
-    return "US$ " + n.toString();
-}
-
-function formatSpeed(n){
-    return formatMoney(n) + " / 秒";
-}
-
-function fastRender(){
-    if(renderLock) return;
-    renderLock = true;
-    requestAnimationFrame(()=>{
-        renderLock = false;
-        renderAll();
-    });
-}
-
-function companyLv(){
-    return Math.max(1, Math.floor(Number(money.toString().length)/2));
-}
-
-function getSecurityScore(){
-    if(!securityState) return 100;
-    const totalPenalty = securityState.vulns.reduce((sum, v) => sum + (v.penalty || 0), 0);
-    return Math.max(0, Math.min(100, 100 - totalPenalty));
-}
-
-function getIndustryIncome(ind){
-    return toBigIntAmount(ind.emp.length) * toBigIntAmount(ind.lv) * toBigIntAmount(ind.base);
-}
-
-function getUpgradeCost(ind){
-    return toBigIntAmount(ind.lv) * 20000000000000000n; // 2e16
-}
-
-function renderAll(){
-    document.getElementById("money").innerText = formatMoney(money);
-    document.getElementById("empCount").innerText = employees.length;
-    document.getElementById("companyLv").innerText = companyLv();
-    document.getElementById("secScoreHeader").innerText = getSecurityScore();
-    renderIndustry();
-    renderEmployee();
-    renderProject();
-    renderSecurity();
-}
-
 function renderIndustry(){
-    let html = "";
-    for(let k in industries){
-        let ind = industries[k];
-        let income = getIndustryIncome(ind);
-        let upCost = getUpgradeCost(ind);
-        let icon = industryIcons[k] || "🏬";
-        let eduExtra = "";
+    const container = document.getElementById("industries");
+    container.replaceChildren();
+
+    for(const k of Object.keys(industries)){
+        const ind = industries[k];
+        const income = getIndustryIncome(ind);
+        const upCost = getUpgradeCost(ind);
+        const icon = INDUSTRY_ICONS[k] || "🏬";
+
+        const card = createEl("div", "card");
+        appendLine(card, `${icon} ${k} Lv.${ind.lv} (${ind.emp.length}/${ind.cap})`).style.fontWeight = "bold";
+        const speedLine = appendLine(card, `💹 產業轉速：${formatSpeed(income)}`);
+        speedLine.className = "card-line speed";
+        appendLine(card, `💵 單位產值：${formatMoney(toBigIntAmount(ind.base))}`);
+
+        const costLine = appendLine(card, `🔧 升級費用：${formatMoney(upCost)}`);
+        costLine.className = "card-line money";
 
         if(k === "學校教育"){
             const gainPerTick = ind.emp.length * 10 + ind.lv * 5;
-            eduExtra = `<div class="small edu-tag">🎓 每5秒自動培育：在職與全體員工 +${gainPerTick} 經驗（${escapeHtml(lastEduSummary)}）</div><br>`;
+            appendLine(
+                card,
+                `🎓 每5秒自動培育：在職與全體員工 +${gainPerTick} 經驗（${lastEduSummary}）`,
+                "card-line small edu-tag"
+            );
         }
 
-        html += `
-        <div class="card">
-        <b>${icon} ${escapeHtml(k)} Lv.${ind.lv}</b> (${ind.emp.length}/${ind.cap})<br><br>
-        💹 產業轉速：<span class="speed">${formatSpeed(income)}</span><br><br>
-        💵 單位產值：${formatMoney(toBigIntAmount(ind.base))}<br><br>
-        🔧 升級費用：<span class="money">${formatMoney(upCost)}</span><br><br>
-        ${eduExtra}
-        <button onclick="upgradeInd('${escapeHtml(k)}')">升級產業</button>
-        </div>`;
+        const upBtn = createEl("button", "", "升級產業");
+        upBtn.type = "button";
+        upBtn.addEventListener("click", () => upgradeInd(k));
+        card.appendChild(upBtn);
+
+        container.appendChild(card);
     }
-    document.getElementById("industries").innerHTML = html;
 }
 
 function renderEmployee(){
-    let html = "";
-    [...employees].sort((a,b)=>b.kp - a.kp).forEach(e=>{
-        html += `
-        <div class="card">
-        <b>${escapeHtml(e.name)}</b> Lv.${e.lv} ${escapeHtml(e.trait)}<br><br>
-        ⚡ 能量：${e.energy}（訓練不扣能量）<br>
-        ✨ 經驗：${e.exp}/100<br>
-        📈 KPI：${e.kp}<br>
-        🏢 部門：${escapeHtml(e.industry || "待命")}<br><br>
-        <button onclick="train(${e.id})">訓練</button>
-        <button onclick="aiAssign(${e.id})">AI分配</button>
-        </div>`;
+    const container = document.getElementById("employees");
+    container.replaceChildren();
+
+    [...employees].sort((a, b) => b.kp - a.kp).forEach((e) => {
+        const card = createEl("div", "card");
+        appendLine(card, `${e.name} Lv.${e.lv} ${e.trait}`).style.fontWeight = "bold";
+        appendLine(card, `⚡ 能量：${e.energy}（訓練不扣能量）`);
+        appendLine(card, `✨ 經驗：${e.exp}/100`);
+        appendLine(card, `📈 KPI：${e.kp}`);
+        appendLine(card, `🏢 部門：${e.industry || "待命"}`);
+
+        const trainBtn = createEl("button", "", "訓練");
+        trainBtn.type = "button";
+        trainBtn.addEventListener("click", () => train(e.id));
+
+        const assignBtn = createEl("button", "", "AI分配");
+        assignBtn.type = "button";
+        assignBtn.addEventListener("click", () => aiAssign(e.id));
+
+        card.appendChild(trainBtn);
+        card.appendChild(assignBtn);
+        container.appendChild(card);
     });
-    document.getElementById("employees").innerHTML = html;
 }
 
 function renderProject(){
-    let html = "";
-    projects.forEach((p,i)=>{
-        const unlocked = Boolean(industries[p.unlock]);
-        html += `
-        <div class="card">
-        <b>${escapeHtml(p.name)}</b><br><br>
-        💰 成本：${formatMoney(toBigIntAmount(p.cost))}<br><br>
-        📊 進度：${p.prog}%<br><br>
-        🔓 解鎖：${escapeHtml(p.unlock)} ${unlocked ? "✅（已解鎖）" : ""}<br><br>
-        <button onclick="work(${i})">${p.prog >= 100 && unlocked ? "繼續投入研發" : "研發"}</button>
-        </div>`;
-    });
-    document.getElementById("projects").innerHTML = html;
-}
+    const container = document.getElementById("projects");
+    container.replaceChildren();
 
-function severityBadge(sev){
-    if(sev === "high") return `<span class="badge-high">高風險</span>`;
-    if(sev === "med") return `<span class="badge-med">中風險</span>`;
-    return `<span class="badge-low">低風險</span>`;
+    projects.forEach((p, i) => {
+        const unlocked = Boolean(industries[p.unlock]);
+        const card = createEl("div", "card");
+        appendLine(card, p.name).style.fontWeight = "bold";
+        appendLine(card, `💰 成本：${formatMoney(toBigIntAmount(p.cost))}`);
+        appendLine(card, `📊 進度：${p.prog}%`);
+        appendLine(card, `🔓 解鎖：${p.unlock}${unlocked ? " ✅（已解鎖）" : ""}`);
+
+        const workBtn = createEl("button", "", p.prog >= 100 && unlocked ? "繼續投入研發" : "研發");
+        workBtn.type = "button";
+        workBtn.addEventListener("click", () => work(i));
+        card.appendChild(workBtn);
+
+        container.appendChild(card);
+    });
 }
 
 function renderSecurity(){
+    const container = document.getElementById("securityPanel");
+    container.replaceChildren();
+
     const score = getSecurityScore();
     const socBtn = document.getElementById("socToggleBtn");
     if(socBtn){
-        socBtn.innerText = securityState.autoSoc ? "🟢 自動SOC巡檢：開啟中" : "開啟自動SOC巡檢";
+        socBtn.textContent = securityState.autoSoc ? "🟢 自動SOC巡檢：開啟中" : "開啟自動SOC巡檢";
     }
 
-    let statusText = score >= 90 ? "🟢 安全優良" : (score >= 70 ? "🟡 尚可（建議修補）" : "🔴 高危警戒");
-    let lastTime = securityState.lastScanAt ? formatTimeLabel(new Date(securityState.lastScanAt)) : "--:--:--";
+    const statusText = score >= 90 ? "🟢 安全優良" : (score >= 70 ? "🟡 尚可（建議修補）" : "🔴 高危警戒");
+    const lastTime = securityState.lastScanAt ? formatTimeLabel(new Date(securityState.lastScanAt)) : "--:--:--";
 
-    let html = `
-    <div class="sec-card">
-        <b>📊 資安健康總覽：${statusText}</b><br>
-        <div class="score-bar"><div class="score-fill" style="width:${score}%"></div></div>
-        🛡️ 防護評分：<b>${score} / 100</b>｜資安等級：<b>Lv.${securityState.secLv}</b><br>
-        🔎 累計弱掃次數：${securityState.scanCount} 次｜已修補漏洞：${securityState.patchedTotal} 個<br>
-        🕒 最近弱掃時間：${lastTime}
-    </div>`;
+    const overview = createEl("div", "sec-card");
+    appendLine(overview, `📊 資安健康總覽：${statusText}`).style.fontWeight = "bold";
+
+    const bar = createEl("div", "score-bar");
+    const fill = createEl("div", "score-fill");
+    fill.style.width = `${score}%`;
+    bar.appendChild(fill);
+    overview.appendChild(bar);
+
+    appendLine(overview, `🛡️ 防護評分：${score} / 100｜資安等級：Lv.${securityState.secLv}`);
+    appendLine(overview, `🔎 累計弱掃次數：${securityState.scanCount} 次｜已修補漏洞：${securityState.patchedTotal} 個`);
+    appendLine(overview, `🕒 最近弱掃時間：${lastTime}`);
+    container.appendChild(overview);
 
     if(securityState.vulns.length === 0){
-        html += `
-        <div class="sec-card">
-            ✅ <b>目前未偵測到已知弱點！</b><br>
-            <span class="small">所有網頁與產業介面皆通過最新弱掃檢核。</span>
-        </div>`;
+        const cleanCard = createEl("div", "sec-card");
+        appendLine(cleanCard, "✅ 目前未偵測到已知弱點！").style.fontWeight = "bold";
+        appendLine(cleanCard, "所有網頁與產業介面皆通過最新弱掃檢核。", "small");
+        container.appendChild(cleanCard);
     }else{
-        securityState.vulns.forEach(v => {
-            html += `
-            <div class="sec-card">
-                ${severityBadge(v.severity)} <b>[${escapeHtml(v.code)}] ${escapeHtml(v.title)}</b><br>
-                <span class="small">${escapeHtml(v.desc)}</span><br><br>
-                📉 評分影響：-${v.penalty} 分｜🔧 修補成本：<span class="money">${formatMoney(toBigIntAmount(v.patchCost))}</span><br>
-                <button class="patch-btn" onclick="patchVuln(${v.id})">立即修補漏洞</button>
-            </div>`;
+        securityState.vulns.forEach((v) => {
+            const vCard = createEl("div", "sec-card");
+            const titleLine = createEl("div", "card-line");
+            const badgeClass = v.severity === "high"
+                ? "badge badge-high"
+                : (v.severity === "med" ? "badge badge-med" : "badge badge-low");
+            const badgeText = v.severity === "high" ? "高風險" : (v.severity === "med" ? "中風險" : "低風險");
+            titleLine.appendChild(createEl("span", badgeClass, badgeText));
+            const titleSpan = createEl("b", "", `[${v.code}] ${v.title}`);
+            titleLine.appendChild(titleSpan);
+            vCard.appendChild(titleLine);
+
+            appendLine(vCard, v.desc, "card-line small");
+            const costLine = appendLine(vCard, `📉 評分影響：-${v.penalty} 分｜🔧 修補成本：${formatMoney(toBigIntAmount(v.patchCost))}`);
+            costLine.className = "card-line money";
+
+            const patchBtn = createEl("button", "patch-btn", "立即修補漏洞");
+            patchBtn.type = "button";
+            patchBtn.addEventListener("click", () => patchVuln(v.id));
+            vCard.appendChild(patchBtn);
+
+            container.appendChild(vCard);
         });
     }
 
     if(Array.isArray(securityState.logs) && securityState.logs.length > 0){
-        html += `<div class="sec-card"><b>📜 弱掃與資安事件紀錄</b><br>`;
-        securityState.logs.slice(0, 5).forEach(log => {
-            html += `<div class="small">• ${escapeHtml(log)}</div>`;
+        const logCard = createEl("div", "sec-card");
+        appendLine(logCard, "📜 弱掃與資安事件紀錄").style.fontWeight = "bold";
+        securityState.logs.slice(0, 5).forEach((log) => {
+            appendLine(logCard, `• ${log}`, "small");
         });
-        html += `</div>`;
+        container.appendChild(logCard);
     }
+}
 
-    document.getElementById("securityPanel").innerHTML = html;
+function renderAll(){
+    document.getElementById("money").textContent = formatMoney(money);
+    document.getElementById("empCount").textContent = String(employees.length);
+    document.getElementById("companyLv").textContent = String(companyLv());
+    document.getElementById("secScoreHeader").textContent = String(getSecurityScore());
+    renderIndustry();
+    renderEmployee();
+    renderProject();
+    renderSecurity();
 }
 
 function addSecurityLog(msg){
@@ -946,8 +1029,8 @@ function runVulnScan(manual = false){
     securityState.scanCount++;
     securityState.lastScanAt = new Date().toISOString();
 
-    const existingCodes = new Set(securityState.vulns.map(v => v.code));
-    const candidates = VULN_CATALOG.filter(v => !existingCodes.has(v.code));
+    const existingCodes = new Set(securityState.vulns.map((v) => v.code));
+    const candidates = VULN_CATALOG.filter((v) => !existingCodes.has(v.code));
 
     if(candidates.length > 0 && (manual || Math.random() < 0.65)){
         const picked = candidates[Math.floor(Math.random() * candidates.length)];
@@ -970,7 +1053,7 @@ function runVulnScan(manual = false){
 }
 
 function patchVuln(vulnId){
-    const idx = securityState.vulns.findIndex(v => v.id === vulnId);
+    const idx = securityState.vulns.findIndex((v) => v.id === vulnId);
     if(idx === -1) return;
 
     const target = securityState.vulns[idx];
@@ -984,7 +1067,7 @@ function patchVuln(vulnId){
         securityState.secLv++;
     }
 
-    employees.forEach(e => { e.kp += 2; });
+    employees.forEach((e) => { e.kp += 2; });
     addSecurityLog(`已修補弱點 [${target.code}] ${target.title}，全體員工 KPI +2`);
     fastRender();
 }
@@ -1013,7 +1096,7 @@ function patchAllVulns(){
         return alert("資金不足以修補目前任何漏洞！");
     }
 
-    employees.forEach(e => { e.kp += patched * 2; });
+    employees.forEach((e) => { e.kp += patched * 2; });
     addSecurityLog(`一鍵修補完成，共修復 ${patched} 項漏洞！`);
     fastRender();
 }
@@ -1025,16 +1108,14 @@ function toggleAutoSoc(){
 }
 
 function recruitEmployee(){
-    const cost = 10000000n; // 1000萬美金
-    if(money < cost) return alert("資金不足");
-
-    money -= cost;
+    if(money < RECRUIT_COST) return alert("資金不足");
+    money -= RECRUIT_COST;
     employees.push(createEmployeeObj());
     fastRender();
 }
 
 function findAvailableIndustry(){
-    for(let k in industries){
+    for(const k of Object.keys(industries)){
         if(industries[k].emp.length < industries[k].cap){
             return k;
         }
@@ -1043,14 +1124,14 @@ function findAvailableIndustry(){
 }
 
 function aiAssign(id){
-    let e = employees.find(x => x.id === id);
+    const e = employees.find((x) => x.id === id);
     if(!e) return;
 
-    let best = findAvailableIndustry();
+    const best = findAvailableIndustry();
     if(!best) return alert("目前所有產業人數皆已滿編！");
 
-    for(let k in industries){
-        industries[k].emp = industries[k].emp.filter(x => x.id !== id);
+    for(const k of Object.keys(industries)){
+        industries[k].emp = industries[k].emp.filter((x) => x.id !== id);
     }
 
     industries[best].emp.push(e);
@@ -1061,16 +1142,16 @@ function aiAssign(id){
 function aiAssignAll(){
     let assignedCount = 0;
 
-    for(let e of employees){
+    for(const e of employees){
         if(e.industry && industries[e.industry]){
             continue;
         }
 
-        let best = findAvailableIndustry();
+        const best = findAvailableIndustry();
         if(!best) break;
 
-        for(let k in industries){
-            industries[k].emp = industries[k].emp.filter(x => x.id !== e.id);
+        for(const k of Object.keys(industries)){
+            industries[k].emp = industries[k].emp.filter((x) => x.id !== e.id);
         }
 
         industries[best].emp.push(e);
@@ -1103,20 +1184,17 @@ function applyTrainGain(e){
 }
 
 function train(id){
-    let e = employees.find(x => x.id === id);
+    const e = employees.find((x) => x.id === id);
     if(!e) return;
-
     applyTrainGain(e);
     fastRender();
 }
 
 function trainAll(){
     if(employees.length === 0) return alert("目前沒有員工可訓練！");
-
-    for(let e of employees){
+    for(const e of employees){
         applyTrainGain(e);
     }
-
     fastRender();
 }
 
@@ -1131,23 +1209,23 @@ function runSchoolEducationTick(){
     const allStaffGain = edu.emp.length * 8 + edu.lv * 4;
     let levelUpCount = 0;
 
-    edu.emp.forEach(staff => {
-        const empObj = employees.find(x => x.id === staff.id);
+    edu.emp.forEach((staff) => {
+        const empObj = employees.find((x) => x.id === staff.id);
         if(empObj){
             levelUpCount += addExpToEmployee(empObj, staffGain, 2);
         }
     });
 
-    employees.forEach(emp => {
+    employees.forEach((emp) => {
         levelUpCount += addExpToEmployee(emp, allStaffGain, 1);
     });
 
-    lastEduSummary = `上次於 ${formatTimeLabel()} 培育 ${employees.length} 人${levelUpCount > 0 ? "（升等 " + levelUpCount + " 次）" : ""}`;
+    lastEduSummary = `上次於 ${formatTimeLabel()} 培育 ${employees.length} 人${levelUpCount > 0 ? `（升等 ${levelUpCount} 次）` : ""}`;
     fastRender();
 }
 
 function applySingleIndustryUpgrade(ind){
-    let cost = getUpgradeCost(ind);
+    const cost = getUpgradeCost(ind);
     if(money < cost) return false;
 
     money -= cost;
@@ -1158,7 +1236,7 @@ function applySingleIndustryUpgrade(ind){
 }
 
 function upgradeInd(name){
-    let ind = industries[name];
+    const ind = industries[name];
     if(!ind) return;
 
     if(!applySingleIndustryUpgrade(ind)){
@@ -1171,7 +1249,7 @@ function upgradeInd(name){
 function upgradeAllInd(){
     let upgradedCount = 0;
 
-    for(let k in industries){
+    for(const k of Object.keys(industries)){
         if(applySingleIndustryUpgrade(industries[k])){
             upgradedCount++;
         }
@@ -1185,10 +1263,10 @@ function upgradeAllInd(){
 }
 
 function work(i){
-    let p = projects[i];
+    const p = projects[i];
     if(!p) return;
 
-    let cost = toBigIntAmount(p.cost);
+    const cost = toBigIntAmount(p.cost);
     if(money < cost) return alert("資金不足");
 
     money -= cost;
@@ -1196,10 +1274,10 @@ function work(i){
 
     if(p.prog >= 100 && p.unlock && !industries[p.unlock]){
         industries[p.unlock] = {lv:1, cap:5, emp:[], base:3e16};
-        alert("🔥解鎖產業：" + p.unlock);
+        alert(`🔥解鎖產業：${p.unlock}`);
     }
 
-    employees.forEach(e=>{
+    employees.forEach((e) => {
         e.energy = Math.min(100, e.energy + 5);
         e.kp++;
     });
@@ -1207,10 +1285,23 @@ function work(i){
     fastRender();
 }
 
-// 收益計時器
-setInterval(()=>{
+function bindStaticEvents(){
+    document.getElementById("manualSaveBtn").addEventListener("click", () => saveGame(true));
+    document.getElementById("exportSaveBtn").addEventListener("click", openExportModal);
+    document.getElementById("importSaveBtn").addEventListener("click", openImportModal);
+    document.getElementById("resetGameBtn").addEventListener("click", resetGame);
+    document.getElementById("upgradeAllIndBtn").addEventListener("click", upgradeAllInd);
+    document.getElementById("recruitBtn").addEventListener("click", recruitEmployee);
+    document.getElementById("aiAssignAllBtn").addEventListener("click", aiAssignAll);
+    document.getElementById("trainAllBtn").addEventListener("click", trainAll);
+    document.getElementById("scanNowBtn").addEventListener("click", () => runVulnScan(true));
+    document.getElementById("patchAllBtn").addEventListener("click", patchAllVulns);
+    document.getElementById("socToggleBtn").addEventListener("click", toggleAutoSoc);
+}
+
+setInterval(() => {
     let totalIncome = 0n;
-    for(let k in industries){
+    for(const k of Object.keys(industries)){
         totalIncome += getIndustryIncome(industries[k]);
     }
     const score = BigInt(Math.max(50, getSecurityScore()));
@@ -1218,19 +1309,17 @@ setInterval(()=>{
     fastRender();
 }, 500);
 
-// 學校教育自動培育計時器（每 5 秒一次）
-setInterval(()=>{
+setInterval(() => {
     runSchoolEducationTick();
 }, 5000);
 
-// 定期弱掃與自動 SOC 巡檢（每 20 秒一次）
-setInterval(()=>{
+setInterval(() => {
     if(!securityState) return;
     if(securityState.autoSoc){
-        const target = securityState.vulns.find(v => v.severity !== "high");
+        const target = securityState.vulns.find((v) => v.severity !== "high");
         if(target && money >= toBigIntAmount(target.patchCost)){
             money -= toBigIntAmount(target.patchCost);
-            securityState.vulns = securityState.vulns.filter(v => v.id !== target.id);
+            securityState.vulns = securityState.vulns.filter((v) => v.id !== target.id);
             securityState.patchedTotal++;
             addSecurityLog(`自動SOC已攔截並修補 [${target.code}] ${target.title}`);
         }else{
@@ -1242,17 +1331,15 @@ setInterval(()=>{
     }
 }, 20000);
 
-// 自動存檔（每 10 秒一次）
-setInterval(()=>{
+setInterval(() => {
     saveGame(false);
 }, 10000);
 
+bindStaticEvents();
 if(!loadGame()){
     initNewGameState();
 }
-
 renderAll();
-
 </script>
 </body>
 </html>
