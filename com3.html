@@ -88,6 +88,10 @@ button{
     font-size:13px;
 }
 button:hover{background:#f57c00;}
+button:disabled{
+    background:#ccc;
+    cursor:not-allowed;
+}
 .batch-btn{
     background:#ef6c00;
     font-weight:bold;
@@ -235,7 +239,7 @@ button:hover{background:#f57c00;}
 <script>
 "use strict";
 
-const SAVE_KEY = "company_game_three_cols_v1";
+const SAVE_KEY = "company_game_school_3col_v1";
 const DEFAULT_EMP_COUNT = 40;
 const RECRUIT_COST = 10000000n;
 const BASE_UPGRADE_COST = 20000000000000000n;
@@ -443,9 +447,11 @@ function applySaveData(data){
 
     const rawMoney = String(data.money ?? ("9".repeat(120))).trim();
     if(!/^-?\d+$/.test(rawMoney)) return false;
-    money = BigInt(rawMoney);
+    const parsedMoney = BigInt(rawMoney);
 
+    money = parsedMoney;
     usedNames.clear();
+
     employees = data.employees.map((e, idx) => {
         const empName = typeof e.name === "string" && e.name.trim() ? e.name.trim() : `員工_${idx + 1}`;
         usedNames.add(empName);
