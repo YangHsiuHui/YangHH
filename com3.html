@@ -9,124 +9,181 @@
 
 <style>
 *{box-sizing:border-box;}
-body{
+html, body{
     margin:0;
+    padding:0;
+    height:100%;
     font-family:"Microsoft JhengHei",sans-serif;
     background:linear-gradient(135deg,#fff3e0,#ffe0b2);
     color:#333;
+    overflow:hidden;
+}
+body{
+    display:flex;
+    flex-direction:column;
 }
 header{
+    flex-shrink:0;
     background:linear-gradient(90deg,#ff9800,#ffb74d);
     color:white;
     text-align:center;
-    padding:12px 14px;
-    font-size:18px;
+    padding:8px 8px;
+    font-size:14px;
     font-weight:bold;
-    position:sticky;
-    top:0;
     z-index:10;
 }
 .header-stats{
-    line-height:1.5;
+    line-height:1.4;
 }
 .header-actions{
-    margin-top:8px;
+    margin-top:6px;
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
     align-items:center;
-    gap:8px;
-    font-size:13px;
+    gap:4px;
+    font-size:11px;
     font-weight:normal;
 }
 .save-status{
     background:rgba(255,255,255,0.25);
-    padding:4px 10px;
-    border-radius:8px;
+    padding:3px 7px;
+    border-radius:6px;
 }
 .container{
+    flex:1;
+    min-height:0;
+    width:100%;
     display:grid;
-    grid-template-columns:repeat(3, minmax(260px, 1fr));
-    gap:10px;
-    padding:10px;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:6px;
+    padding:6px;
 }
 .panel{
+    min-width:0;
+    min-height:0;
+    width:100%;
+    height:100%;
     background:#fff8e1;
-    border-radius:14px;
-    padding:10px;
-    height:82vh;
+    border-radius:10px;
+    padding:6px;
     overflow-y:auto;
-    box-shadow:0 4px 12px rgba(0,0,0,0.12);
+    -webkit-overflow-scrolling:touch;
+    box-shadow:0 2px 8px rgba(0,0,0,0.12);
 }
 h3{
     color:#e65100;
-    margin-top:0;
+    margin:0 0 6px 0;
+    font-size:13px;
     position:sticky;
     top:0;
     background:#fff8e1;
-    padding:6px 0;
+    padding:4px 0;
     z-index:2;
+    border-bottom:1px solid #ffe0b2;
 }
 .card{
     background:#fff3e0;
     border:1px solid #ffd180;
-    padding:10px;
-    margin-bottom:8px;
-    border-radius:12px;
+    padding:6px;
+    margin-bottom:6px;
+    border-radius:8px;
+    font-size:11px;
 }
 .card-line{
-    margin-bottom:6px;
+    margin-bottom:4px;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+}
+.card-title{
+    font-weight:bold;
+    margin-bottom:4px;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+}
+.btn-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+    margin-top:6px;
 }
 button{
-    background:#ff9800;
-    border:none;
-    color:white;
-    padding:6px 10px;
-    margin:3px 3px 0 0;
-    border-radius:8px;
+    flex-shrink:0;
+    white-space:nowrap;
+    background-color:#ff9800;
+    border:1px solid #e65100;
+    color:#ffffff;
+    opacity:1;
+    padding:5px 7px;
+    border-radius:6px;
     cursor:pointer;
-    font-size:13px;
+    font-size:11px;
+    line-height:1.2;
 }
-button:hover{background:#f57c00;}
+button:hover{background-color:#f57c00;}
 button:disabled{
-    background:#ccc;
+    background-color:#ccc;
+    border-color:#aaa;
+    color:#666;
     cursor:not-allowed;
 }
-.batch-btn{
-    background:#ef6c00;
+.rd-btn{
+    display:block;
+    width:100%;
+    background-color:#e65100 !important;
+    border:1px solid #bf360c !important;
+    color:#ffffff !important;
+    opacity:1 !important;
     font-weight:bold;
+    text-align:center;
+    padding:6px 4px;
+    border-radius:6px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.rd-btn:hover{
+    background-color:#bf360c !important;
+}
+.batch-btn{
+    background-color:#ef6c00;
+    font-weight:bold;
+    width:100%;
+    margin-top:4px;
 }
 .batch-btn:hover{
-    background:#e65100;
+    background-color:#e65100;
 }
 .save-btn{
-    background:#2e7d32;
+    background-color:#2e7d32;
+    border-color:#1b5e20;
     font-weight:bold;
 }
 .save-btn:hover{
-    background:#1b5e20;
+    background-color:#1b5e20;
 }
 .io-btn{
-    background:#5d4037;
+    background-color:#5d4037;
+    border-color:#3e2723;
     font-weight:bold;
 }
 .io-btn:hover{
-    background:#3e2723;
+    background-color:#3e2723;
 }
 .reset-btn{
-    background:#c62828;
+    background-color:#c62828;
+    border-color:#8e0000;
     font-weight:bold;
 }
 .reset-btn:hover{
-    background:#8e0000;
+    background-color:#8e0000;
 }
 .toolbar-box{
-    margin-bottom:12px;
-    padding:10px;
+    margin-bottom:8px;
+    padding:6px;
     background:#ffe0b2;
-    border-radius:12px;
+    border-radius:8px;
+    font-size:11px;
 }
-.small{font-size:12px;color:#555;}
+.small{font-size:10px;color:#555;}
 .money{color:#d84315;font-weight:bold;}
 .speed{color:#2e7d32;font-weight:bold;}
 .edu-tag{color:#1565c0;font-weight:bold;}
@@ -138,26 +195,26 @@ button:disabled{
     align-items:center;
     justify-content:center;
     z-index:50;
-    padding:16px;
+    padding:12px;
 }
 .modal-box{
     background:#fff8e1;
     color:#333;
     width:100%;
-    max-width:560px;
-    border-radius:14px;
-    padding:16px;
+    max-width:520px;
+    border-radius:12px;
+    padding:14px;
     box-shadow:0 8px 24px rgba(0,0,0,0.3);
 }
 .modal-box h4{
     margin:0 0 8px 0;
     color:#e65100;
-    font-size:17px;
+    font-size:16px;
 }
 .modal-box textarea{
     width:100%;
-    height:180px;
-    padding:10px;
+    height:150px;
+    padding:8px;
     border-radius:8px;
     border:1px solid #ffb74d;
     font-family:monospace;
@@ -172,9 +229,17 @@ button:disabled{
     justify-content:flex-end;
     gap:8px;
 }
-@media (max-width: 960px){
-    .container{grid-template-columns:1fr;}
-    .panel{height:auto;max-height:70vh;}
+@media (min-width: 768px){
+    header{font-size:18px;padding:12px 14px;}
+    .header-actions{font-size:13px;gap:8px;}
+    .container{gap:10px;padding:10px;}
+    .panel{padding:10px;border-radius:14px;}
+    h3{font-size:16px;padding:6px 0;}
+    .card{padding:10px;font-size:14px;border-radius:12px;}
+    .toolbar-box{padding:10px;font-size:13px;border-radius:12px;}
+    button{font-size:13px;padding:6px 10px;}
+    .rd-btn{width:auto;display:inline-block;padding:6px 12px;}
+    .small{font-size:12px;}
 }
 </style>
 </head>
@@ -185,11 +250,11 @@ button:disabled{
     <div class="header-stats">
         🏢 公司經營遊戲｜
         💵 總資產：<span id="money"></span>｜
-        👥 工作人員：<span id="empCount"></span>｜
-        🏆 公司Lv：<span id="companyLv"></span>
+        👥 人員：<span id="empCount"></span>｜
+        🏆 Lv：<span id="companyLv"></span>
     </div>
     <div class="header-actions">
-        <span class="save-status" id="saveStatus">💾 自動存檔已啟用</span>
+        <span class="save-status" id="saveStatus">💾 自動存檔</span>
         <button class="save-btn" id="manualSaveBtn" type="button">手動存檔</button>
         <button class="io-btn" id="exportSaveBtn" type="button">匯出存檔</button>
         <button class="io-btn" id="importSaveBtn" type="button">匯入存檔</button>
@@ -208,28 +273,27 @@ button:disabled{
 
 <div class="container">
 
-<div class="panel">
+<div class="panel" id="leftPanel">
     <h3>🏭 產業大樓</h3>
     <div class="toolbar-box">
-        <b>🏗️ 產業管理</b><br>
-        <button class="batch-btn" id="upgradeAllIndBtn" type="button">一鍵升級所有可升級產業</button>
+        <b>🏗️ 產業管理</b>
+        <button class="batch-btn" id="upgradeAllIndBtn" type="button">一鍵升級全部產業</button>
     </div>
     <div id="industries"></div>
 </div>
 
-<div class="panel">
-    <h3>👥 員工招聘 / 管理</h3>
+<div class="panel" id="centerPanel">
+    <h3>👥 員工管理</h3>
     <div class="toolbar-box">
-        <b>📝 招聘中心</b><br>
-        招聘成本：1000萬美金<br>
-        <button id="recruitBtn" type="button">招聘新員工</button>
-        <button class="batch-btn" id="aiAssignAllBtn" type="button">一鍵AI分配全部員工</button>
-        <button class="batch-btn" id="trainAllBtn" type="button">一鍵訓練所有員工</button>
+        <b>📝 招聘：1000萬</b><br>
+        <button class="batch-btn" id="recruitBtn" type="button">招聘新員工</button>
+        <button class="batch-btn" id="aiAssignAllBtn" type="button">一鍵AI分配全部</button>
+        <button class="batch-btn" id="trainAllBtn" type="button">一鍵訓練全部</button>
     </div>
     <div id="employees"></div>
 </div>
 
-<div class="panel">
+<div class="panel" id="rightPanel">
     <h3>🚀 科技專案</h3>
     <div id="projects"></div>
 </div>
@@ -239,7 +303,7 @@ button:disabled{
 <script>
 "use strict";
 
-const SAVE_KEY = "company_game_school_3col_v1";
+const SAVE_KEY = "company_game_rd_btn_v2";
 const DEFAULT_EMP_COUNT = 40;
 const RECRUIT_COST = 10000000n;
 const BASE_UPGRADE_COST = 20000000000000000n;
@@ -250,19 +314,19 @@ const ENDNAMES = ["真","婷","宏","玲","傑","翰","雯","惠","華","安","�
 const TRAITS = ["⚡效率","🧠商業","🛠技術"];
 
 const INDUSTRY_ICONS = {
-    "學校教育":     "🎓",
-    "奶茶店":       "🧋",
-    "大賣場":       "🛒",
-    "電影院":       "🎬",
-    "美容館":       "💆",
-    "飯店":         "🏨",
-    "醫院":         "🏥",
-    "網吧":         "💻",
+    "學校教育":       "🎓",
+    "奶茶店":         "🧋",
+    "大賣場":         "🛒",
+    "電影院":         "🎬",
+    "美容館":         "💆",
+    "飯店":           "🏨",
+    "醫院":           "🏥",
+    "網吧":           "💻",
     "智慧手機專賣店": "📱",
-    "物流中心":     "🚚",
-    "銀行":         "🏦",
-    "建設公司":     "🏗️",
-    "科技園區":     "🌆"
+    "物流中心":       "🚚",
+    "銀行":           "🏦",
+    "建設公司":       "🏗️",
+    "科技園區":       "🌆"
 };
 
 let money = 0n;
@@ -271,7 +335,7 @@ let renderLock = false;
 let employees = [];
 let industries = {};
 let projects = [];
-let lastEduSummary = "尚未派駐員工至學校教育";
+let lastEduSummary = "無在職";
 const usedNames = new Set();
 
 function createEl(tag, className, text){
@@ -353,7 +417,7 @@ function initNewGameState(){
     industries = createInitialIndustries();
     projects = createInitialProjects();
     employees = Array.from({length: DEFAULT_EMP_COUNT}, () => createEmployeeObj());
-    lastEduSummary = "尚未派駐員工至學校教育";
+    lastEduSummary = "無在職";
 }
 
 function formatTimeLabel(date = new Date()){
@@ -390,7 +454,7 @@ function formatMoney(n){
 }
 
 function formatSpeed(n){
-    return `${formatMoney(n)} / 秒`;
+    return `${formatMoney(n)}/秒`;
 }
 
 function fastRender(){
@@ -637,7 +701,7 @@ function confirmImportBackup(){
             return alert("⚠️ 存檔格式不完整，無法匯入！");
         }
         saveGame(false);
-        updateSaveStatus(`📥 已匯入存檔：${formatTimeLabel()}`);
+        updateSaveStatus(`📥 已匯入：${formatTimeLabel()}`);
         closeIoModal();
         fastRender();
         alert("✅ 存檔匯入成功！");
@@ -651,7 +715,7 @@ function saveGame(showAlert = false){
     try{
         const payload = buildSavePayload();
         localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
-        updateSaveStatus(`💾 已存檔：${formatTimeLabel()}`);
+        updateSaveStatus(`💾 已存：${formatTimeLabel()}`);
         if(showAlert) alert("✅ 遊戲進度已手動存檔！");
     }catch(err){
         console.error("存檔失敗：", err);
@@ -669,7 +733,7 @@ function loadGame(){
         if(!applySaveData(data)) return false;
 
         if(data.savedAt){
-            updateSaveStatus(`💾 已讀取存檔：${formatTimeLabel(new Date(data.savedAt))}`);
+            updateSaveStatus(`💾 已讀：${formatTimeLabel(new Date(data.savedAt))}`);
         }
         return true;
     }catch(err){
@@ -683,7 +747,7 @@ function resetGame(){
     localStorage.removeItem(SAVE_KEY);
     initNewGameState();
     saveGame(false);
-    updateSaveStatus(`🔄 已重置並建立新存檔：${formatTimeLabel()}`);
+    updateSaveStatus(`🔄 已重置：${formatTimeLabel()}`);
     fastRender();
 }
 
@@ -698,27 +762,26 @@ function renderIndustry(){
         const icon = INDUSTRY_ICONS[k] || "🏬";
 
         const card = createEl("div", "card");
-        appendLine(card, `${icon} ${k} Lv.${ind.lv} (${ind.emp.length}/${ind.cap})`).style.fontWeight = "bold";
-        const speedLine = appendLine(card, `💹 產業轉速：${formatSpeed(income)}`);
-        speedLine.className = "card-line speed";
-        appendLine(card, `💵 單位產值：${formatMoney(toBigIntAmount(ind.base))}`);
-
-        const costLine = appendLine(card, `🔧 升級費用：${formatMoney(upCost)}`);
-        costLine.className = "card-line money";
+        createEl("div", "card-title", `${icon} ${k} Lv.${ind.lv} (${ind.emp.length}/${ind.cap})`);
+        appendLine(card, `💹 轉速：${formatSpeed(income)}`, "card-line speed");
+        appendLine(card, `💵 產值：${formatMoney(toBigIntAmount(ind.base))}`);
+        appendLine(card, `🔧 升級：${formatMoney(upCost)}`, "card-line money");
 
         if(k === "學校教育"){
             const gainPerTick = ind.emp.length * 10 + ind.lv * 5;
             appendLine(
                 card,
-                `🎓 每5秒自動培育：在職與全體員工 +${gainPerTick} 經驗（${lastEduSummary}）`,
+                `🎓 每5秒培育+${gainPerTick}EXP（${lastEduSummary}）`,
                 "card-line small edu-tag"
             );
         }
 
+        const btnRow = createEl("div", "btn-row");
         const upBtn = createEl("button", "", "升級產業");
         upBtn.type = "button";
         upBtn.addEventListener("click", () => upgradeInd(k));
-        card.appendChild(upBtn);
+        btnRow.appendChild(upBtn);
+        card.appendChild(btnRow);
 
         container.appendChild(card);
     }
@@ -730,12 +793,12 @@ function renderEmployee(){
 
     [...employees].sort((a, b) => b.kp - a.kp).forEach((e) => {
         const card = createEl("div", "card");
-        appendLine(card, `${e.name} Lv.${e.lv} ${e.trait}`).style.fontWeight = "bold";
-        appendLine(card, `⚡ 能量：${e.energy}（訓練不扣能量）`);
-        appendLine(card, `✨ 經驗：${e.exp}/100`);
+        createEl("div", "card-title", `${e.name} Lv.${e.lv} ${e.trait}`);
+        appendLine(card, `⚡ 能量：${e.energy}｜✨ EXP：${e.exp}/100`);
         appendLine(card, `📈 KPI：${e.kp}`);
         appendLine(card, `🏢 部門：${e.industry || "待命"}`);
 
+        const btnRow = createEl("div", "btn-row");
         const trainBtn = createEl("button", "", "訓練");
         trainBtn.type = "button";
         trainBtn.addEventListener("click", () => train(e.id));
@@ -744,8 +807,9 @@ function renderEmployee(){
         assignBtn.type = "button";
         assignBtn.addEventListener("click", () => aiAssign(e.id));
 
-        card.appendChild(trainBtn);
-        card.appendChild(assignBtn);
+        btnRow.appendChild(trainBtn);
+        btnRow.appendChild(assignBtn);
+        card.appendChild(btnRow);
         container.appendChild(card);
     });
 }
@@ -757,15 +821,17 @@ function renderProject(){
     projects.forEach((p, i) => {
         const unlocked = Boolean(industries[p.unlock]);
         const card = createEl("div", "card");
-        appendLine(card, p.name).style.fontWeight = "bold";
-        appendLine(card, `💰 成本：${formatMoney(toBigIntAmount(p.cost))}`);
+        createEl("div", "card-title", p.name);
+        appendLine(card, `💰 成本：${formatMoney(toBigIntAmount(p.cost))}`, "card-line money");
         appendLine(card, `📊 進度：${p.prog}%`);
-        appendLine(card, `🔓 解鎖：${p.unlock}${unlocked ? " ✅（已解鎖）" : ""}`);
+        appendLine(card, `🔓 解鎖：${p.unlock}${unlocked ? " ✅" : ""}`);
 
-        const workBtn = createEl("button", "", p.prog >= 100 && unlocked ? "繼續投入研發" : "研發");
+        const btnRow = createEl("div", "btn-row");
+        const workBtn = createEl("button", "rd-btn", p.prog >= 100 && unlocked ? "繼續研發" : "研發");
         workBtn.type = "button";
         workBtn.addEventListener("click", () => work(i));
-        card.appendChild(workBtn);
+        btnRow.appendChild(workBtn);
+        card.appendChild(btnRow);
 
         container.appendChild(card);
     });
@@ -874,7 +940,7 @@ function trainAll(){
 function runSchoolEducationTick(){
     const edu = industries["學校教育"];
     if(!edu || edu.emp.length === 0){
-        lastEduSummary = "目前無員工在職";
+        lastEduSummary = "無在職";
         return;
     }
 
@@ -893,7 +959,7 @@ function runSchoolEducationTick(){
         levelUpCount += addExpToEmployee(emp, allStaffGain, 1);
     });
 
-    lastEduSummary = `上次於 ${formatTimeLabel()} 培育 ${employees.length} 人${levelUpCount > 0 ? `（升等 ${levelUpCount} 次）` : ""}`;
+    lastEduSummary = `${formatTimeLabel()} 培育${employees.length}人${levelUpCount > 0 ? ` 升${levelUpCount}級` : ""}`;
     fastRender();
 }
 
