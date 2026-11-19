@@ -17,12 +17,30 @@ header{
     background:linear-gradient(90deg,#ff9800,#ffb74d);
     color:white;
     text-align:center;
-    padding:14px;
-    font-size:19px;
+    padding:12px 14px;
+    font-size:18px;
     font-weight:bold;
     position:sticky;
     top:0;
     z-index:10;
+}
+.header-stats{
+    line-height:1.5;
+}
+.header-actions{
+    margin-top:8px;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    font-weight:normal;
+}
+.save-status{
+    background:rgba(255,255,255,0.25);
+    padding:4px 10px;
+    border-radius:8px;
 }
 .container{display:flex;gap:10px;padding:10px;}
 .panel{
@@ -30,7 +48,7 @@ header{
     background:#fff8e1;
     border-radius:14px;
     padding:10px;
-    height:88vh;
+    height:84vh;
     overflow-y:auto;
     box-shadow:0 4px 12px rgba(0,0,0,0.12);
 }
@@ -41,7 +59,6 @@ h3{
     top:0;
     background:#fff8e1;
     padding:6px 0;
-    z-index:5;
 }
 .card{
     background:#fff3e0;
@@ -55,46 +72,81 @@ button{
     border:none;
     color:white;
     padding:6px 10px;
-    margin:3px 3px 0 0;
+    margin:3px;
     border-radius:8px;
     cursor:pointer;
-    font-weight:bold;
+    font-size:13px;
 }
 button:hover{background:#f57c00;}
+.batch-btn{
+    background:#ef6c00;
+    font-weight:bold;
+}
+.batch-btn:hover{
+    background:#e65100;
+}
+.save-btn{
+    background:#2e7d32;
+    font-weight:bold;
+}
+.save-btn:hover{
+    background:#1b5e20;
+}
+.reset-btn{
+    background:#c62828;
+    font-weight:bold;
+}
+.reset-btn:hover{
+    background:#8e0000;
+}
+.toolbar-box{
+    margin-bottom:12px;
+    padding:10px;
+    background:#ffe0b2;
+    border-radius:12px;
+}
 .small{font-size:12px;color:#666;}
-.recruit-box{margin-bottom:12px;padding:10px;background:#ffe0b2;border-radius:12px;}
 .money{color:#d84315;font-weight:bold;}
 .speed{color:#2e7d32;font-weight:bold;}
-@media (max-width: 900px){
-    .container{flex-direction:column;}
-    .panel{height:auto;max-height:70vh;}
-}
 </style>
 </head>
 
 <body>
 
 <header>
-🏢 公司經營遊戲｜
-💵 總資產：<span id="money"></span>｜
-👥 工作人員：<span id="empCount"></span>｜
-🏆 公司Lv：<span id="companyLv"></span>
+    <div class="header-stats">
+        🏢 公司經營遊戲｜
+        💵 總資產：<span id="money"></span>｜
+        👥 工作人員：<span id="empCount"></span>｜
+        🏆 公司Lv：<span id="companyLv"></span>
+    </div>
+    <div class="header-actions">
+        <span class="save-status" id="saveStatus">💾 自動存檔已啟用</span>
+        <button class="save-btn" onclick="manualSave()">手動存檔</button>
+        <button class="reset-btn" onclick="resetGame()">重置遊戲</button>
+    </div>
 </header>
 
 <div class="container">
 
 <div class="panel">
     <h3>🏭 產業大樓</h3>
+    <div class="toolbar-box">
+        <b>🏗️ 產業管理</b><br>
+        <button class="batch-btn" onclick="upgradeAllInd()">一鍵升級所有可升級產業</button>
+    </div>
     <div id="industries"></div>
 </div>
 
 <div class="panel">
     <h3>👥 員工招聘 / 管理</h3>
 
-    <div class="recruit-box">
+    <div class="toolbar-box">
         <b>📝 招聘中心</b><br>
-        招聘成本：US$ 1,000 萬<br>
+        招聘成本：1000萬美金<br>
         <button onclick="recruitEmployee()">招聘新員工</button>
+        <button class="batch-btn" onclick="aiAssignAll()">一鍵AI分配全部員工</button>
+        <button class="batch-btn" onclick="trainAll()">一鍵訓練所有員工</button>
     </div>
 
     <div id="employees"></div>
@@ -108,24 +160,250 @@ button:hover{background:#f57c00;}
 </div>
 
 <script>
-let money = BigInt("9".repeat(120));
+
+const SAVE_KEY = "company_game_school_save_v1";
+
+const last=["王","李","張","林","陳","黃","楊","吳","劉","蔡","鄭","許","郭","謝"];
+const mid=["志","雅","俊","美","冠","柏","家","琇","承","亞","欣","佩","哲","思","子","佳"];
+const end=["真","婷","宏","玲","傑","翰","雯","惠","華","安","琪","君","庭","翔","明","強"];
+
+const industryIcons = {
+    "學校教育": "🎓",
+    "奶茶店":   "🧋",
+    "大賣場":   "🛒",
+    "電影院":   "🎬",
+    "美容館":   "💆",
+    "飯店":     "🏨",
+    "醫院":     "🏥",
+    "網吧":     "💻"
+};
+
+let money = 0n;
 let nextEmpId = 0;
 let renderLock = false;
+let employees = [];
+let industries = {};
+let projects = [];
+window.usedNames = new Set();
+
+function createInitialIndustries(){
+    return {
+        "學校教育": {lv:1, cap:5, emp:[], base:1.5e16},
+        "奶茶店":   {lv:1, cap:5, emp:[], base:3e15},
+        "大賣場":   {lv:1, cap:5, emp:[], base:5e15},
+        "電影院":   {lv:1, cap:5, emp:[], base:8e15},
+        "美容館":   {lv:1, cap:5, emp:[], base:6e15},
+        "飯店":     {lv:1, cap:5, emp:[], base:1e16},
+        "醫院":     {lv:1, cap:5, emp:[], base:2e16},
+        "網吧":     {lv:1, cap:5, emp:[], base:7e15}
+    };
+}
+
+function createInitialProjects(){
+    return [
+        {name:"📱智慧手機", cost:1e16, prog:0, unlock:"智慧手機專賣店"},
+        {name:"🚲腳踏車AI", cost:5e16, prog:0, unlock:"物流中心"},
+        {name:"💱數位貨幣", cost:2e17, prog:0, unlock:"銀行"},
+        {name:"🏠房地產AI", cost:5e17, prog:0, unlock:"建設公司"},
+        {name:"🚗無人車AI", cost:2e18, prog:0, unlock:"科技園區"}
+    ];
+}
+
+function makeName(){
+    let name;
+    let guard = 0;
+    do{
+        name =
+            last[Math.floor(Math.random()*last.length)] +
+            mid[Math.floor(Math.random()*mid.length)] +
+            end[Math.floor(Math.random()*end.length)];
+        guard++;
+    }while(window.usedNames.has(name) && guard < 2000);
+
+    if(window.usedNames.has(name)){
+        name = name + "_" + (nextEmpId + 1);
+    }
+
+    window.usedNames.add(name);
+    return name;
+}
+
+function trait(){
+    return ["⚡效率","🧠商業","🛠技術"][Math.floor(Math.random()*3)];
+}
+
+function createEmployeeObj(){
+    return {
+        id: nextEmpId++,
+        name: makeName(),
+        lv: 1,
+        exp: 0,
+        energy: 100,
+        kp: 0,
+        trait: trait(),
+        industry: null
+    };
+}
+
+function initNewGameState(){
+    money = BigInt("9".repeat(120)); // 120個9
+    nextEmpId = 0;
+    window.usedNames = new Set();
+    industries = createInitialIndustries();
+    projects = createInitialProjects();
+    employees = Array.from({length:35}, ()=>createEmployeeObj());
+}
+
+function formatTimeLabel(date = new Date()){
+    return date.toTimeString().slice(0, 8);
+}
+
+function updateSaveStatus(text){
+    const el = document.getElementById("saveStatus");
+    if(el) el.innerText = text;
+}
+
+function saveGame(showAlert = false){
+    try{
+        const serializedIndustries = {};
+        for(let k in industries){
+            const ind = industries[k];
+            serializedIndustries[k] = {
+                lv: ind.lv,
+                cap: ind.cap,
+                base: ind.base,
+                empIds: ind.emp.map(e => e.id)
+            };
+        }
+
+        const payload = {
+            version: 1,
+            savedAt: new Date().toISOString(),
+            money: money.toString(),
+            nextEmpId,
+            usedNames: Array.from(window.usedNames),
+            employees,
+            industries: serializedIndustries,
+            projects
+        };
+
+        localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+        updateSaveStatus("💾 已存檔：" + formatTimeLabel());
+        if(showAlert) alert("✅ 遊戲進度已手動存檔！");
+    }catch(err){
+        console.error("存檔失敗：", err);
+        updateSaveStatus("⚠️ 存檔失敗");
+        if(showAlert) alert("⚠️ 存檔失敗，可能是瀏覽器儲存空間不足。");
+    }
+}
+
+function loadGame(){
+    try{
+        const raw = localStorage.getItem(SAVE_KEY);
+        if(!raw) return false;
+
+        const data = JSON.parse(raw);
+        if(!data || !Array.isArray(data.employees) || !data.industries){
+            return false;
+        }
+
+        money = BigInt(data.money || ("9".repeat(120)));
+        employees = data.employees.map((e, idx) => ({
+            id: typeof e.id === "number" ? e.id : idx,
+            name: e.name || ("員工" + (idx + 1)),
+            lv: e.lv || 1,
+            exp: e.exp || 0,
+            energy: typeof e.energy === "number" ? e.energy : 100,
+            kp: e.kp || 0,
+            trait: e.trait || trait(),
+            industry: e.industry || null
+        }));
+
+        const maxId = employees.reduce((m, e) => Math.max(m, e.id), -1);
+        nextEmpId = typeof data.nextEmpId === "number" ? Math.max(data.nextEmpId, maxId + 1) : maxId + 1;
+
+        window.usedNames = new Set(Array.isArray(data.usedNames) ? data.usedNames : employees.map(e => e.name));
+
+        const empMap = new Map(employees.map(e => [e.id, e]));
+        const restoredIndustries = {};
+
+        for(let k in data.industries){
+            const savedInd = data.industries[k];
+            const empList = [];
+            if(Array.isArray(savedInd.empIds)){
+                savedInd.empIds.forEach(eid => {
+                    const empObj = empMap.get(eid);
+                    if(empObj && !empList.some(x => x.id === eid)){
+                        empObj.industry = k;
+                        empList.push(empObj);
+                    }
+                });
+            }
+            restoredIndustries[k] = {
+                lv: savedInd.lv || 1,
+                cap: savedInd.cap || 5,
+                emp: empList,
+                base: savedInd.base || 3e15
+            };
+        }
+
+        // 確保新增的預設產業（如學校教育）存在
+        const defaults = createInitialIndustries();
+        for(let k in defaults){
+            if(!restoredIndustries[k]){
+                restoredIndustries[k] = defaults[k];
+            }
+        }
+        industries = restoredIndustries;
+
+        projects = Array.isArray(data.projects) && data.projects.length > 0
+            ? data.projects
+            : createInitialProjects();
+
+        if(data.savedAt){
+            updateSaveStatus("💾 已讀取存檔：" + formatTimeLabel(new Date(data.savedAt)));
+        }
+        return true;
+    }catch(err){
+        console.error("讀取存檔失敗：", err);
+        return false;
+    }
+}
+
+function manualSave(){
+    saveGame(true);
+}
+
+function resetGame(){
+    if(!confirm("確定要重置遊戲嗎？目前的存檔與進度將會清除。")) return;
+    localStorage.removeItem(SAVE_KEY);
+    initNewGameState();
+    saveGame(false);
+    updateSaveStatus("🔄 已重置並建立新存檔：" + formatTimeLabel());
+    fastRender();
+}
+
+function toBigIntAmount(n){
+    if(typeof n === "bigint") return n;
+    if(typeof n === "number"){
+        if(!Number.isFinite(n) || n <= 0) return 0n;
+        return BigInt(Math.floor(n));
+    }
+    return BigInt(n);
+}
 
 function formatMoney(n){
     n = BigInt(n);
 
-    const quintillion = 10n**20n;
-    const quadrillion = 10n**16n;
     const trillion = 10n**12n;
-    const yi = 10n**8n;
-    const wan = 10n**4n;
+    const quadrillion = 10n**16n;
+    const quintillion = 10n**20n;
 
-    if(n >= quintillion) return "US$ " + (Number(n / (quintillion / 100n)) / 100) + " 垓";
-    if(n >= quadrillion) return "US$ " + (Number(n / (quadrillion / 100n)) / 100) + " 京";
-    if(n >= trillion) return "US$ " + (Number(n / (trillion / 100n)) / 100) + " 兆";
-    if(n >= yi) return "US$ " + (Number(n / (yi / 100n)) / 100) + " 億";
-    if(n >= wan) return "US$ " + (Number(n / (wan / 100n)) / 100) + " 萬";
+    if(n >= quintillion) return "US$ " + Number(n/quintillion) + " 垓";
+    if(n >= quadrillion) return "US$ " + Number(n/quadrillion) + " 京";
+    if(n >= trillion) return "US$ " + Number(n/trillion) + " 兆";
+    if(n >= 10n**8n) return "US$ " + Number(n/(10n**8n)) + " 億";
+    if(n >= 10n**4n) return "US$ " + Number(n/(10n**4n)) + " 萬";
 
     return "US$ " + n.toString();
 }
@@ -143,81 +421,16 @@ function fastRender(){
     });
 }
 
-const last = ["王","李","張","林","陳","黃","楊","吳","劉","蔡","鄭","許","郭","謝"];
-const mid = ["志","雅","俊","美","冠","柏","家","琇","承","亞","欣","佩","哲","思","子","佳"];
-const end = ["真","婷","宏","玲","傑","翰","雯","惠","華","安","琪","君","庭","翔","明","強"];
-
-window.usedNames = new Set();
-
-function makeName(){
-    let name;
-    do{
-        name =
-            last[Math.floor(Math.random()*last.length)] +
-            mid[Math.floor(Math.random()*mid.length)] +
-            end[Math.floor(Math.random()*end.length)];
-    } while(window.usedNames.has(name) && window.usedNames.size < last.length * mid.length * end.length);
-
-    window.usedNames.add(name);
-    return name;
-}
-
-function trait(){
-    return ["⚡效率","🧠商業","🛠技術"][Math.floor(Math.random()*3)];
-}
-
-function createEmployee(){
-    return {
-        id: nextEmpId++,
-        name: makeName(),
-        lv: 1,
-        exp: 0,
-        energy: 100,
-        kp: 0,
-        trait: trait(),
-        industry: null
-    };
-}
-
-let employees = Array.from({length: 35}, () => createEmployee());
-
-let industries = {
-    "奶茶店": { lv:1, cap:5, emp:[], base: 3000000000000000n },
-    "大賣場": { lv:1, cap:5, emp:[], base: 5000000000000000n },
-    "電影院": { lv:1, cap:5, emp:[], base: 8000000000000000n },
-    "美容館": { lv:1, cap:5, emp:[], base: 6000000000000000n },
-    "飯店":   { lv:1, cap:5, emp:[], base: 10000000000000000n },
-    "醫院":   { lv:1, cap:5, emp:[], base: 20000000000000000n },
-    "網吧":   { lv:1, cap:5, emp:[], base: 7000000000000000n },
-    "學校教育": { lv:1, cap:5, emp:[], base: 15000000000000000n }
-};
-
-let projects = [
-    { name:"📱智慧手機", cost: 10000000000000000n, prog:0, unlock:"智慧手機專賣店" },
-    { name:"🚲腳踏車AI", cost: 50000000000000000n, prog:0, unlock:"物流中心" },
-    { name:"💱數位貨幣", cost: 200000000000000000n, prog:0, unlock:"銀行" },
-    { name:"🏠房地產AI", cost: 500000000000000000n, prog:0, unlock:"建設公司" },
-    { name:"🚗無人車AI", cost: 2000000000000000000n, prog:0, unlock:"科技園區" }
-];
-
-function getEmployeeMultiplier(emp){
-    // 員工等級越高，產出越高；學校教育對員工等級加成更明顯
-    const lvBonus = 1 + (emp.lv - 1) * 0.25;
-    const eduBonus = emp.industry === "學校教育" ? 1.2 : 1.0;
-    return lvBonus * eduBonus;
-}
-
-function calcIndustryIncome(ind){
-    let total = 0n;
-    for(const emp of ind.emp){
-        const mult = Math.round(getEmployeeMultiplier(emp) * 100);
-        total += (ind.base * BigInt(ind.lv) * BigInt(mult)) / 100n;
-    }
-    return total;
-}
-
 function companyLv(){
-    return Math.max(1, Math.floor(money.toString().length / 2));
+    return Math.max(1, Math.floor(Number(money.toString().length)/2));
+}
+
+function getIndustryIncome(ind){
+    return toBigIntAmount(ind.emp.length) * toBigIntAmount(ind.lv) * toBigIntAmount(ind.base);
+}
+
+function getUpgradeCost(ind){
+    return toBigIntAmount(ind.lv) * 20000000000000000n; // 2e16
 }
 
 function renderAll(){
@@ -233,15 +446,16 @@ function renderIndustry(){
     let html = "";
     for(let k in industries){
         let ind = industries[k];
-        let income = calcIndustryIncome(ind);
-        let upgradeCost = BigInt(ind.lv) * 20000000000000000n;
+        let income = getIndustryIncome(ind);
+        let upCost = getUpgradeCost(ind);
+        let icon = industryIcons[k] || "🏬";
 
         html += `
         <div class="card">
-        <b>${k} Lv.${ind.lv}</b> (${ind.emp.length}/${ind.cap})<br><br>
+        <b>${icon} ${k} Lv.${ind.lv}</b> (${ind.emp.length}/${ind.cap})<br><br>
         💹 產業轉速：<span class="speed">${formatSpeed(income)}</span><br><br>
-        💵 單位產值：${formatMoney(ind.base)}<br><br>
-        🔧 升級費用：${formatMoney(upgradeCost)}<br><br>
+        💵 單位產值：${formatMoney(toBigIntAmount(ind.base))}<br><br>
+        🔧 升級費用：<span class="money">${formatMoney(upCost)}</span><br><br>
         <button onclick="upgradeInd('${k}')">升級產業</button>
         </div>`;
     }
@@ -250,12 +464,12 @@ function renderIndustry(){
 
 function renderEmployee(){
     let html = "";
-    [...employees].sort((a,b) => b.kp - a.kp).forEach(e => {
+    [...employees].sort((a,b)=>b.kp - a.kp).forEach(e=>{
         html += `
         <div class="card">
         <b>${e.name}</b> Lv.${e.lv} ${e.trait}<br><br>
-        ✨ 經驗值：${e.exp} / 100<br>
         ⚡ 能量：${e.energy}（訓練不扣能量）<br>
+        ✨ 經驗：${e.exp}/100<br>
         📈 KPI：${e.kp}<br>
         🏢 部門：${e.industry || "待命"}<br><br>
         <button onclick="train(${e.id})">訓練</button>
@@ -267,11 +481,11 @@ function renderEmployee(){
 
 function renderProject(){
     let html = "";
-    projects.forEach((p, i) => {
+    projects.forEach((p,i)=>{
         html += `
         <div class="card">
         <b>${p.name}</b><br><br>
-        💰 成本：${formatMoney(p.cost)}<br><br>
+        💰 成本：${formatMoney(toBigIntAmount(p.cost))}<br><br>
         📊 進度：${p.prog}%<br><br>
         🔓 解鎖：${p.unlock}<br><br>
         <button onclick="work(${i})">研發</button>
@@ -281,79 +495,148 @@ function renderProject(){
 }
 
 function recruitEmployee(){
-    const cost = 10000000n;
+    const cost = 10000000n; // 1000萬美金
     if(money < cost) return alert("資金不足");
 
     money -= cost;
-    employees.push(createEmployee());
+    employees.push(createEmployeeObj());
     fastRender();
 }
 
-function aiAssign(id){
-    const emp = employees.find(x => x.id === id);
-    if(!emp) return;
-
-    let best = null;
+function findAvailableIndustry(){
     for(let k in industries){
         if(industries[k].emp.length < industries[k].cap){
-            best = k;
-            break;
+            return k;
         }
     }
-    if(!best) return alert("所有產業目前都已滿編！");
+    return null;
+}
+
+function aiAssign(id){
+    let e = employees.find(x => x.id === id);
+    if(!e) return;
+
+    let best = findAvailableIndustry();
+    if(!best) return alert("目前所有產業人數皆已滿編！");
 
     for(let k in industries){
         industries[k].emp = industries[k].emp.filter(x => x.id !== id);
     }
 
-    industries[best].emp.push(emp);
-    emp.industry = best;
+    industries[best].emp.push(e);
+    e.industry = best;
     fastRender();
 }
 
-function train(id){
-    const emp = employees.find(x => x.id === id);
-    if(!emp) return;
+function aiAssignAll(){
+    let assignedCount = 0;
 
-    // 訓練不扣體力，直接增加經驗與 KPI，保留原本姓名
-    emp.exp += 25;
-    emp.kp += 5;
+    for(let e of employees){
+        if(e.industry && industries[e.industry]){
+            continue;
+        }
 
-    while(emp.exp >= 100){
-        emp.lv++;
-        emp.exp -= 100;
+        let best = findAvailableIndustry();
+        if(!best) break;
+
+        for(let k in industries){
+            industries[k].emp = industries[k].emp.filter(x => x.id !== e.id);
+        }
+
+        industries[best].emp.push(e);
+        e.industry = best;
+        assignedCount++;
+    }
+
+    if(assignedCount === 0){
+        alert("沒有可分配的新空缺（可能所有員工皆已分配或產業已滿編）。");
     }
 
     fastRender();
 }
 
-function upgradeInd(name){
-    let ind = industries[name];
-    let cost = BigInt(ind.lv) * 20000000000000000n;
+function applyTrainGain(e){
+    e.exp += 25;
+    e.kp += 5;
 
-    if(money < cost) return alert("資金不足");
+    while(e.exp >= 100){
+        e.lv++;
+        e.exp -= 100;
+    }
+}
+
+function train(id){
+    let e = employees.find(x => x.id === id);
+    if(!e) return;
+
+    applyTrainGain(e);
+    fastRender();
+}
+
+function trainAll(){
+    if(employees.length === 0) return alert("目前沒有員工可訓練！");
+
+    for(let e of employees){
+        applyTrainGain(e);
+    }
+
+    fastRender();
+}
+
+function applySingleIndustryUpgrade(ind){
+    let cost = getUpgradeCost(ind);
+    if(money < cost) return false;
 
     money -= cost;
     ind.lv++;
     ind.cap++;
-    ind.base = (ind.base * 16n) / 10n;
+    ind.base = ind.base * 1.6;
+    return true;
+}
+
+function upgradeInd(name){
+    let ind = industries[name];
+    if(!ind) return;
+
+    if(!applySingleIndustryUpgrade(ind)){
+        return alert("資金不足");
+    }
+
+    fastRender();
+}
+
+function upgradeAllInd(){
+    let upgradedCount = 0;
+
+    for(let k in industries){
+        if(applySingleIndustryUpgrade(industries[k])){
+            upgradedCount++;
+        }
+    }
+
+    if(upgradedCount === 0){
+        return alert("目前資金不足以升級任何產業！");
+    }
 
     fastRender();
 }
 
 function work(i){
     let p = projects[i];
-    if(money < p.cost) return alert("資金不足");
+    if(!p) return;
 
-    money -= p.cost;
+    let cost = toBigIntAmount(p.cost);
+    if(money < cost) return alert("資金不足");
+
+    money -= cost;
     p.prog = Math.min(100, p.prog + 20);
 
     if(p.prog >= 100 && !industries[p.unlock]){
-        industries[p.unlock] = { lv:1, cap:5, emp:[], base: 30000000000000000n };
+        industries[p.unlock] = {lv:1, cap:5, emp:[], base:3e16};
         alert("🔥解鎖產業：" + p.unlock);
     }
 
-    employees.forEach(e => {
+    employees.forEach(e=>{
         e.energy = Math.min(100, e.energy + 5);
         e.kp++;
     });
@@ -361,16 +644,27 @@ function work(i){
     fastRender();
 }
 
+// 收益計時器
 setInterval(()=>{
-    let income = 0n;
+    let totalIncome = 0n;
     for(let k in industries){
-        income += calcIndustryIncome(industries[k]);
+        totalIncome += getIndustryIncome(industries[k]);
     }
-    money += income;
+    money += totalIncome;
     fastRender();
 }, 500);
 
+// 自動存檔（每 10 秒一次）
+setInterval(()=>{
+    saveGame(false);
+}, 10000);
+
+if(!loadGame()){
+    initNewGameState();
+}
+
 renderAll();
+
 </script>
 </body>
 </html>
