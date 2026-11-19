@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>公司經營遊戲｜京級美金版（學校教育版）</title>
+<title>公司經營遊戲｜京級美金版（學校教育＋弱掃資安版）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -42,9 +42,14 @@ header{
     padding:4px 10px;
     border-radius:8px;
 }
-.container{display:flex;gap:10px;padding:10px;}
+.container{
+    display:flex;
+    gap:10px;
+    padding:10px;
+}
 .panel{
     flex:1;
+    min-width:260px;
     background:#fff8e1;
     border-radius:14px;
     padding:10px;
@@ -59,10 +64,18 @@ h3{
     top:0;
     background:#fff8e1;
     padding:6px 0;
+    z-index:2;
 }
 .card{
     background:#fff3e0;
     border:1px solid #ffd180;
+    padding:10px;
+    margin-bottom:8px;
+    border-radius:12px;
+}
+.sec-card{
+    background:#eef6ff;
+    border:1px solid #90caf9;
     padding:10px;
     margin-bottom:8px;
     border-radius:12px;
@@ -85,12 +98,33 @@ button:hover{background:#f57c00;}
 .batch-btn:hover{
     background:#e65100;
 }
+.sec-btn{
+    background:#1565c0;
+    font-weight:bold;
+}
+.sec-btn:hover{
+    background:#0d47a1;
+}
+.patch-btn{
+    background:#00838f;
+    font-weight:bold;
+}
+.patch-btn:hover{
+    background:#006064;
+}
 .save-btn{
     background:#2e7d32;
     font-weight:bold;
 }
 .save-btn:hover{
     background:#1b5e20;
+}
+.io-btn{
+    background:#5d4037;
+    font-weight:bold;
+}
+.io-btn:hover{
+    background:#3e2723;
 }
 .reset-btn{
     background:#c62828;
@@ -105,9 +139,105 @@ button:hover{background:#f57c00;}
     background:#ffe0b2;
     border-radius:12px;
 }
-.small{font-size:12px;color:#666;}
+.sec-toolbar{
+    margin-bottom:12px;
+    padding:10px;
+    background:#bbdefb;
+    border-radius:12px;
+}
+.small{font-size:12px;color:#555;}
 .money{color:#d84315;font-weight:bold;}
 .speed{color:#2e7d32;font-weight:bold;}
+.edu-tag{color:#1565c0;font-weight:bold;}
+.badge-high{
+    display:inline-block;
+    background:#d32f2f;
+    color:#fff;
+    padding:2px 7px;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:bold;
+}
+.badge-med{
+    display:inline-block;
+    background:#f57c00;
+    color:#fff;
+    padding:2px 7px;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:bold;
+}
+.badge-low{
+    display:inline-block;
+    background:#388e3c;
+    color:#fff;
+    padding:2px 7px;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:bold;
+}
+.score-bar{
+    width:100%;
+    height:10px;
+    background:#cfd8dc;
+    border-radius:6px;
+    overflow:hidden;
+    margin:6px 0;
+}
+.score-fill{
+    height:100%;
+    background:linear-gradient(90deg,#1976d2,#26a69a);
+    transition:width 0.3s ease;
+}
+.modal-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:16px;
+}
+.modal-box{
+    background:#fff8e1;
+    color:#333;
+    width:100%;
+    max-width:560px;
+    border-radius:14px;
+    padding:16px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.3);
+}
+.modal-box h4{
+    margin:0 0 8px 0;
+    color:#e65100;
+    font-size:17px;
+}
+.modal-box textarea{
+    width:100%;
+    height:180px;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ffb74d;
+    font-family:monospace;
+    font-size:12px;
+    resize:vertical;
+    background:#fff;
+    color:#222;
+}
+.modal-actions{
+    margin-top:10px;
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+}
+@media (max-width: 1100px){
+    .container{flex-wrap:wrap;}
+    .panel{flex:1 1 45%;height:65vh;}
+}
+@media (max-width: 680px){
+    .panel{flex:1 1 100%;height:auto;max-height:70vh;}
+}
 </style>
 </head>
 
@@ -118,14 +248,26 @@ button:hover{background:#f57c00;}
         🏢 公司經營遊戲｜
         💵 總資產：<span id="money"></span>｜
         👥 工作人員：<span id="empCount"></span>｜
-        🏆 公司Lv：<span id="companyLv"></span>
+        🏆 公司Lv：<span id="companyLv"></span>｜
+        🛡️ 資安評分：<span id="secScoreHeader">100</span>分
     </div>
     <div class="header-actions">
         <span class="save-status" id="saveStatus">💾 自動存檔已啟用</span>
         <button class="save-btn" onclick="manualSave()">手動存檔</button>
+        <button class="io-btn" onclick="openExportModal()">匯出存檔</button>
+        <button class="io-btn" onclick="openImportModal()">匯入存檔</button>
         <button class="reset-btn" onclick="resetGame()">重置遊戲</button>
     </div>
 </header>
+
+<div class="modal-backdrop" id="saveIoModal">
+    <div class="modal-box">
+        <h4 id="ioModalTitle">存檔備份</h4>
+        <div class="small" id="ioModalDesc" style="margin-bottom:8px;"></div>
+        <textarea id="ioTextarea" placeholder="請在此貼上或複製存檔備份字串..."></textarea>
+        <div class="modal-actions" id="ioModalActions"></div>
+    </div>
+</div>
 
 <div class="container">
 
@@ -157,11 +299,24 @@ button:hover{background:#f57c00;}
     <div id="projects"></div>
 </div>
 
+<div class="panel">
+    <h3>🛡️ 弱掃資安中心</h3>
+    <div class="sec-toolbar">
+        <b>🔍 企業弱點掃描（Vulnerability Scan）</b><br>
+        <span class="small">定期檢測網頁安全、產業系統權限與存檔完整性，避免駭客攻擊造成資產損失。</span><br>
+        <button class="sec-btn" onclick="runVulnScan(true)">立即弱點掃描</button>
+        <button class="patch-btn" onclick="patchAllVulns()">一鍵修補全部漏洞</button>
+        <button class="sec-btn" onclick="toggleAutoSoc()" id="socToggleBtn">開啟自動SOC巡檢</button>
+    </div>
+    <div id="securityPanel"></div>
+</div>
+
 </div>
 
 <script>
 
-const SAVE_KEY = "company_game_school_save_v1";
+const SAVE_KEY = "company_game_school_save_v3";
+const DEFAULT_EMP_COUNT = 40; // 預設工作人員 40 人
 
 const last=["王","李","張","林","陳","黃","楊","吳","劉","蔡","鄭","許","郭","謝"];
 const mid=["志","雅","俊","美","冠","柏","家","琇","承","亞","欣","佩","哲","思","子","佳"];
@@ -178,13 +333,75 @@ const industryIcons = {
     "網吧":     "💻"
 };
 
+const VULN_CATALOG = [
+    {
+        code: "CVE-WEB-001",
+        title: "DOM XSS 輸出跳脫檢核缺失",
+        severity: "high",
+        penalty: 18,
+        patchCost: 5e15,
+        desc: "未過濾動態渲染字串可能導致跨站腳本注入風險。"
+    },
+    {
+        code: "CVE-WEB-002",
+        title: "Content-Security-Policy (CSP) 標頭未強化",
+        severity: "med",
+        penalty: 12,
+        patchCost: 3e15,
+        desc: "建議限制內聯腳本與外部資源來源以降低注入面。"
+    },
+    {
+        code: "CVE-AUTH-003",
+        title: "產業金流 API 速率限制過寬",
+        severity: "high",
+        penalty: 16,
+        patchCost: 8e15,
+        desc: "高頻交易接口缺乏節流機制，易遭自動化撞庫或重放。"
+    },
+    {
+        code: "CVE-DATA-004",
+        title: "localStorage 存檔雜湊校驗弱化",
+        severity: "med",
+        penalty: 10,
+        patchCost: 2e15,
+        desc: "本地儲存資料缺少完整性簽章，可能遭異常竄改。"
+    },
+    {
+        code: "CVE-SYS-005",
+        title: "過時第三方套件相依風險",
+        severity: "low",
+        penalty: 6,
+        patchCost: 1e15,
+        desc: "偵測到舊版前端模組存在已知低風險資訊揭露。"
+    },
+    {
+        code: "CVE-NET-006",
+        title: "HTTPS / HSTS 傳輸層安全降級風險",
+        severity: "med",
+        penalty: 11,
+        patchCost: 4e15,
+        desc: "未強制啟用嚴格傳輸安全策略，存在中間人竊聽風險。"
+    }
+];
+
 let money = 0n;
 let nextEmpId = 0;
 let renderLock = false;
 let employees = [];
 let industries = {};
 let projects = [];
+let securityState = null;
+let lastEduSummary = "尚未派駐員工至學校教育";
 window.usedNames = new Set();
+
+function escapeHtml(str){
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
 
 function createInitialIndustries(){
     return {
@@ -207,6 +424,24 @@ function createInitialProjects(){
         {name:"🏠房地產AI", cost:5e17, prog:0, unlock:"建設公司"},
         {name:"🚗無人車AI", cost:2e18, prog:0, unlock:"科技園區"}
     ];
+}
+
+function createInitialSecurity(){
+    return {
+        secLv: 1,
+        scanCount: 1,
+        patchedTotal: 0,
+        lastScanAt: new Date().toISOString(),
+        autoSoc: false,
+        vulns: [
+            {...VULN_CATALOG[0], id: 1},
+            {...VULN_CATALOG[3], id: 2}
+        ],
+        nextVulnId: 3,
+        logs: [
+            "系統初始化完成，建議立即執行弱點掃描並修補高風險漏洞。"
+        ]
+    };
 }
 
 function makeName(){
@@ -251,7 +486,9 @@ function initNewGameState(){
     window.usedNames = new Set();
     industries = createInitialIndustries();
     projects = createInitialProjects();
-    employees = Array.from({length:35}, ()=>createEmployeeObj());
+    employees = Array.from({length: DEFAULT_EMP_COUNT}, ()=>createEmployeeObj());
+    securityState = createInitialSecurity();
+    lastEduSummary = "尚未派駐員工至學校教育";
 }
 
 function formatTimeLabel(date = new Date()){
@@ -263,30 +500,211 @@ function updateSaveStatus(text){
     if(el) el.innerText = text;
 }
 
+function buildSavePayload(){
+    const serializedIndustries = {};
+    for(let k in industries){
+        const ind = industries[k];
+        serializedIndustries[k] = {
+            lv: ind.lv,
+            cap: ind.cap,
+            base: ind.base,
+            empIds: ind.emp.map(e => e.id)
+        };
+    }
+
+    return {
+        version: 3,
+        savedAt: new Date().toISOString(),
+        money: money.toString(),
+        nextEmpId,
+        usedNames: Array.from(window.usedNames),
+        employees,
+        industries: serializedIndustries,
+        projects,
+        securityState,
+        lastEduSummary
+    };
+}
+
+function applySaveData(data){
+    if(!data || !Array.isArray(data.employees) || !data.industries){
+        return false;
+    }
+
+    // 驗證 BigInt 金額格式
+    const rawMoney = String(data.money ?? ("9".repeat(120))).trim();
+    const parsedMoney = BigInt(rawMoney);
+
+    money = parsedMoney;
+    employees = data.employees.map((e, idx) => ({
+        id: typeof e.id === "number" ? e.id : idx,
+        name: e.name || ("員工" + (idx + 1)),
+        lv: e.lv || 1,
+        exp: e.exp || 0,
+        energy: typeof e.energy === "number" ? e.energy : 100,
+        kp: e.kp || 0,
+        trait: e.trait || trait(),
+        industry: e.industry || null
+    }));
+
+    const maxId = employees.reduce((m, e) => Math.max(m, e.id), -1);
+    nextEmpId = typeof data.nextEmpId === "number" ? Math.max(data.nextEmpId, maxId + 1) : maxId + 1;
+
+    window.usedNames = new Set(Array.isArray(data.usedNames) ? data.usedNames : employees.map(e => e.name));
+
+    const empMap = new Map(employees.map(e => [e.id, e]));
+    const restoredIndustries = {};
+
+    for(let k in data.industries){
+        const savedInd = data.industries[k];
+        const empList = [];
+        if(Array.isArray(savedInd.empIds)){
+            savedInd.empIds.forEach(eid => {
+                const empObj = empMap.get(eid);
+                if(empObj && !empList.some(x => x.id === eid)){
+                    empObj.industry = k;
+                    empList.push(empObj);
+                }
+            });
+        }
+        restoredIndustries[k] = {
+            lv: savedInd.lv || 1,
+            cap: savedInd.cap || 5,
+            emp: empList,
+            base: savedInd.base || 3e15
+        };
+    }
+
+    const defaults = createInitialIndustries();
+    for(let k in defaults){
+        if(!restoredIndustries[k]){
+            restoredIndustries[k] = defaults[k];
+        }
+    }
+    industries = restoredIndustries;
+
+    projects = Array.isArray(data.projects) && data.projects.length > 0
+        ? data.projects
+        : createInitialProjects();
+
+    securityState = data.securityState && Array.isArray(data.securityState.vulns)
+        ? data.securityState
+        : createInitialSecurity();
+
+    if(typeof data.lastEduSummary === "string"){
+        lastEduSummary = data.lastEduSummary;
+    }
+
+    return true;
+}
+
+function encodeBackupString(payload){
+    const jsonStr = JSON.stringify(payload);
+    const bytes = new TextEncoder().encode(jsonStr);
+    let bin = "";
+    for(let i = 0; i < bytes.length; i++){
+        bin += String.fromCharCode(bytes[i]);
+    }
+    return btoa(bin);
+}
+
+function decodeBackupString(input){
+    const trimmed = String(input || "").trim();
+    if(!trimmed) throw new Error("空白內容");
+
+    // 支援直接貼上 JSON 或 Base64 備份字串
+    if(trimmed.startsWith("{")){
+        return JSON.parse(trimmed);
+    }
+
+    const bin = atob(trimmed);
+    const bytes = new Uint8Array(bin.length);
+    for(let i = 0; i < bin.length; i++){
+        bytes[i] = bin.charCodeAt(i);
+    }
+    const jsonStr = new TextDecoder().decode(bytes);
+    return JSON.parse(jsonStr);
+}
+
+function closeIoModal(){
+    const modal = document.getElementById("saveIoModal");
+    if(modal) modal.style.display = "none";
+}
+
+function openExportModal(){
+    saveGame(false);
+    const payload = buildSavePayload();
+    const encoded = encodeBackupString(payload);
+
+    document.getElementById("ioModalTitle").innerText = "📤 匯出遊戲存檔";
+    document.getElementById("ioModalDesc").innerText = "請複製下方備份字串妥善保存；之後可使用「匯入存檔」還原進度。";
+    const ta = document.getElementById("ioTextarea");
+    ta.readOnly = true;
+    ta.value = encoded;
+
+    document.getElementById("ioModalActions").innerHTML = `
+        <button class="save-btn" onclick="copyExportText()">一鍵複製</button>
+        <button onclick="closeIoModal()">關閉</button>
+    `;
+
+    document.getElementById("saveIoModal").style.display = "flex";
+    ta.focus();
+    ta.select();
+}
+
+function copyExportText(){
+    const ta = document.getElementById("ioTextarea");
+    ta.select();
+    if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(ta.value).then(()=>{
+            alert("✅ 已複製存檔備份字串到剪貼簿！");
+        }).catch(()=>{
+            document.execCommand("copy");
+            alert("✅ 已選取並嘗試複製存檔備份字串！");
+        });
+    }else{
+        document.execCommand("copy");
+        alert("✅ 已複製存檔備份字串！");
+    }
+}
+
+function openImportModal(){
+    document.getElementById("ioModalTitle").innerText = "📥 匯入遊戲存檔";
+    document.getElementById("ioModalDesc").innerText = "請將先前匯出的存檔字串貼入下方，確認後將覆蓋目前進度並自動存檔。";
+    const ta = document.getElementById("ioTextarea");
+    ta.readOnly = false;
+    ta.value = "";
+
+    document.getElementById("ioModalActions").innerHTML = `
+        <button class="save-btn" onclick="confirmImportBackup()">確認匯入</button>
+        <button onclick="closeIoModal()">取消</button>
+    `;
+
+    document.getElementById("saveIoModal").style.display = "flex";
+    ta.focus();
+}
+
+function confirmImportBackup(){
+    const rawText = document.getElementById("ioTextarea").value;
+    try{
+        const data = decodeBackupString(rawText);
+        if(!applySaveData(data)){
+            return alert("⚠️ 存檔格式不完整，無法匯入！");
+        }
+        saveGame(false);
+        updateSaveStatus("📥 已匯入存檔：" + formatTimeLabel());
+        closeIoModal();
+        fastRender();
+        alert("✅ 存檔匯入成功！");
+    }catch(err){
+        console.error("匯入存檔失敗：", err);
+        alert("⚠️ 存檔字串無效或已損毀，請確認是否完整複製。");
+    }
+}
+
 function saveGame(showAlert = false){
     try{
-        const serializedIndustries = {};
-        for(let k in industries){
-            const ind = industries[k];
-            serializedIndustries[k] = {
-                lv: ind.lv,
-                cap: ind.cap,
-                base: ind.base,
-                empIds: ind.emp.map(e => e.id)
-            };
-        }
-
-        const payload = {
-            version: 1,
-            savedAt: new Date().toISOString(),
-            money: money.toString(),
-            nextEmpId,
-            usedNames: Array.from(window.usedNames),
-            employees,
-            industries: serializedIndustries,
-            projects
-        };
-
+        const payload = buildSavePayload();
         localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
         updateSaveStatus("💾 已存檔：" + formatTimeLabel());
         if(showAlert) alert("✅ 遊戲進度已手動存檔！");
@@ -303,62 +721,9 @@ function loadGame(){
         if(!raw) return false;
 
         const data = JSON.parse(raw);
-        if(!data || !Array.isArray(data.employees) || !data.industries){
+        if(!applySaveData(data)){
             return false;
         }
-
-        money = BigInt(data.money || ("9".repeat(120)));
-        employees = data.employees.map((e, idx) => ({
-            id: typeof e.id === "number" ? e.id : idx,
-            name: e.name || ("員工" + (idx + 1)),
-            lv: e.lv || 1,
-            exp: e.exp || 0,
-            energy: typeof e.energy === "number" ? e.energy : 100,
-            kp: e.kp || 0,
-            trait: e.trait || trait(),
-            industry: e.industry || null
-        }));
-
-        const maxId = employees.reduce((m, e) => Math.max(m, e.id), -1);
-        nextEmpId = typeof data.nextEmpId === "number" ? Math.max(data.nextEmpId, maxId + 1) : maxId + 1;
-
-        window.usedNames = new Set(Array.isArray(data.usedNames) ? data.usedNames : employees.map(e => e.name));
-
-        const empMap = new Map(employees.map(e => [e.id, e]));
-        const restoredIndustries = {};
-
-        for(let k in data.industries){
-            const savedInd = data.industries[k];
-            const empList = [];
-            if(Array.isArray(savedInd.empIds)){
-                savedInd.empIds.forEach(eid => {
-                    const empObj = empMap.get(eid);
-                    if(empObj && !empList.some(x => x.id === eid)){
-                        empObj.industry = k;
-                        empList.push(empObj);
-                    }
-                });
-            }
-            restoredIndustries[k] = {
-                lv: savedInd.lv || 1,
-                cap: savedInd.cap || 5,
-                emp: empList,
-                base: savedInd.base || 3e15
-            };
-        }
-
-        // 確保新增的預設產業（如學校教育）存在
-        const defaults = createInitialIndustries();
-        for(let k in defaults){
-            if(!restoredIndustries[k]){
-                restoredIndustries[k] = defaults[k];
-            }
-        }
-        industries = restoredIndustries;
-
-        projects = Array.isArray(data.projects) && data.projects.length > 0
-            ? data.projects
-            : createInitialProjects();
 
         if(data.savedAt){
             updateSaveStatus("💾 已讀取存檔：" + formatTimeLabel(new Date(data.savedAt)));
@@ -375,7 +740,7 @@ function manualSave(){
 }
 
 function resetGame(){
-    if(!confirm("確定要重置遊戲嗎？目前的存檔與進度將會清除。")) return;
+    if(!confirm("確定要重置遊戲嗎？目前的存檔與進度將會清除，並恢復預設 40 名工作人員。")) return;
     localStorage.removeItem(SAVE_KEY);
     initNewGameState();
     saveGame(false);
@@ -425,6 +790,12 @@ function companyLv(){
     return Math.max(1, Math.floor(Number(money.toString().length)/2));
 }
 
+function getSecurityScore(){
+    if(!securityState) return 100;
+    const totalPenalty = securityState.vulns.reduce((sum, v) => sum + (v.penalty || 0), 0);
+    return Math.max(0, Math.min(100, 100 - totalPenalty));
+}
+
 function getIndustryIncome(ind){
     return toBigIntAmount(ind.emp.length) * toBigIntAmount(ind.lv) * toBigIntAmount(ind.base);
 }
@@ -437,9 +808,11 @@ function renderAll(){
     document.getElementById("money").innerText = formatMoney(money);
     document.getElementById("empCount").innerText = employees.length;
     document.getElementById("companyLv").innerText = companyLv();
+    document.getElementById("secScoreHeader").innerText = getSecurityScore();
     renderIndustry();
     renderEmployee();
     renderProject();
+    renderSecurity();
 }
 
 function renderIndustry(){
@@ -449,14 +822,21 @@ function renderIndustry(){
         let income = getIndustryIncome(ind);
         let upCost = getUpgradeCost(ind);
         let icon = industryIcons[k] || "🏬";
+        let eduExtra = "";
+
+        if(k === "學校教育"){
+            const gainPerTick = ind.emp.length * 10 + ind.lv * 5;
+            eduExtra = `<div class="small edu-tag">🎓 每5秒自動培育：在職與全體員工 +${gainPerTick} 經驗（${escapeHtml(lastEduSummary)}）</div><br>`;
+        }
 
         html += `
         <div class="card">
-        <b>${icon} ${k} Lv.${ind.lv}</b> (${ind.emp.length}/${ind.cap})<br><br>
+        <b>${icon} ${escapeHtml(k)} Lv.${ind.lv}</b> (${ind.emp.length}/${ind.cap})<br><br>
         💹 產業轉速：<span class="speed">${formatSpeed(income)}</span><br><br>
         💵 單位產值：${formatMoney(toBigIntAmount(ind.base))}<br><br>
         🔧 升級費用：<span class="money">${formatMoney(upCost)}</span><br><br>
-        <button onclick="upgradeInd('${k}')">升級產業</button>
+        ${eduExtra}
+        <button onclick="upgradeInd('${escapeHtml(k)}')">升級產業</button>
         </div>`;
     }
     document.getElementById("industries").innerHTML = html;
@@ -467,11 +847,11 @@ function renderEmployee(){
     [...employees].sort((a,b)=>b.kp - a.kp).forEach(e=>{
         html += `
         <div class="card">
-        <b>${e.name}</b> Lv.${e.lv} ${e.trait}<br><br>
+        <b>${escapeHtml(e.name)}</b> Lv.${e.lv} ${escapeHtml(e.trait)}<br><br>
         ⚡ 能量：${e.energy}（訓練不扣能量）<br>
         ✨ 經驗：${e.exp}/100<br>
         📈 KPI：${e.kp}<br>
-        🏢 部門：${e.industry || "待命"}<br><br>
+        🏢 部門：${escapeHtml(e.industry || "待命")}<br><br>
         <button onclick="train(${e.id})">訓練</button>
         <button onclick="aiAssign(${e.id})">AI分配</button>
         </div>`;
@@ -484,14 +864,157 @@ function renderProject(){
     projects.forEach((p,i)=>{
         html += `
         <div class="card">
-        <b>${p.name}</b><br><br>
+        <b>${escapeHtml(p.name)}</b><br><br>
         💰 成本：${formatMoney(toBigIntAmount(p.cost))}<br><br>
         📊 進度：${p.prog}%<br><br>
-        🔓 解鎖：${p.unlock}<br><br>
+        🔓 解鎖：${escapeHtml(p.unlock)}<br><br>
         <button onclick="work(${i})">研發</button>
         </div>`;
     });
     document.getElementById("projects").innerHTML = html;
+}
+
+function severityBadge(sev){
+    if(sev === "high") return `<span class="badge-high">高風險</span>`;
+    if(sev === "med") return `<span class="badge-med">中風險</span>`;
+    return `<span class="badge-low">低風險</span>`;
+}
+
+function renderSecurity(){
+    const score = getSecurityScore();
+    const socBtn = document.getElementById("socToggleBtn");
+    if(socBtn){
+        socBtn.innerText = securityState.autoSoc ? "🟢 自動SOC巡檢：開啟中" : "開啟自動SOC巡檢";
+    }
+
+    let statusText = score >= 90 ? "🟢 安全優良" : (score >= 70 ? "🟡 尚可（建議修補）" : "🔴 高危警戒");
+    let lastTime = securityState.lastScanAt ? formatTimeLabel(new Date(securityState.lastScanAt)) : "--:--:--";
+
+    let html = `
+    <div class="sec-card">
+        <b>📊 資安健康總覽：${statusText}</b><br>
+        <div class="score-bar"><div class="score-fill" style="width:${score}%"></div></div>
+        🛡️ 防護評分：<b>${score} / 100</b>｜資安等級：<b>Lv.${securityState.secLv}</b><br>
+        🔎 累計弱掃次數：${securityState.scanCount} 次｜已修補漏洞：${securityState.patchedTotal} 個<br>
+        🕒 最近弱掃時間：${lastTime}
+    </div>`;
+
+    if(securityState.vulns.length === 0){
+        html += `
+        <div class="sec-card">
+            ✅ <b>目前未偵測到已知弱點！</b><br>
+            <span class="small">所有網頁與產業介面皆通過最新弱掃檢核。</span>
+        </div>`;
+    }else{
+        securityState.vulns.forEach(v => {
+            html += `
+            <div class="sec-card">
+                ${severityBadge(v.severity)} <b>[${escapeHtml(v.code)}] ${escapeHtml(v.title)}</b><br>
+                <span class="small">${escapeHtml(v.desc)}</span><br><br>
+                📉 評分影響：-${v.penalty} 分｜🔧 修補成本：<span class="money">${formatMoney(toBigIntAmount(v.patchCost))}</span><br>
+                <button class="patch-btn" onclick="patchVuln(${v.id})">立即修補漏洞</button>
+            </div>`;
+        });
+    }
+
+    if(Array.isArray(securityState.logs) && securityState.logs.length > 0){
+        html += `<div class="sec-card"><b>📜 弱掃與資安事件紀錄</b><br>`;
+        securityState.logs.slice(0, 5).forEach(log => {
+            html += `<div class="small">• ${escapeHtml(log)}</div>`;
+        });
+        html += `</div>`;
+    }
+
+    document.getElementById("securityPanel").innerHTML = html;
+}
+
+function addSecurityLog(msg){
+    securityState.logs.unshift(`[${formatTimeLabel()}] ${msg}`);
+    if(securityState.logs.length > 15){
+        securityState.logs.length = 15;
+    }
+}
+
+function runVulnScan(manual = false){
+    securityState.scanCount++;
+    securityState.lastScanAt = new Date().toISOString();
+
+    const existingCodes = new Set(securityState.vulns.map(v => v.code));
+    const candidates = VULN_CATALOG.filter(v => !existingCodes.has(v.code));
+
+    if(candidates.length > 0 && (manual || Math.random() < 0.65)){
+        const picked = candidates[Math.floor(Math.random() * candidates.length)];
+        securityState.vulns.push({
+            ...picked,
+            id: securityState.nextVulnId++
+        });
+        addSecurityLog(`弱掃發現新弱點 [${picked.code}] ${picked.title}`);
+        if(manual){
+            alert(`🔍 弱點掃描完成！發現 1 項新弱點：\n[${picked.code}] ${picked.title}`);
+        }
+    }else{
+        addSecurityLog("弱掃完成，未發現新增弱點。");
+        if(manual){
+            alert("🔍 弱點掃描完成！本次未發現新增弱點。");
+        }
+    }
+
+    fastRender();
+}
+
+function patchVuln(vulnId){
+    const idx = securityState.vulns.findIndex(v => v.id === vulnId);
+    if(idx === -1) return;
+
+    const target = securityState.vulns[idx];
+    const cost = toBigIntAmount(target.patchCost);
+    if(money < cost) return alert("資金不足，無法進行資安修補！");
+
+    money -= cost;
+    securityState.vulns.splice(idx, 1);
+    securityState.patchedTotal++;
+    if(securityState.patchedTotal % 2 === 0){
+        securityState.secLv++;
+    }
+
+    employees.forEach(e => { e.kp += 2; });
+    addSecurityLog(`已修補弱點 [${target.code}] ${target.title}，全體員工 KPI +2`);
+    fastRender();
+}
+
+function patchAllVulns(){
+    if(securityState.vulns.length === 0){
+        return alert("✅ 目前沒有需要修補的漏洞！");
+    }
+
+    let patched = 0;
+    while(securityState.vulns.length > 0){
+        const target = securityState.vulns[0];
+        const cost = toBigIntAmount(target.patchCost);
+        if(money < cost) break;
+
+        money -= cost;
+        securityState.vulns.shift();
+        securityState.patchedTotal++;
+        if(securityState.patchedTotal % 2 === 0){
+            securityState.secLv++;
+        }
+        patched++;
+    }
+
+    if(patched === 0){
+        return alert("資金不足以修補目前任何漏洞！");
+    }
+
+    employees.forEach(e => { e.kp += patched * 2; });
+    addSecurityLog(`一鍵修補完成，共修復 ${patched} 項漏洞！`);
+    fastRender();
+}
+
+function toggleAutoSoc(){
+    securityState.autoSoc = !securityState.autoSoc;
+    addSecurityLog(securityState.autoSoc ? "已開啟自動 SOC 24H 資安巡檢與自動防禦" : "已關閉自動 SOC 巡檢");
+    fastRender();
 }
 
 function recruitEmployee(){
@@ -555,14 +1078,21 @@ function aiAssignAll(){
     fastRender();
 }
 
-function applyTrainGain(e){
-    e.exp += 25;
-    e.kp += 5;
+function addExpToEmployee(e, expGain, kpGain = 0){
+    e.exp += expGain;
+    e.kp += kpGain;
+    let leveled = 0;
 
     while(e.exp >= 100){
         e.lv++;
         e.exp -= 100;
+        leveled++;
     }
+    return leveled;
+}
+
+function applyTrainGain(e){
+    addExpToEmployee(e, 25, 5);
 }
 
 function train(id){
@@ -580,6 +1110,32 @@ function trainAll(){
         applyTrainGain(e);
     }
 
+    fastRender();
+}
+
+function runSchoolEducationTick(){
+    const edu = industries["學校教育"];
+    if(!edu || edu.emp.length === 0){
+        lastEduSummary = "目前無員工在職";
+        return;
+    }
+
+    const staffGain = edu.emp.length * 15 + edu.lv * 8;
+    const allStaffGain = edu.emp.length * 8 + edu.lv * 4;
+    let levelUpCount = 0;
+
+    edu.emp.forEach(staff => {
+        const empObj = employees.find(x => x.id === staff.id);
+        if(empObj){
+            levelUpCount += addExpToEmployee(empObj, staffGain, 2);
+        }
+    });
+
+    employees.forEach(emp => {
+        levelUpCount += addExpToEmployee(emp, allStaffGain, 1);
+    });
+
+    lastEduSummary = `上次於 ${formatTimeLabel()} 培育 ${employees.length} 人${levelUpCount > 0 ? "（升等 " + levelUpCount + " 次）" : ""}`;
     fastRender();
 }
 
@@ -650,9 +1206,34 @@ setInterval(()=>{
     for(let k in industries){
         totalIncome += getIndustryIncome(industries[k]);
     }
-    money += totalIncome;
+    const score = BigInt(Math.max(50, getSecurityScore()));
+    money += (totalIncome * score) / 100n;
     fastRender();
 }, 500);
+
+// 學校教育自動培育計時器（每 5 秒一次）
+setInterval(()=>{
+    runSchoolEducationTick();
+}, 5000);
+
+// 定期弱掃與自動 SOC 巡檢（每 20 秒一次）
+setInterval(()=>{
+    if(!securityState) return;
+    if(securityState.autoSoc){
+        const target = securityState.vulns.find(v => v.severity !== "high");
+        if(target && money >= toBigIntAmount(target.patchCost)){
+            money -= toBigIntAmount(target.patchCost);
+            securityState.vulns = securityState.vulns.filter(v => v.id !== target.id);
+            securityState.patchedTotal++;
+            addSecurityLog(`自動SOC已攔截並修補 [${target.code}] ${target.title}`);
+        }else{
+            addSecurityLog("自動SOC巡檢正常，持續監控企業網路安全。");
+        }
+        fastRender();
+    }else if(securityState.vulns.length < 3 && Math.random() < 0.35){
+        runVulnScan(false);
+    }
+}, 20000);
 
 // 自動存檔（每 10 秒一次）
 setInterval(()=>{
