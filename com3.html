@@ -46,7 +46,7 @@ header{
 }
 .container{
     display:grid;
-    grid-template-columns:repeat(4, minmax(240px, 1fr));
+    grid-template-columns:repeat(3, minmax(260px, 1fr));
     gap:10px;
     padding:10px;
 }
@@ -74,13 +74,6 @@ h3{
     margin-bottom:8px;
     border-radius:12px;
 }
-.sec-card{
-    background:#eef6ff;
-    border:1px solid #90caf9;
-    padding:10px;
-    margin-bottom:8px;
-    border-radius:12px;
-}
 .card-line{
     margin-bottom:6px;
 }
@@ -101,20 +94,6 @@ button:hover{background:#f57c00;}
 }
 .batch-btn:hover{
     background:#e65100;
-}
-.sec-btn{
-    background:#1565c0;
-    font-weight:bold;
-}
-.sec-btn:hover{
-    background:#0d47a1;
-}
-.patch-btn{
-    background:#00838f;
-    font-weight:bold;
-}
-.patch-btn:hover{
-    background:#006064;
 }
 .save-btn{
     background:#2e7d32;
@@ -143,41 +122,10 @@ button:hover{background:#f57c00;}
     background:#ffe0b2;
     border-radius:12px;
 }
-.sec-toolbar{
-    margin-bottom:12px;
-    padding:10px;
-    background:#bbdefb;
-    border-radius:12px;
-}
 .small{font-size:12px;color:#555;}
 .money{color:#d84315;font-weight:bold;}
 .speed{color:#2e7d32;font-weight:bold;}
 .edu-tag{color:#1565c0;font-weight:bold;}
-.badge{
-    display:inline-block;
-    color:#fff;
-    padding:2px 7px;
-    border-radius:6px;
-    font-size:12px;
-    font-weight:bold;
-    margin-right:4px;
-}
-.badge-high{background:#d32f2f;}
-.badge-med{background:#f57c00;}
-.badge-low{background:#388e3c;}
-.score-bar{
-    width:100%;
-    height:10px;
-    background:#cfd8dc;
-    border-radius:6px;
-    overflow:hidden;
-    margin:6px 0;
-}
-.score-fill{
-    height:100%;
-    background:linear-gradient(90deg,#1976d2,#26a69a);
-    transition:width 0.3s ease;
-}
 .modal-backdrop{
     position:fixed;
     inset:0;
@@ -220,11 +168,7 @@ button:hover{background:#f57c00;}
     justify-content:flex-end;
     gap:8px;
 }
-@media (max-width: 1200px){
-    .container{grid-template-columns:repeat(2, minmax(260px, 1fr));}
-    .panel{height:65vh;}
-}
-@media (max-width: 680px){
+@media (max-width: 960px){
     .container{grid-template-columns:1fr;}
     .panel{height:auto;max-height:70vh;}
 }
@@ -238,8 +182,7 @@ button:hover{background:#f57c00;}
         🏢 公司經營遊戲｜
         💵 總資產：<span id="money"></span>｜
         👥 工作人員：<span id="empCount"></span>｜
-        🏆 公司Lv：<span id="companyLv"></span>｜
-        🛡️ 資安評分：<span id="secScoreHeader">100</span>分
+        🏆 公司Lv：<span id="companyLv"></span>
     </div>
     <div class="header-actions">
         <span class="save-status" id="saveStatus">💾 自動存檔已啟用</span>
@@ -287,24 +230,12 @@ button:hover{background:#f57c00;}
     <div id="projects"></div>
 </div>
 
-<div class="panel">
-    <h3>🛡️ 弱掃資安中心</h3>
-    <div class="sec-toolbar">
-        <b>🔍 企業弱點掃描（Vulnerability Scan）</b><br>
-        <span class="small">定期檢測網頁安全、產業系統權限與存檔完整性，避免駭客攻擊造成資產損失。</span><br>
-        <button class="sec-btn" id="scanNowBtn" type="button">立即弱點掃描</button>
-        <button class="patch-btn" id="patchAllBtn" type="button">一鍵修補全部漏洞</button>
-        <button class="sec-btn" id="socToggleBtn" type="button">開啟自動SOC巡檢</button>
-    </div>
-    <div id="securityPanel"></div>
-</div>
-
 </div>
 
 <script>
 "use strict";
 
-const SAVE_KEY = "company_game_school_sec_v5";
+const SAVE_KEY = "company_game_three_cols_v1";
 const DEFAULT_EMP_COUNT = 40;
 const RECRUIT_COST = 10000000n;
 const BASE_UPGRADE_COST = 20000000000000000n;
@@ -330,64 +261,12 @@ const INDUSTRY_ICONS = {
     "科技園區":     "🌆"
 };
 
-const VULN_CATALOG = [
-    {
-        code: "CVE-WEB-001",
-        title: "DOM XSS 輸出跳脫檢核缺失",
-        severity: "high",
-        penalty: 18,
-        patchCost: 5e15,
-        desc: "未過濾動態渲染字串可能導致跨站腳本注入風險。"
-    },
-    {
-        code: "CVE-WEB-002",
-        title: "Content-Security-Policy (CSP) 標頭未強化",
-        severity: "med",
-        penalty: 12,
-        patchCost: 3e15,
-        desc: "建議限制內聯腳本與外部資源來源以降低注入面。"
-    },
-    {
-        code: "CVE-AUTH-003",
-        title: "產業金流 API 速率限制過寬",
-        severity: "high",
-        penalty: 16,
-        patchCost: 8e15,
-        desc: "高頻交易接口缺乏節流機制，易遭自動化撞庫或重放。"
-    },
-    {
-        code: "CVE-DATA-004",
-        title: "localStorage 存檔雜湊校驗弱化",
-        severity: "med",
-        penalty: 10,
-        patchCost: 2e15,
-        desc: "本地儲存資料缺少完整性簽章，可能遭異常竄改。"
-    },
-    {
-        code: "CVE-SYS-005",
-        title: "過時第三方套件相依風險",
-        severity: "low",
-        penalty: 6,
-        patchCost: 1e15,
-        desc: "偵測到舊版前端模組存在已知低風險資訊揭露。"
-    },
-    {
-        code: "CVE-NET-006",
-        title: "HTTPS / HSTS 傳輸層安全降級風險",
-        severity: "med",
-        penalty: 11,
-        patchCost: 4e15,
-        desc: "未強制啟用嚴格傳輸安全策略，存在中間人竊聽風險。"
-    }
-];
-
 let money = 0n;
 let nextEmpId = 0;
 let renderLock = false;
 let employees = [];
 let industries = {};
 let projects = [];
-let securityState = null;
 let lastEduSummary = "尚未派駐員工至學校教育";
 const usedNames = new Set();
 
@@ -425,24 +304,6 @@ function createInitialProjects(){
         {name:"🏠房地產AI", cost:5e17, prog:0, unlock:"建設公司"},
         {name:"🚗無人車AI", cost:2e18, prog:0, unlock:"科技園區"}
     ];
-}
-
-function createInitialSecurity(){
-    return {
-        secLv: 1,
-        scanCount: 1,
-        patchedTotal: 0,
-        lastScanAt: new Date().toISOString(),
-        autoSoc: false,
-        vulns: [
-            {...VULN_CATALOG[0], id: 1},
-            {...VULN_CATALOG[3], id: 2}
-        ],
-        nextVulnId: 3,
-        logs: [
-            "系統初始化完成，已通過靜態安全規範檢核。"
-        ]
-    };
 }
 
 function makeName(){
@@ -488,7 +349,6 @@ function initNewGameState(){
     industries = createInitialIndustries();
     projects = createInitialProjects();
     employees = Array.from({length: DEFAULT_EMP_COUNT}, () => createEmployeeObj());
-    securityState = createInitialSecurity();
     lastEduSummary = "尚未派駐員工至學校教育";
 }
 
@@ -542,12 +402,6 @@ function companyLv(){
     return Math.max(1, Math.floor(money.toString().length / 2));
 }
 
-function getSecurityScore(){
-    if(!securityState || !Array.isArray(securityState.vulns)) return 100;
-    const totalPenalty = securityState.vulns.reduce((sum, v) => sum + (Number(v.penalty) || 0), 0);
-    return Math.max(0, Math.min(100, 100 - totalPenalty));
-}
-
 function getIndustryIncome(ind){
     return toBigIntAmount(ind.emp.length) * toBigIntAmount(ind.lv) * toBigIntAmount(ind.base);
 }
@@ -569,7 +423,7 @@ function buildSavePayload(){
     }
 
     return {
-        version: 5,
+        version: 1,
         savedAt: new Date().toISOString(),
         money: money.toString(),
         nextEmpId,
@@ -577,7 +431,6 @@ function buildSavePayload(){
         employees,
         industries: serializedIndustries,
         projects,
-        securityState,
         lastEduSummary
     };
 }
@@ -590,11 +443,9 @@ function applySaveData(data){
 
     const rawMoney = String(data.money ?? ("9".repeat(120))).trim();
     if(!/^-?\d+$/.test(rawMoney)) return false;
-    const parsedMoney = BigInt(rawMoney);
+    money = BigInt(rawMoney);
 
-    money = parsedMoney;
     usedNames.clear();
-
     employees = data.employees.map((e, idx) => {
         const empName = typeof e.name === "string" && e.name.trim() ? e.name.trim() : `員工_${idx + 1}`;
         usedNames.add(empName);
@@ -664,31 +515,6 @@ function applySaveData(data){
             unlock: typeof p.unlock === "string" ? p.unlock : ""
         }))
         : createInitialProjects();
-
-    securityState = data.securityState && Array.isArray(data.securityState.vulns)
-        ? {
-            secLv: Math.max(1, Number(data.securityState.secLv) || 1),
-            scanCount: Math.max(0, Number(data.securityState.scanCount) || 0),
-            patchedTotal: Math.max(0, Number(data.securityState.patchedTotal) || 0),
-            lastScanAt: typeof data.securityState.lastScanAt === "string"
-                ? data.securityState.lastScanAt
-                : new Date().toISOString(),
-            autoSoc: Boolean(data.securityState.autoSoc),
-            vulns: data.securityState.vulns.slice(0, 20).map((v, i) => ({
-                id: typeof v.id === "number" ? v.id : i + 1,
-                code: String(v.code || "CVE-SEC"),
-                title: String(v.title || "安全弱點"),
-                severity: ["high", "med", "low"].includes(v.severity) ? v.severity : "med",
-                penalty: Math.max(1, Math.min(50, Number(v.penalty) || 10)),
-                patchCost: Number(v.patchCost) > 0 ? Number(v.patchCost) : 2e15,
-                desc: String(v.desc || "系統安全檢測項目。")
-            })),
-            nextVulnId: Math.max(1, Number(data.securityState.nextVulnId) || 10),
-            logs: Array.isArray(data.securityState.logs)
-                ? data.securityState.logs.slice(0, 15).map((x) => String(x))
-                : []
-        }
-        : createInitialSecurity();
 
     if(typeof data.lastEduSummary === "string"){
         lastEduSummary = data.lastEduSummary;
@@ -939,172 +765,13 @@ function renderProject(){
     });
 }
 
-function renderSecurity(){
-    const container = document.getElementById("securityPanel");
-    container.replaceChildren();
-
-    const score = getSecurityScore();
-    const socBtn = document.getElementById("socToggleBtn");
-    if(socBtn){
-        socBtn.textContent = securityState.autoSoc ? "🟢 自動SOC巡檢：開啟中" : "開啟自動SOC巡檢";
-    }
-
-    const statusText = score >= 90 ? "🟢 安全優良" : (score >= 70 ? "🟡 尚可（建議修補）" : "🔴 高危警戒");
-    const lastTime = securityState.lastScanAt ? formatTimeLabel(new Date(securityState.lastScanAt)) : "--:--:--";
-
-    const overview = createEl("div", "sec-card");
-    appendLine(overview, `📊 資安健康總覽：${statusText}`).style.fontWeight = "bold";
-
-    const bar = createEl("div", "score-bar");
-    const fill = createEl("div", "score-fill");
-    fill.style.width = `${score}%`;
-    bar.appendChild(fill);
-    overview.appendChild(bar);
-
-    appendLine(overview, `🛡️ 防護評分：${score} / 100｜資安等級：Lv.${securityState.secLv}`);
-    appendLine(overview, `🔎 累計弱掃次數：${securityState.scanCount} 次｜已修補漏洞：${securityState.patchedTotal} 個`);
-    appendLine(overview, `🕒 最近弱掃時間：${lastTime}`);
-    container.appendChild(overview);
-
-    if(securityState.vulns.length === 0){
-        const cleanCard = createEl("div", "sec-card");
-        appendLine(cleanCard, "✅ 目前未偵測到已知弱點！").style.fontWeight = "bold";
-        appendLine(cleanCard, "所有網頁與產業介面皆通過最新弱掃檢核。", "small");
-        container.appendChild(cleanCard);
-    }else{
-        securityState.vulns.forEach((v) => {
-            const vCard = createEl("div", "sec-card");
-            const titleLine = createEl("div", "card-line");
-            const badgeClass = v.severity === "high"
-                ? "badge badge-high"
-                : (v.severity === "med" ? "badge badge-med" : "badge badge-low");
-            const badgeText = v.severity === "high" ? "高風險" : (v.severity === "med" ? "中風險" : "低風險");
-            titleLine.appendChild(createEl("span", badgeClass, badgeText));
-            const titleSpan = createEl("b", "", `[${v.code}] ${v.title}`);
-            titleLine.appendChild(titleSpan);
-            vCard.appendChild(titleLine);
-
-            appendLine(vCard, v.desc, "card-line small");
-            const costLine = appendLine(vCard, `📉 評分影響：-${v.penalty} 分｜🔧 修補成本：${formatMoney(toBigIntAmount(v.patchCost))}`);
-            costLine.className = "card-line money";
-
-            const patchBtn = createEl("button", "patch-btn", "立即修補漏洞");
-            patchBtn.type = "button";
-            patchBtn.addEventListener("click", () => patchVuln(v.id));
-            vCard.appendChild(patchBtn);
-
-            container.appendChild(vCard);
-        });
-    }
-
-    if(Array.isArray(securityState.logs) && securityState.logs.length > 0){
-        const logCard = createEl("div", "sec-card");
-        appendLine(logCard, "📜 弱掃與資安事件紀錄").style.fontWeight = "bold";
-        securityState.logs.slice(0, 5).forEach((log) => {
-            appendLine(logCard, `• ${log}`, "small");
-        });
-        container.appendChild(logCard);
-    }
-}
-
 function renderAll(){
     document.getElementById("money").textContent = formatMoney(money);
     document.getElementById("empCount").textContent = String(employees.length);
     document.getElementById("companyLv").textContent = String(companyLv());
-    document.getElementById("secScoreHeader").textContent = String(getSecurityScore());
     renderIndustry();
     renderEmployee();
     renderProject();
-    renderSecurity();
-}
-
-function addSecurityLog(msg){
-    securityState.logs.unshift(`[${formatTimeLabel()}] ${msg}`);
-    if(securityState.logs.length > 15){
-        securityState.logs.length = 15;
-    }
-}
-
-function runVulnScan(manual = false){
-    securityState.scanCount++;
-    securityState.lastScanAt = new Date().toISOString();
-
-    const existingCodes = new Set(securityState.vulns.map((v) => v.code));
-    const candidates = VULN_CATALOG.filter((v) => !existingCodes.has(v.code));
-
-    if(candidates.length > 0 && (manual || Math.random() < 0.65)){
-        const picked = candidates[Math.floor(Math.random() * candidates.length)];
-        securityState.vulns.push({
-            ...picked,
-            id: securityState.nextVulnId++
-        });
-        addSecurityLog(`弱掃發現新弱點 [${picked.code}] ${picked.title}`);
-        if(manual){
-            alert(`🔍 弱點掃描完成！發現 1 項新弱點：\n[${picked.code}] ${picked.title}`);
-        }
-    }else{
-        addSecurityLog("弱掃完成，未發現新增弱點。");
-        if(manual){
-            alert("🔍 弱點掃描完成！本次未發現新增弱點。");
-        }
-    }
-
-    fastRender();
-}
-
-function patchVuln(vulnId){
-    const idx = securityState.vulns.findIndex((v) => v.id === vulnId);
-    if(idx === -1) return;
-
-    const target = securityState.vulns[idx];
-    const cost = toBigIntAmount(target.patchCost);
-    if(money < cost) return alert("資金不足，無法進行資安修補！");
-
-    money -= cost;
-    securityState.vulns.splice(idx, 1);
-    securityState.patchedTotal++;
-    if(securityState.patchedTotal % 2 === 0){
-        securityState.secLv++;
-    }
-
-    employees.forEach((e) => { e.kp += 2; });
-    addSecurityLog(`已修補弱點 [${target.code}] ${target.title}，全體員工 KPI +2`);
-    fastRender();
-}
-
-function patchAllVulns(){
-    if(securityState.vulns.length === 0){
-        return alert("✅ 目前沒有需要修補的漏洞！");
-    }
-
-    let patched = 0;
-    while(securityState.vulns.length > 0){
-        const target = securityState.vulns[0];
-        const cost = toBigIntAmount(target.patchCost);
-        if(money < cost) break;
-
-        money -= cost;
-        securityState.vulns.shift();
-        securityState.patchedTotal++;
-        if(securityState.patchedTotal % 2 === 0){
-            securityState.secLv++;
-        }
-        patched++;
-    }
-
-    if(patched === 0){
-        return alert("資金不足以修補目前任何漏洞！");
-    }
-
-    employees.forEach((e) => { e.kp += patched * 2; });
-    addSecurityLog(`一鍵修補完成，共修復 ${patched} 項漏洞！`);
-    fastRender();
-}
-
-function toggleAutoSoc(){
-    securityState.autoSoc = !securityState.autoSoc;
-    addSecurityLog(securityState.autoSoc ? "已開啟自動 SOC 24H 資安巡檢與自動防禦" : "已關閉自動 SOC 巡檢");
-    fastRender();
 }
 
 function recruitEmployee(){
@@ -1294,9 +961,6 @@ function bindStaticEvents(){
     document.getElementById("recruitBtn").addEventListener("click", recruitEmployee);
     document.getElementById("aiAssignAllBtn").addEventListener("click", aiAssignAll);
     document.getElementById("trainAllBtn").addEventListener("click", trainAll);
-    document.getElementById("scanNowBtn").addEventListener("click", () => runVulnScan(true));
-    document.getElementById("patchAllBtn").addEventListener("click", patchAllVulns);
-    document.getElementById("socToggleBtn").addEventListener("click", toggleAutoSoc);
 }
 
 setInterval(() => {
@@ -1304,32 +968,13 @@ setInterval(() => {
     for(const k of Object.keys(industries)){
         totalIncome += getIndustryIncome(industries[k]);
     }
-    const score = BigInt(Math.max(50, getSecurityScore()));
-    money += (totalIncome * score) / 100n;
+    money += totalIncome;
     fastRender();
 }, 500);
 
 setInterval(() => {
     runSchoolEducationTick();
 }, 5000);
-
-setInterval(() => {
-    if(!securityState) return;
-    if(securityState.autoSoc){
-        const target = securityState.vulns.find((v) => v.severity !== "high");
-        if(target && money >= toBigIntAmount(target.patchCost)){
-            money -= toBigIntAmount(target.patchCost);
-            securityState.vulns = securityState.vulns.filter((v) => v.id !== target.id);
-            securityState.patchedTotal++;
-            addSecurityLog(`自動SOC已攔截並修補 [${target.code}] ${target.title}`);
-        }else{
-            addSecurityLog("自動SOC巡檢正常，持續監控企業網路安全。");
-        }
-        fastRender();
-    }else if(securityState.vulns.length < 3 && Math.random() < 0.35){
-        runVulnScan(false);
-    }
-}, 20000);
 
 setInterval(() => {
     saveGame(false);
