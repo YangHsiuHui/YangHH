@@ -131,7 +131,7 @@
   </style>
 </head>
 <body>
-  <div class="card" role="application" aria-label="皇上批奏摺遊戲">
+  <div class="card" role="application" aria-label="皇上批奏摺">
     <header>
       <!--  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Emperor%27s_crown.svg" alt="" width="44" height="44"> -->
       <div>
@@ -183,7 +183,7 @@
       </div>
     </div>
 
-    <div class="footer">小遊戲示範版 — 想要更多奏摺、事件或中文古文風味我可以再加。按下按鈕就會顯示決策結果喔～</div>
+    
   </div>
 
   <div class="big-toast" id="toast"></div>
@@ -452,7 +452,7 @@
 
     ];
 
-    // 遊戲狀態
+    // 狀態
     let state = {
       stability: 60,
       people: 60,
@@ -555,7 +555,7 @@
         message = `唉唷皇上，局勢危險——任期結束。民心 ${state.people}、安定 ${state.stability}、國庫 ${state.treasury}`;
       }
       showToast(message, 6000);
-      appendLog('遊戲結束。' + message);
+      appendLog('結束。' + message);
       // 禁用按鈕
       document.getElementById('btnAllow').disabled = true;
       document.getElementById('btnReject').disabled = true;
