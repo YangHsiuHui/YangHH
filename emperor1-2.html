@@ -190,7 +190,7 @@
   </style>
 </head>
 <body>
-  <div class="card" role="application" aria-label="皇上批奏摺遊戲">
+  <div class="card" role="application" aria-label="皇上批奏摺">
     <header>
       <div>
         <h1>皇帝批摺<span class="yahoo">萬歲!</span></h1>
@@ -239,7 +239,7 @@
       </div>
     </div>
 
-    <div class="footer">小遊戲示範版 — 結合最新時事食安油與AI資安，國庫實時動態波動與防禦規格。</div>
+    
   </div>
 
   <div class="big-toast" id="toast"></div>
@@ -616,7 +616,7 @@
       }
     ];
 
-    // 遊戲狀態
+    // 狀態
     let state = {
       stability: 60,
       people: 60,
@@ -742,7 +742,7 @@
         message = `局勢危急 — 任期結束。民心 ${state.people}、安定 ${state.stability}`;
       }
       showToast(message, 6000);
-      appendLog('遊戲結束。' + message);
+      appendLog('結束。' + message);
       
       document.getElementById('btnAllow').disabled = true;
       document.getElementById('btnReject').disabled = true;
